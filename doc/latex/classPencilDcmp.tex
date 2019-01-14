@@ -1,0 +1,792 @@
+\hypertarget{classPencilDcmp}{}\section{Pencil\+Dcmp Class Reference}
+\label{classPencilDcmp}\index{Pencil\+Dcmp@{Pencil\+Dcmp}}
+
+
+This Class performs pencil decomposition and encapsulates all the necessary communications required for F\+FT transformation.  
+
+
+
+
+{\ttfamily \#include $<$pencil\+Dcmp.\+h$>$}
+
+Inheritance diagram for Pencil\+Dcmp\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classPencilDcmp}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classPencilDcmp_a0252169fc4c2d578ae7b5368e247d557}{Pencil\+Dcmp}} (int nx, int ny, int \mbox{\hyperlink{classPencilDcmp_aedb528abdba6fa4a541af83f851e11c8}{nz}}, int p0, int p1)
+\item 
+\mbox{\hyperlink{classPencilDcmp_aba2e52de6d05da361e99dfa078ea76ca}{Pencil\+Dcmp}} (int argcs, char $\ast$p\+Args\mbox{[}$\,$\mbox{]}, int nx, int ny, int \mbox{\hyperlink{classPencilDcmp_aedb528abdba6fa4a541af83f851e11c8}{nz}})
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a8307c0e36c4489e86638d08f20a3ba50}\label{classPencilDcmp_a8307c0e36c4489e86638d08f20a3ba50}} 
+void {\bfseries get\+Chunk\+Size} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_ade8a6cbeeb92600a30403e74377689c6}{allocate\+Chunks}} ()
+\item 
+\mbox{\Hypertarget{classPencilDcmp_ac34b588ab1ea599b003b406e0f7047ac}\label{classPencilDcmp_ac34b588ab1ea599b003b406e0f7047ac}} 
+void {\bfseries get\+No\+Of\+Chunk} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a885fa996b7c6a9a0b63e046937da5bcb}{set\+Coords}} (int dir)
+\item 
+Pitt\+Pack\+Result \mbox{\hyperlink{classPencilDcmp_aa0dfe19263f66b6c4c9bf73705d62b15}{construct\+Connectivity}} ()
+\item 
+\mbox{\Hypertarget{classPencilDcmp_ad23927d66de2ce94617a0883eaeef222}\label{classPencilDcmp_ad23927d66de2ce94617a0883eaeef222}} 
+void {\bfseries M\+P\+I\+Start\+Up} ()
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a799167827f38d46f881215fad605ee97}\label{classPencilDcmp_a799167827f38d46f881215fad605ee97}} 
+void {\bfseries run\+Info} ()
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a326de10cf2e330a4360b9b70f41d1bad}\label{classPencilDcmp_a326de10cf2e330a4360b9b70f41d1bad}} 
+int {\bfseries get\+Periodic\+Rank} (int rank)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_abb7f48287933606d2f936768543cc5d3}\label{classPencilDcmp_abb7f48287933606d2f936768543cc5d3}} 
+int {\bfseries get\+Periodic\+Index} (int rank)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a2f2e64944e0f8587c7a6f02532b11fc5}{change\+Ownership\+Pairwise\+Exchange\+ZX}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a9a135d2665f56ef206861d5b7e0f84be}{change\+Ownership\+Pairwise\+Exchange\+XY}} ()
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a4811e6de65dea576803696f6c4e7f068}\label{classPencilDcmp_a4811e6de65dea576803696f6c4e7f068}} 
+void {\bfseries modify\+Rhs\+Dirichlet} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a6ba4438fd05274b40dd2e56aeba339e1}{graph\+Create}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a06651ef577567ce90c4f7ad4d8fadf58}{nbr\+All\+To\+All\+ZX}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a5a6415c2ca9d9bf54009ccfd252a76e5}{nbr\+All\+To\+All\+XY}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_acbb1930609563f24d408fb2a5766400b}{check\+Graph}} (int index)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a2d6bd36234f5f8fd585461eefc2e2a48}\label{classPencilDcmp_a2d6bd36234f5f8fd585461eefc2e2a48}} 
+void {\bfseries set\+Dxyz} (double $\ast$X)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a52e42ff66fb2ba16fdd776d91891d455}\label{classPencilDcmp_a52e42ff66fb2ba16fdd776d91891d455}} 
+int {\bfseries get\+Index} (int rank)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_aed55d37658908708a60d94b4cb4bdb7f}\label{classPencilDcmp_aed55d37658908708a60d94b4cb4bdb7f}} 
+int {\bfseries get\+Periodic\+Index\+Stride} (int index)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a4b9993d599a4136137bd8d6f68180b87}\label{classPencilDcmp_a4b9993d599a4136137bd8d6f68180b87}} 
+int {\bfseries get\+Periodic\+Rank\+Stride} (int index)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a653d1f3fec551d03a03ba9fdaf88ff96}{adjust\+Index}} (int \&index)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_ad7147b6c56b50aa50d09d8161000ba5f}\label{classPencilDcmp_ad7147b6c56b50aa50d09d8161000ba5f}} 
+int {\bfseries get\+Transpose\+Rank} ()
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a82c24d74335e0f680b27de82cbb4e081}\label{classPencilDcmp_a82c24d74335e0f680b27de82cbb4e081}} 
+void {\bfseries reshape} ()
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a68a2dcf09578241f71f845522d4c77a2}\label{classPencilDcmp_a68a2dcf09578241f71f845522d4c77a2}} 
+sint {\bfseries old\+IndexX} (const sint chunk\+Id, const sint j, const sint k)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_acb2bb843a6d1f5ae6d9ef2caef199565}\label{classPencilDcmp_acb2bb843a6d1f5ae6d9ef2caef199565}} 
+sint {\bfseries old\+IndexY} (const sint chunk\+Id, const sint i, const sint k)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_ab70b1280876b069d3821a660d03b70f3}\label{classPencilDcmp_ab70b1280876b069d3821a660d03b70f3}} 
+void {\bfseries decompose\+Old\+IndexX} (const sint id, sint \&chunk\+Id, sint \&j, sint \&k)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a75078d6a97a8dec9345cca6f88602b3b}\label{classPencilDcmp_a75078d6a97a8dec9345cca6f88602b3b}} 
+void {\bfseries decompose\+Old\+IndexY} (const sint id, sint \&chunk\+Id, sint \&i, sint \&k)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a9469d4a1462fd2ee0e490dd31c2694a3}\label{classPencilDcmp_a9469d4a1462fd2ee0e490dd31c2694a3}} 
+sint {\bfseries get\+Destination\+LocX} (const sint id)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_ae115f372f1da771deba940df5b650e17}\label{classPencilDcmp_ae115f372f1da771deba940df5b650e17}} 
+sint {\bfseries get\+Destination\+LocY} (const sint id)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a2076e314ec80c355137c743450c31d0b}{construct\+Shuffle\+VectorX}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a41667d2540bb3f3435acd5f5af7db2e4}{construct\+Shuffle\+VectorY}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a8ea122a3a5c4f6481fce20d8ac8e87f6}{set\+Up\+Shuffle\+ArraysX}} (vector$<$ \mbox{\hyperlink{structshuffle}{shuffle0}} $>$ \&a)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a30bae43ce292f1ddb54e16c3b0f6bbfd}{set\+Up\+Shuffle\+ArraysY}} (vector$<$ \mbox{\hyperlink{structshuffle}{shuffle0}} $>$ \&a)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_af3f6394865e0b11848459191ad108acd}\label{classPencilDcmp_af3f6394865e0b11848459191ad108acd}} 
+void {\bfseries change\+Location} ()
+\item 
+\mbox{\Hypertarget{classPencilDcmp_ab9f56baf0c40ff4b14600ced7c0aed28}\label{classPencilDcmp_ab9f56baf0c40ff4b14600ced7c0aed28}} 
+void {\bfseries save\+To\+Dest} (const sint source, const sint dest, sint dir)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_aaeccaa40492d3fc5ae44cb1b003a395c}\label{classPencilDcmp_aaeccaa40492d3fc5ae44cb1b003a395c}} 
+void {\bfseries save\+Tmp\+To\+Dest} (const double $\ast$tmp, const sint dest, sint dir)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a559e7d0018fe962d6a73e2f70f831de0}{restore\+LocationX}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a30c55e0b0ae5ecbe1eeb005190c89e21}{restore\+LocationY}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a09f2e5cdf07d70efde9d42c455b61295}{change\+LocationX}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a47f04f2af8e4fbcc7544d04adf7978d5}{change\+LocationY}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a58ebcd5b4bf661379cfc89df94f1d1eb}{initialize\+Trigonometric}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a59feaa65591c690a68a52fe98ad9da8b}{save\+To\+Tmp}} (const sint id, double $\ast$tmp, sint dir)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_ae46aa4d19c1c33f1c6ba9f0ae8d53247}{restore\+Tmp}} (const sint id, double $\ast$tmp, sint dir)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_acf7d6672a7fdc141bfba205b27fb9d84}{printX}} (ofstream \&myfile)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_af19e8faec61ef717c742af90faa2c40c}{printY}} (ofstream \&myfile)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_ada428705a35ecbbb9b86db93f21125fd}\label{classPencilDcmp_ada428705a35ecbbb9b86db93f21125fd}} 
+void {\bfseries assign\+Temp\+X2Y} (const int chunk\+Id, const int k, double $\ast$tmp)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a82bf7135b75d4a0fe7a7e011af56834c}\label{classPencilDcmp_a82bf7135b75d4a0fe7a7e011af56834c}} 
+void {\bfseries assign\+Temp\+Y2X} (const int chunk\+Id)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_adad784ec680eea4d05425365fd311d2e}\label{classPencilDcmp_adad784ec680eea4d05425365fd311d2e}} 
+void {\bfseries assign\+Temp\+Y2Z} (const int chunk\+Id)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a05daf8d8db828b6591390c4ac235bd12}\label{classPencilDcmp_a05daf8d8db828b6591390c4ac235bd12}} 
+void {\bfseries assign\+Back\+Temp\+Z2Y} (const int chunk\+Id)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_aae31df14224073d20f48a7cd4259b079}\label{classPencilDcmp_aae31df14224073d20f48a7cd4259b079}} 
+void {\bfseries assign\+Temp\+Z2Y} (const int chunk\+Id)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_ae3d801255b0af3835331825e42043a98}{rearrange\+X2Y}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_adf77ae1fe6ac288f290e7b588b5a235e}{rearrange\+X2\+Y\+Inverse}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a33abfd41b7ea649af6c86f5611aeed79}{rescale}} ()
+\item 
+int \mbox{\hyperlink{classPencilDcmp_a536eab196adc27ccc36fa51dccf5606f}{thomas}} (int i, int j, int dir, int index)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_aac2a7354c9e629510b8de6f96921788b}{set\+Eigen\+Val}} ()
+\item 
+int \mbox{\hyperlink{classPencilDcmp_a5eaf7b3581e2cbe3ee3595cd44154a73}{solve\+Thm}} (const int index)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a9a27e4f6c9f2b567009759c0c03506c1}{solve\+MG}} (const int index)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_ac4b1060595d90c99e2b81cc0c4622f60}{eigen\+Val}} (ofstream \&myfile)
+\item 
+real \mbox{\hyperlink{classPencilDcmp_afa0acfd2badba2e06d1800f67fce3dba}{get\+Eigen\+Val}} (int i, int j)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a7afb77ba481af376247adf69b93d318c}{thomas\+Periodic}} (int i, int j, int dir, int index)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a2146f493283ffa68e46648205c9b6ab2}{thomas\+Single\+Block}} (int i, int j, int dir, int index)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_abad58d40d070a52c2b2a8e7f90523ec4}{assign\+Boundary}} (char $\ast$boundary)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a68f53a914a7dca2ddc7078468fb8e0f5}{extract\+Tag}} ()
+\item 
+void \mbox{\hyperlink{classPencilDcmp_a6cdc6f82cdbf5ee0ee8e1da2810ed5b3}{detect\+Transforms}} ()
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a9d0f7acc7d71ffc350573ab2789f374e}\label{classPencilDcmp_a9d0f7acc7d71ffc350573ab2789f374e}} 
+double {\bfseries get\+Error} ()
+\item 
+\mbox{\Hypertarget{classPencilDcmp_ac0d8fbd9e8e021b3670e0557b131ca45}\label{classPencilDcmp_ac0d8fbd9e8e021b3670e0557b131ca45}} 
+void {\bfseries set\+Box} (double $\ast$X)
+\item 
+void \mbox{\hyperlink{classPencilDcmp_aad302367ed6433ac0fab84c540b9ca49}{IO}} (int app, int dir, int aligndir)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a022c8097572fb9ac205c2503e10edc31}\label{classPencilDcmp_a022c8097572fb9ac205c2503e10edc31}} 
+void {\bfseries assign\+Temp\+X2\+Yv1} (const int chunk\+Id)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a7209e2cd68081b85de067e6d9a614d44}\label{classPencilDcmp_a7209e2cd68081b85de067e6d9a614d44}} 
+void {\bfseries debug} ()
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a8b8f97d40f902f13234c635a6bba8bf8}\label{classPencilDcmp_a8b8f97d40f902f13234c635a6bba8bf8}} 
+void {\bfseries assign\+Back\+Temp\+X2Y} (const int chunk\+Id)
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a2588c69ca3df97fb00c40bbd43e707b0}\label{classPencilDcmp_a2588c69ca3df97fb00c40bbd43e707b0}} 
+void {\bfseries assign\+Back\+Temp\+Y2X} (const int chunk\+Id)
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_afd40fa5e7cc43c9d3d4290279b5ed245}\label{classPencilDcmp_afd40fa5e7cc43c9d3d4290279b5ed245}} 
+static int {\bfseries get\+Periodic\+Rank\+YZ} (int rank)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_af27d1d1ecb8ca3f1ba1f5358a151bfa8}\label{classPencilDcmp_af27d1d1ecb8ca3f1ba1f5358a151bfa8}} 
+\mbox{\hyperlink{classSignalProc}{Signal\+Proc}} {\bfseries Sig}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a09f052dc6ca5fa44b9903decdbd94643}\label{classPencilDcmp_a09f052dc6ca5fa44b9903decdbd94643}} 
+\mbox{\hyperlink{classTriDiag}{Tri\+Diag}} {\bfseries T}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a2af367390792d724bb236c221dfca09b}\label{classPencilDcmp_a2af367390792d724bb236c221dfca09b}} 
+\mbox{\hyperlink{classMultiGrid}{Multi\+Grid}} {\bfseries MG}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a704f4833c6924ad793571b49368d324d}\label{classPencilDcmp_a704f4833c6924ad793571b49368d324d}} 
+int {\bfseries nx}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a0127b72085e393b9cb7ce93e0bd305aa}\label{classPencilDcmp_a0127b72085e393b9cb7ce93e0bd305aa}} 
+int {\bfseries ny}
+\item 
+int \mbox{\hyperlink{classPencilDcmp_aedb528abdba6fa4a541af83f851e11c8}{nz}}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_af9832befb38f93a3362fded8d2bed49f}\label{classPencilDcmp_af9832befb38f93a3362fded8d2bed49f}} 
+int {\bfseries nx\+Chunk}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a972ecab11f0e9e690397bf146ff3f541}\label{classPencilDcmp_a972ecab11f0e9e690397bf146ff3f541}} 
+int {\bfseries ny\+Chunk}
+\item 
+int \mbox{\hyperlink{classPencilDcmp_af606d599e42ca97ed639e4b4a633e691}{nz\+Chunk}}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a07f216cb52f0e1d6abda590a891d8790}\label{classPencilDcmp_a07f216cb52f0e1d6abda590a891d8790}} 
+int {\bfseries p0}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a6d30295337c553ee27f8b31ef412d881}\label{classPencilDcmp_a6d30295337c553ee27f8b31ef412d881}} 
+int {\bfseries p1}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a93f5d6c46148396e24879b9faae8c257}\label{classPencilDcmp_a93f5d6c46148396e24879b9faae8c257}} 
+int {\bfseries my\+Rank}
+\item 
+int \mbox{\hyperlink{classPencilDcmp_aadefb86246eafd53011fe4d369922ab6}{com\+Size}}
+\item 
+int \mbox{\hyperlink{classPencilDcmp_a44102096e8239b752fe1d39f3d8fd203}{chunk\+Size}}
+\item 
+int \mbox{\hyperlink{classPencilDcmp_a1f7f54dbd7adbfd03d171c72cbae865e}{n\+Chunk}}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a29aa6ccd98a43fea50a375d60aa1e8c6}\label{classPencilDcmp_a29aa6ccd98a43fea50a375d60aa1e8c6}} 
+int {\bfseries full\+Size}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_ac487332ebd9a1ac370acea04d10dae6b}\label{classPencilDcmp_ac487332ebd9a1ac370acea04d10dae6b}} 
+int {\bfseries return\+Val}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a06280573341b5fa1031b504d4ea79a3c}\label{classPencilDcmp_a06280573341b5fa1031b504d4ea79a3c}} 
+M\+P\+I\+\_\+\+Comm {\bfseries Comm}
+\item 
+M\+P\+I\+\_\+\+Comm \mbox{\hyperlink{classPencilDcmp_a04ce960d67858cb869c100789e72be95}{nbr\+Comm}} \mbox{[}2\mbox{]}
+\item 
+M\+P\+I\+\_\+\+Comm \mbox{\hyperlink{classPencilDcmp_a96b154d85babab87ec4373273ad9a4a1}{nbr\+Comm0}}
+\item 
+M\+P\+I\+\_\+\+Comm \mbox{\hyperlink{classPencilDcmp_a708235c4b590cb76e8b88b5073828f25}{nbr\+Comm1}}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a7ae002bef32961c44115d65683f87ff8}\label{classPencilDcmp_a7ae002bef32961c44115d65683f87ff8}} 
+double $\ast$restrict {\bfseries Xbox} = N\+U\+LL
+\item 
+\mbox{\Hypertarget{classPencilDcmp_aaf91706afcda17921e1735f1bf1e5d95}\label{classPencilDcmp_aaf91706afcda17921e1735f1bf1e5d95}} 
+double $\ast$restrict {\bfseries coords} = N\+U\+LL
+\item 
+\mbox{\Hypertarget{classPencilDcmp_ad942c591e34364464f4d9cce19b3dc21}\label{classPencilDcmp_ad942c591e34364464f4d9cce19b3dc21}} 
+double $\ast$ {\bfseries tmp} = N\+U\+LL
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a2bbbc886f9e41d36c96482de3fe23d5e}\label{classPencilDcmp_a2bbbc886f9e41d36c96482de3fe23d5e}} 
+double $\ast$ {\bfseries tmpX} = N\+U\+LL
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a74de5785b5585811170b31dde71dc4f9}\label{classPencilDcmp_a74de5785b5585811170b31dde71dc4f9}} 
+double $\ast$restrict {\bfseries tmpY} = N\+U\+LL
+\item 
+\mbox{\Hypertarget{classPencilDcmp_aaa7674c7a1f6fa3b5c4030538d3788a7}\label{classPencilDcmp_aaa7674c7a1f6fa3b5c4030538d3788a7}} 
+double $\ast$restrict {\bfseries tmp\+M\+G\+Real} = N\+U\+LL
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a7b3364fedade9bec6d654aa370711a91}\label{classPencilDcmp_a7b3364fedade9bec6d654aa370711a91}} 
+double $\ast$restrict {\bfseries tmp\+M\+G\+Imag} = N\+U\+LL
+\item 
+double \mbox{\hyperlink{classPencilDcmp_a6f614285fa414f35f63d2c6277b39bc0}{scale}}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a8190fed77d255603ac79831da77c3069}\label{classPencilDcmp_a8190fed77d255603ac79831da77c3069}} 
+sint $\ast$ {\bfseries face\+Tag} = N\+U\+LL
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a551ac372f59ddd81946dbaf83860f2ad}\label{classPencilDcmp_a551ac372f59ddd81946dbaf83860f2ad}} 
+double {\bfseries final\+Err}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_afd0847709755393cc1efbf4b7f3a792e}\label{classPencilDcmp_afd0847709755393cc1efbf4b7f3a792e}} 
+double $\ast$restrict {\bfseries num} = N\+U\+LL
+\item 
+\mbox{\Hypertarget{classPencilDcmp_acf0f013d3db5cabc878c3322d0a707e4}\label{classPencilDcmp_acf0f013d3db5cabc878c3322d0a707e4}} 
+double $\ast$restrict {\bfseries denum} = N\+U\+LL
+\item 
+double $\ast$ \mbox{\hyperlink{classPencilDcmp_a8b8e20d0f2241d0e9f16b55647f35cc6}{omega}} = N\+U\+LL
+\item 
+double $\ast$restrict \mbox{\hyperlink{classPencilDcmp_a551bc9ca5c23d551cf276c966d360399}{sub\+Diag}} = N\+U\+LL
+\item 
+double $\ast$restrict \mbox{\hyperlink{classPencilDcmp_a1207ba2d374b1a9bf6b899d661adac96}{sup\+Diag}} = N\+U\+LL
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a5b2d117b7d69d712338c8a8a2790761c}\label{classPencilDcmp_a5b2d117b7d69d712338c8a8a2790761c}} 
+int $\ast$ {\bfseries length} = N\+U\+LL
+\item 
+char $\ast$ \mbox{\hyperlink{classPencilDcmp_a8b5e6078c5689aeb6d5f79ae6c384260}{bc}} = N\+U\+LL
+\item 
+char \mbox{\hyperlink{classPencilDcmp_ab98fa8acc24281443f45521fd71de8d3}{transform}} \mbox{[}3\mbox{]}
+\item 
+int $\ast$restrict \mbox{\hyperlink{classPencilDcmp_ac6ad56d62e7f4d40db194b15fc7f3660}{tags}} = N\+U\+LL
+\item 
+double $\ast$restrict \mbox{\hyperlink{classPencilDcmp_aec821580237fce38c3bc110f3598aef7}{dxyz}} = N\+U\+LL
+\item 
+\mbox{\Hypertarget{classPencilDcmp_a1ebc214b15b67cf4d63f227de95052d0}\label{classPencilDcmp_a1ebc214b15b67cf4d63f227de95052d0}} 
+double $\ast$ {\bfseries freqs}
+\item 
+\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \mbox{\hyperlink{classPencilDcmp_a5e2f2da0cb460d3307c9f4a4429a7104}{P}}
+\item 
+\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \mbox{\hyperlink{classPencilDcmp_a38a178b9176b286ceb4daa5e5a27df0f}{R}}
+\item 
+\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \mbox{\hyperlink{classPencilDcmp_a229ec3f8be3816c1b7ffe2e7979fe542}{temp}}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_ac6a07f702b29754e48ac92671b3a8a86}\label{classPencilDcmp_ac6a07f702b29754e48ac92671b3a8a86}} 
+double {\bfseries run\+Time}
+\item 
+\mbox{\Hypertarget{classPencilDcmp_ad253add14bcf5e941cad4e8e1d4e195b}\label{classPencilDcmp_ad253add14bcf5e941cad4e8e1d4e195b}} 
+char {\bfseries name\+Appendix} \mbox{[}80\mbox{]}
+\item 
+sint \mbox{\hyperlink{classPencilDcmp_ab8ff65838fec412a74fb1f5178a413e6}{iax\+Size}}
+\item 
+sint $\ast$ \mbox{\hyperlink{classPencilDcmp_a212ba8f18dd586576806e271652b1ac1}{iax}} = N\+U\+LL
+\item 
+sint $\ast$ \mbox{\hyperlink{classPencilDcmp_ae7816023aee42122b16ab8a0d885b03f}{jax}} = N\+U\+LL
+\item 
+sint \mbox{\hyperlink{classPencilDcmp_abdef25617d6bf992f58e2d8676e42024}{jax\+Size}}
+\item 
+sint \mbox{\hyperlink{classPencilDcmp_a33d1d485a59cc727f9f4136d093874f2}{iay\+Size}}
+\item 
+sint $\ast$ \mbox{\hyperlink{classPencilDcmp_ab18c2646b8ccdaa7dc2db95ef4fc7bf3}{iay}} = N\+U\+LL
+\item 
+sint $\ast$ \mbox{\hyperlink{classPencilDcmp_a5f3b57ed2e3886b453b91dfdd3349f81}{jay}} = N\+U\+LL
+\item 
+sint \mbox{\hyperlink{classPencilDcmp_aeb810ab0904e334d8ea573fb5000d795}{jay\+Size}}
+\item 
+int $\ast$ \mbox{\hyperlink{classPencilDcmp_a88d5d59f2e15bc6a1e7b4370b757f8ce}{Nbrs}} \mbox{[}2\mbox{]} = \{N\+U\+LL, N\+U\+LL\}
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classPencilDcmp_abf858174faa5fb6573824cbcbddf7924}{V\+TK}}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This Class performs pencil decomposition and encapsulates all the necessary communications required for F\+FT transformation. 
+
+\begin{eqnarray*} \Delta u &=& f \end{eqnarray*} N\+O\+TE\+: inlining the functions will cause the inherited class not to see the function and hence be undefined in C\+PU version 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classPencilDcmp_a0252169fc4c2d578ae7b5368e247d557}\label{classPencilDcmp_a0252169fc4c2d578ae7b5368e247d557}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{Pencil\+Dcmp()}{PencilDcmp()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Pencil\+Dcmp\+::\+Pencil\+Dcmp (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{nz,  }\item[{int}]{p0,  }\item[{int}]{p1 }\end{DoxyParamCaption})}
+
+Class constructor Alternative Class constructor \mbox{\Hypertarget{classPencilDcmp_aba2e52de6d05da361e99dfa078ea76ca}\label{classPencilDcmp_aba2e52de6d05da361e99dfa078ea76ca}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{Pencil\+Dcmp()}{PencilDcmp()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Pencil\+Dcmp\+::\+Pencil\+Dcmp (\begin{DoxyParamCaption}\item[{int}]{argcs,  }\item[{char $\ast$}]{p\+Args\mbox{[}$\,$\mbox{]},  }\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{nz }\end{DoxyParamCaption})}
+
+Alternative Class constructor 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classPencilDcmp_a653d1f3fec551d03a03ba9fdaf88ff96}\label{classPencilDcmp_a653d1f3fec551d03a03ba9fdaf88ff96}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!adjust\+Index@{adjust\+Index}}
+\index{adjust\+Index@{adjust\+Index}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{adjust\+Index()}{adjustIndex()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::adjust\+Index (\begin{DoxyParamCaption}\item[{int \&}]{index }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Adjusts index for the cases where index$<$0 or  index$>$p0 \mbox{\Hypertarget{classPencilDcmp_ade8a6cbeeb92600a30403e74377689c6}\label{classPencilDcmp_ade8a6cbeeb92600a30403e74377689c6}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!allocate\+Chunks@{allocate\+Chunks}}
+\index{allocate\+Chunks@{allocate\+Chunks}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{allocate\+Chunks()}{allocateChunks()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::allocate\+Chunks (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Allocates the chunked\+Array container to hold data \mbox{\Hypertarget{classPencilDcmp_abad58d40d070a52c2b2a8e7f90523ec4}\label{classPencilDcmp_abad58d40d070a52c2b2a8e7f90523ec4}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!assign\+Boundary@{assign\+Boundary}}
+\index{assign\+Boundary@{assign\+Boundary}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{assign\+Boundary()}{assignBoundary()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::assign\+Boundary (\begin{DoxyParamCaption}\item[{char $\ast$}]{boundary }\end{DoxyParamCaption})}
+
+assig the boundary from user to the object \mbox{\Hypertarget{classPencilDcmp_a09f2e5cdf07d70efde9d42c455b61295}\label{classPencilDcmp_a09f2e5cdf07d70efde9d42c455b61295}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!change\+LocationX@{change\+LocationX}}
+\index{change\+LocationX@{change\+LocationX}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{change\+Location\+X()}{changeLocationX()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::change\+LocationX (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+changes storage layout from local to global for perfoming F\+FT in x-\/dir \mbox{\Hypertarget{classPencilDcmp_a47f04f2af8e4fbcc7544d04adf7978d5}\label{classPencilDcmp_a47f04f2af8e4fbcc7544d04adf7978d5}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!change\+LocationY@{change\+LocationY}}
+\index{change\+LocationY@{change\+LocationY}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{change\+Location\+Y()}{changeLocationY()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::change\+LocationY (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+changes storage layout from local to global for perfoming F\+FT in y-\/dir \mbox{\Hypertarget{classPencilDcmp_a9a135d2665f56ef206861d5b7e0f84be}\label{classPencilDcmp_a9a135d2665f56ef206861d5b7e0f84be}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!change\+Ownership\+Pairwise\+Exchange\+XY@{change\+Ownership\+Pairwise\+Exchange\+XY}}
+\index{change\+Ownership\+Pairwise\+Exchange\+XY@{change\+Ownership\+Pairwise\+Exchange\+XY}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{change\+Ownership\+Pairwise\+Exchange\+X\+Y()}{changeOwnershipPairwiseExchangeXY()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::change\+Ownership\+Pairwise\+Exchange\+XY (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Redistributes data by rotating from X to Y direction using pairwise exchange \mbox{\Hypertarget{classPencilDcmp_a2f2e64944e0f8587c7a6f02532b11fc5}\label{classPencilDcmp_a2f2e64944e0f8587c7a6f02532b11fc5}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!change\+Ownership\+Pairwise\+Exchange\+ZX@{change\+Ownership\+Pairwise\+Exchange\+ZX}}
+\index{change\+Ownership\+Pairwise\+Exchange\+ZX@{change\+Ownership\+Pairwise\+Exchange\+ZX}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{change\+Ownership\+Pairwise\+Exchange\+Z\+X()}{changeOwnershipPairwiseExchangeZX()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::change\+Ownership\+Pairwise\+Exchange\+ZX (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Redistributes data by rotating from Z to X direction using pairwise exchange \mbox{\Hypertarget{classPencilDcmp_acbb1930609563f24d408fb2a5766400b}\label{classPencilDcmp_acbb1930609563f24d408fb2a5766400b}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!check\+Graph@{check\+Graph}}
+\index{check\+Graph@{check\+Graph}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{check\+Graph()}{checkGraph()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::check\+Graph (\begin{DoxyParamCaption}\item[{int}]{index }\end{DoxyParamCaption})}
+
+Checks the consistency of the graph \mbox{\Hypertarget{classPencilDcmp_aa0dfe19263f66b6c4c9bf73705d62b15}\label{classPencilDcmp_aa0dfe19263f66b6c4c9bf73705d62b15}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!construct\+Connectivity@{construct\+Connectivity}}
+\index{construct\+Connectivity@{construct\+Connectivity}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{construct\+Connectivity()}{constructConnectivity()}}
+{\footnotesize\ttfamily Pitt\+Pack\+Result Pencil\+Dcmp\+::construct\+Connectivity (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+neighborhood connectivity to be used in the M\+P\+I\+\_\+\+Neighbor collectives \mbox{\Hypertarget{classPencilDcmp_a2076e314ec80c355137c743450c31d0b}\label{classPencilDcmp_a2076e314ec80c355137c743450c31d0b}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!construct\+Shuffle\+VectorX@{construct\+Shuffle\+VectorX}}
+\index{construct\+Shuffle\+VectorX@{construct\+Shuffle\+VectorX}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{construct\+Shuffle\+Vector\+X()}{constructShuffleVectorX()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::construct\+Shuffle\+VectorX (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+constructs iay, jay,(Compressed Row Storage) to be copied to G\+PU for x-\/major direction \mbox{\Hypertarget{classPencilDcmp_a41667d2540bb3f3435acd5f5af7db2e4}\label{classPencilDcmp_a41667d2540bb3f3435acd5f5af7db2e4}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!construct\+Shuffle\+VectorY@{construct\+Shuffle\+VectorY}}
+\index{construct\+Shuffle\+VectorY@{construct\+Shuffle\+VectorY}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{construct\+Shuffle\+Vector\+Y()}{constructShuffleVectorY()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::construct\+Shuffle\+VectorY (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+constructs iay, jay,(Compressed Row Storage) to be copied to G\+PU for y-\/major direction \mbox{\Hypertarget{classPencilDcmp_a6cdc6f82cdbf5ee0ee8e1da2810ed5b3}\label{classPencilDcmp_a6cdc6f82cdbf5ee0ee8e1da2810ed5b3}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!detect\+Transforms@{detect\+Transforms}}
+\index{detect\+Transforms@{detect\+Transforms}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{detect\+Transforms()}{detectTransforms()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::detect\+Transforms (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Detects the appropriate transformation, i.\+e. D\+S\+T00, D\+C\+T10, etc based on the boundary conditions \mbox{\Hypertarget{classPencilDcmp_ac4b1060595d90c99e2b81cc0c4622f60}\label{classPencilDcmp_ac4b1060595d90c99e2b81cc0c4622f60}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!eigen\+Val@{eigen\+Val}}
+\index{eigen\+Val@{eigen\+Val}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{eigen\+Val()}{eigenVal()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::eigen\+Val (\begin{DoxyParamCaption}\item[{ofstream \&}]{myfile }\end{DoxyParamCaption})}
+
+prints the eigenvcalues to a file for debugging \mbox{\Hypertarget{classPencilDcmp_a68f53a914a7dca2ddc7078468fb8e0f5}\label{classPencilDcmp_a68f53a914a7dca2ddc7078468fb8e0f5}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!extract\+Tag@{extract\+Tag}}
+\index{extract\+Tag@{extract\+Tag}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{extract\+Tag()}{extractTag()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::extract\+Tag (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Extracts transformation tags based on the Boundary Conditions \mbox{\Hypertarget{classPencilDcmp_afa0acfd2badba2e06d1800f67fce3dba}\label{classPencilDcmp_afa0acfd2badba2e06d1800f67fce3dba}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!get\+Eigen\+Val@{get\+Eigen\+Val}}
+\index{get\+Eigen\+Val@{get\+Eigen\+Val}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{get\+Eigen\+Val()}{getEigenVal()}}
+{\footnotesize\ttfamily real Pencil\+Dcmp\+::get\+Eigen\+Val (\begin{DoxyParamCaption}\item[{int}]{i,  }\item[{int}]{j }\end{DoxyParamCaption})}
+
+Calculates the eigen vale based on the offset, note that, at the tridiagonal solve, j-\/ direction is the dominant direction if nx\+Chunk==ny\+Chunk \&\& dx=dy, the eigenvalues are symmetric \mbox{\Hypertarget{classPencilDcmp_a6ba4438fd05274b40dd2e56aeba339e1}\label{classPencilDcmp_a6ba4438fd05274b40dd2e56aeba339e1}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!graph\+Create@{graph\+Create}}
+\index{graph\+Create@{graph\+Create}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{graph\+Create()}{graphCreate()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::graph\+Create (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Creates Neighborhood Graph for communicaton
+
+Two different communicators are required due to the presence of stride in X to Y to rotation \mbox{\Hypertarget{classPencilDcmp_a58ebcd5b4bf661379cfc89df94f1d1eb}\label{classPencilDcmp_a58ebcd5b4bf661379cfc89df94f1d1eb}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!initialize\+Trigonometric@{initialize\+Trigonometric}}
+\index{initialize\+Trigonometric@{initialize\+Trigonometric}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{initialize\+Trigonometric()}{initializeTrigonometric()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::initialize\+Trigonometric (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Initializes the source using $sin(\omega x)$ and $cos(\omega)$ bases on the boundary condition \mbox{\Hypertarget{classPencilDcmp_aad302367ed6433ac0fab84c540b9ca49}\label{classPencilDcmp_aad302367ed6433ac0fab84c540b9ca49}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!IO@{IO}}
+\index{IO@{IO}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{I\+O()}{IO()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::\+IO (\begin{DoxyParamCaption}\item[{int}]{app,  }\item[{int}]{dir,  }\item[{int}]{aligndir }\end{DoxyParamCaption})}
+
+I/O is performed using hdf5 and xmf file formats \mbox{\Hypertarget{classPencilDcmp_a5a6415c2ca9d9bf54009ccfd252a76e5}\label{classPencilDcmp_a5a6415c2ca9d9bf54009ccfd252a76e5}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!nbr\+All\+To\+All\+XY@{nbr\+All\+To\+All\+XY}}
+\index{nbr\+All\+To\+All\+XY@{nbr\+All\+To\+All\+XY}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{nbr\+All\+To\+All\+X\+Y()}{nbrAllToAllXY()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::nbr\+All\+To\+All\+XY (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Redistributes data by rotating from X to Y by using neighborhood collective \mbox{\Hypertarget{classPencilDcmp_a06651ef577567ce90c4f7ad4d8fadf58}\label{classPencilDcmp_a06651ef577567ce90c4f7ad4d8fadf58}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!nbr\+All\+To\+All\+ZX@{nbr\+All\+To\+All\+ZX}}
+\index{nbr\+All\+To\+All\+ZX@{nbr\+All\+To\+All\+ZX}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{nbr\+All\+To\+All\+Z\+X()}{nbrAllToAllZX()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::nbr\+All\+To\+All\+ZX (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Redistributes data by rotating from Z to X by using neighborhood collective \mbox{\Hypertarget{classPencilDcmp_acf7d6672a7fdc141bfba205b27fb9d84}\label{classPencilDcmp_acf7d6672a7fdc141bfba205b27fb9d84}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!printX@{printX}}
+\index{printX@{printX}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{print\+X()}{printX()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::printX (\begin{DoxyParamCaption}\item[{ofstream \&}]{myfile }\end{DoxyParamCaption})}
+
+Each rank prints x-\/major their own file name data$\ast$ where \textquotesingle{}$\ast$\textquotesingle{} is appended by processor rank \mbox{\Hypertarget{classPencilDcmp_af19e8faec61ef717c742af90faa2c40c}\label{classPencilDcmp_af19e8faec61ef717c742af90faa2c40c}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!printY@{printY}}
+\index{printY@{printY}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{print\+Y()}{printY()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::printY (\begin{DoxyParamCaption}\item[{ofstream \&}]{myfile }\end{DoxyParamCaption})}
+
+Each rank prints y-\/major their own file name data$\ast$ where \textquotesingle{}$\ast$\textquotesingle{} is appended by processor rank \mbox{\Hypertarget{classPencilDcmp_ae3d801255b0af3835331825e42043a98}\label{classPencilDcmp_ae3d801255b0af3835331825e42043a98}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!rearrange\+X2Y@{rearrange\+X2Y}}
+\index{rearrange\+X2Y@{rearrange\+X2Y}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{rearrange\+X2\+Y()}{rearrangeX2Y()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::rearrange\+X2Y (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+rearranges storage of data from x-\/major to y-\/major format \mbox{\Hypertarget{classPencilDcmp_adf77ae1fe6ac288f290e7b588b5a235e}\label{classPencilDcmp_adf77ae1fe6ac288f290e7b588b5a235e}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!rearrange\+X2\+Y\+Inverse@{rearrange\+X2\+Y\+Inverse}}
+\index{rearrange\+X2\+Y\+Inverse@{rearrange\+X2\+Y\+Inverse}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{rearrange\+X2\+Y\+Inverse()}{rearrangeX2YInverse()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::rearrange\+X2\+Y\+Inverse (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+rearranges storage of data from y-\/major back to x-\/major format \mbox{\Hypertarget{classPencilDcmp_a33abfd41b7ea649af6c86f5611aeed79}\label{classPencilDcmp_a33abfd41b7ea649af6c86f5611aeed79}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!rescale@{rescale}}
+\index{rescale@{rescale}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{rescale()}{rescale()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::rescale (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Rescales the inverse transformation, dince F\+FT transforms by F\+F\+TW and Cu\+F\+FT are not normalized \mbox{\Hypertarget{classPencilDcmp_a559e7d0018fe962d6a73e2f70f831de0}\label{classPencilDcmp_a559e7d0018fe962d6a73e2f70f831de0}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!restore\+LocationX@{restore\+LocationX}}
+\index{restore\+LocationX@{restore\+LocationX}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{restore\+Location\+X()}{restoreLocationX()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::restore\+LocationX (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+restores the data stored at each chunk to its original x-\/major lay-\/out \mbox{\Hypertarget{classPencilDcmp_a30c55e0b0ae5ecbe1eeb005190c89e21}\label{classPencilDcmp_a30c55e0b0ae5ecbe1eeb005190c89e21}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!restore\+LocationY@{restore\+LocationY}}
+\index{restore\+LocationY@{restore\+LocationY}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{restore\+Location\+Y()}{restoreLocationY()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::restore\+LocationY (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+restores the data stored at each chunk to its original y-\/major lay-\/out \mbox{\Hypertarget{classPencilDcmp_ae46aa4d19c1c33f1c6ba9f0ae8d53247}\label{classPencilDcmp_ae46aa4d19c1c33f1c6ba9f0ae8d53247}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!restore\+Tmp@{restore\+Tmp}}
+\index{restore\+Tmp@{restore\+Tmp}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{restore\+Tmp()}{restoreTmp()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::restore\+Tmp (\begin{DoxyParamCaption}\item[{const sint}]{id,  }\item[{double $\ast$}]{tmp,  }\item[{sint}]{dir }\end{DoxyParamCaption})}
+
+Assignes the data in the temporary array to its new location \mbox{\Hypertarget{classPencilDcmp_a59feaa65591c690a68a52fe98ad9da8b}\label{classPencilDcmp_a59feaa65591c690a68a52fe98ad9da8b}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!save\+To\+Tmp@{save\+To\+Tmp}}
+\index{save\+To\+Tmp@{save\+To\+Tmp}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{save\+To\+Tmp()}{saveToTmp()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::save\+To\+Tmp (\begin{DoxyParamCaption}\item[{const sint}]{id,  }\item[{double $\ast$}]{tmp,  }\item[{sint}]{dir }\end{DoxyParamCaption})}
+
+saves the data to a temporary array \mbox{\Hypertarget{classPencilDcmp_a885fa996b7c6a9a0b63e046937da5bcb}\label{classPencilDcmp_a885fa996b7c6a9a0b63e046937da5bcb}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!set\+Coords@{set\+Coords}}
+\index{set\+Coords@{set\+Coords}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{set\+Coords()}{setCoords()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::set\+Coords (\begin{DoxyParamCaption}\item[{int}]{dir }\end{DoxyParamCaption})}
+
+sets teh coordinates of every pencil depending on the direction of the pencil \mbox{\Hypertarget{classPencilDcmp_aac2a7354c9e629510b8de6f96921788b}\label{classPencilDcmp_aac2a7354c9e629510b8de6f96921788b}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!set\+Eigen\+Val@{set\+Eigen\+Val}}
+\index{set\+Eigen\+Val@{set\+Eigen\+Val}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{set\+Eigen\+Val()}{setEigenVal()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::set\+Eigen\+Val (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+sets the eigenvalue based for each filament \mbox{\Hypertarget{classPencilDcmp_a8ea122a3a5c4f6481fce20d8ac8e87f6}\label{classPencilDcmp_a8ea122a3a5c4f6481fce20d8ac8e87f6}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!set\+Up\+Shuffle\+ArraysX@{set\+Up\+Shuffle\+ArraysX}}
+\index{set\+Up\+Shuffle\+ArraysX@{set\+Up\+Shuffle\+ArraysX}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{set\+Up\+Shuffle\+Arrays\+X()}{setUpShuffleArraysX()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::set\+Up\+Shuffle\+ArraysX (\begin{DoxyParamCaption}\item[{vector$<$ \mbox{\hyperlink{structshuffle}{shuffle0}} $>$ \&}]{a }\end{DoxyParamCaption})}
+
+This is only done once on C\+PU, it sets up the order in which data shuffling should be performed in x-\/dir \mbox{\Hypertarget{classPencilDcmp_a30bae43ce292f1ddb54e16c3b0f6bbfd}\label{classPencilDcmp_a30bae43ce292f1ddb54e16c3b0f6bbfd}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!set\+Up\+Shuffle\+ArraysY@{set\+Up\+Shuffle\+ArraysY}}
+\index{set\+Up\+Shuffle\+ArraysY@{set\+Up\+Shuffle\+ArraysY}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{set\+Up\+Shuffle\+Arrays\+Y()}{setUpShuffleArraysY()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::set\+Up\+Shuffle\+ArraysY (\begin{DoxyParamCaption}\item[{vector$<$ \mbox{\hyperlink{structshuffle}{shuffle0}} $>$ \&}]{a }\end{DoxyParamCaption})}
+
+This is only done once on C\+PU, it sets up the order in which data shuffling should be performed in y-\/dir \mbox{\Hypertarget{classPencilDcmp_a9a27e4f6c9f2b567009759c0c03506c1}\label{classPencilDcmp_a9a27e4f6c9f2b567009759c0c03506c1}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!solve\+MG@{solve\+MG}}
+\index{solve\+MG@{solve\+MG}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{solve\+M\+G()}{solveMG()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::solve\+MG (\begin{DoxyParamCaption}\item[{const int}]{index }\end{DoxyParamCaption})}
+
+index=0 solves for the real part and index=1 solves for the immaginary part \mbox{\Hypertarget{classPencilDcmp_a5eaf7b3581e2cbe3ee3595cd44154a73}\label{classPencilDcmp_a5eaf7b3581e2cbe3ee3595cd44154a73}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!solve\+Thm@{solve\+Thm}}
+\index{solve\+Thm@{solve\+Thm}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{solve\+Thm()}{solveThm()}}
+{\footnotesize\ttfamily int Pencil\+Dcmp\+::solve\+Thm (\begin{DoxyParamCaption}\item[{const int}]{index }\end{DoxyParamCaption})}
+
+Performs the solve operaton by calling thomas method \mbox{\Hypertarget{classPencilDcmp_a536eab196adc27ccc36fa51dccf5606f}\label{classPencilDcmp_a536eab196adc27ccc36fa51dccf5606f}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!thomas@{thomas}}
+\index{thomas@{thomas}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{thomas()}{thomas()}}
+{\footnotesize\ttfamily int Pencil\+Dcmp\+::thomas (\begin{DoxyParamCaption}\item[{int}]{i,  }\item[{int}]{j,  }\item[{int}]{dir,  }\item[{int}]{index }\end{DoxyParamCaption})}
+
+performs direct solve using Thomas algorithm slower \mbox{\Hypertarget{classPencilDcmp_a7afb77ba481af376247adf69b93d318c}\label{classPencilDcmp_a7afb77ba481af376247adf69b93d318c}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!thomas\+Periodic@{thomas\+Periodic}}
+\index{thomas\+Periodic@{thomas\+Periodic}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{thomas\+Periodic()}{thomasPeriodic()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::thomas\+Periodic (\begin{DoxyParamCaption}\item[{int}]{i,  }\item[{int}]{j,  }\item[{int}]{dir,  }\item[{int}]{index }\end{DoxyParamCaption})}
+
+Sherman-\/\+Morrison version of the Thomas algorithm (also called cyclic Thomas) \mbox{\Hypertarget{classPencilDcmp_a2146f493283ffa68e46648205c9b6ab2}\label{classPencilDcmp_a2146f493283ffa68e46648205c9b6ab2}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!thomas\+Single\+Block@{thomas\+Single\+Block}}
+\index{thomas\+Single\+Block@{thomas\+Single\+Block}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{thomas\+Single\+Block()}{thomasSingleBlock()}}
+{\footnotesize\ttfamily void Pencil\+Dcmp\+::thomas\+Single\+Block (\begin{DoxyParamCaption}\item[{int}]{i,  }\item[{int}]{j,  }\item[{int}]{dir,  }\item[{int}]{index }\end{DoxyParamCaption})}
+
+Singke Block solver used for debugging 
+
+\subsection{Friends And Related Function Documentation}
+\mbox{\Hypertarget{classPencilDcmp_abf858174faa5fb6573824cbcbddf7924}\label{classPencilDcmp_abf858174faa5fb6573824cbcbddf7924}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!V\+TK@{V\+TK}}
+\index{V\+TK@{V\+TK}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{V\+TK}{VTK}}
+{\footnotesize\ttfamily friend class V\+TK\hspace{0.3cm}{\ttfamily [friend]}}
+
+for small problems V\+TK is also provided 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classPencilDcmp_a8b5e6078c5689aeb6d5f79ae6c384260}\label{classPencilDcmp_a8b5e6078c5689aeb6d5f79ae6c384260}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!bc@{bc}}
+\index{bc@{bc}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{bc}{bc}}
+{\footnotesize\ttfamily char$\ast$ Pencil\+Dcmp\+::bc = N\+U\+LL\hspace{0.3cm}{\ttfamily [protected]}}
+
+boundary conditions of the entire domain specified at Xmin,Xmax, Ymin,Ymax, Zmin and Zmax \mbox{\Hypertarget{classPencilDcmp_a44102096e8239b752fe1d39f3d8fd203}\label{classPencilDcmp_a44102096e8239b752fe1d39f3d8fd203}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!chunk\+Size@{chunk\+Size}}
+\index{chunk\+Size@{chunk\+Size}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{chunk\+Size}{chunkSize}}
+{\footnotesize\ttfamily int Pencil\+Dcmp\+::chunk\+Size\hspace{0.3cm}{\ttfamily [protected]}}
+
+stores chunksize=nx\+Chunk$\ast$ny\+Chunk$\ast$nz\+Chunk \mbox{\Hypertarget{classPencilDcmp_aadefb86246eafd53011fe4d369922ab6}\label{classPencilDcmp_aadefb86246eafd53011fe4d369922ab6}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!com\+Size@{com\+Size}}
+\index{com\+Size@{com\+Size}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{com\+Size}{comSize}}
+{\footnotesize\ttfamily int Pencil\+Dcmp\+::com\+Size\hspace{0.3cm}{\ttfamily [protected]}}
+
+stores the rank and communicator size \mbox{\Hypertarget{classPencilDcmp_aec821580237fce38c3bc110f3598aef7}\label{classPencilDcmp_aec821580237fce38c3bc110f3598aef7}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!dxyz@{dxyz}}
+\index{dxyz@{dxyz}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{dxyz}{dxyz}}
+{\footnotesize\ttfamily double$\ast$ restrict Pencil\+Dcmp\+::dxyz = N\+U\+LL\hspace{0.3cm}{\ttfamily [protected]}}
+
+dx=dxyz\mbox{[}0\mbox{]}; dy=dxyz\mbox{[}1\mbox{]}; dz=dxyz\mbox{[}2\mbox{]} \mbox{\Hypertarget{classPencilDcmp_a212ba8f18dd586576806e271652b1ac1}\label{classPencilDcmp_a212ba8f18dd586576806e271652b1ac1}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!iax@{iax}}
+\index{iax@{iax}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{iax}{iax}}
+{\footnotesize\ttfamily sint$\ast$ Pencil\+Dcmp\+::iax = N\+U\+LL\hspace{0.3cm}{\ttfamily [protected]}}
+
+saves the extent for the array \mbox{\Hypertarget{classPencilDcmp_ab8ff65838fec412a74fb1f5178a413e6}\label{classPencilDcmp_ab8ff65838fec412a74fb1f5178a413e6}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!iax\+Size@{iax\+Size}}
+\index{iax\+Size@{iax\+Size}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{iax\+Size}{iaxSize}}
+{\footnotesize\ttfamily sint Pencil\+Dcmp\+::iax\+Size\hspace{0.3cm}{\ttfamily [protected]}}
+
+size of the iax array, we use Compressed Row Storage format to compactly store these indices \mbox{\Hypertarget{classPencilDcmp_ab18c2646b8ccdaa7dc2db95ef4fc7bf3}\label{classPencilDcmp_ab18c2646b8ccdaa7dc2db95ef4fc7bf3}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!iay@{iay}}
+\index{iay@{iay}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{iay}{iay}}
+{\footnotesize\ttfamily sint$\ast$ Pencil\+Dcmp\+::iay = N\+U\+LL\hspace{0.3cm}{\ttfamily [protected]}}
+
+saves the extent for the array in y-\/direction \mbox{\Hypertarget{classPencilDcmp_a33d1d485a59cc727f9f4136d093874f2}\label{classPencilDcmp_a33d1d485a59cc727f9f4136d093874f2}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!iay\+Size@{iay\+Size}}
+\index{iay\+Size@{iay\+Size}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{iay\+Size}{iaySize}}
+{\footnotesize\ttfamily sint Pencil\+Dcmp\+::iay\+Size\hspace{0.3cm}{\ttfamily [protected]}}
+
+size of the iax array, we use Compressed Row Storage format to compactly store these indices \mbox{\Hypertarget{classPencilDcmp_ae7816023aee42122b16ab8a0d885b03f}\label{classPencilDcmp_ae7816023aee42122b16ab8a0d885b03f}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!jax@{jax}}
+\index{jax@{jax}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{jax}{jax}}
+{\footnotesize\ttfamily sint$\ast$ Pencil\+Dcmp\+::jax = N\+U\+LL\hspace{0.3cm}{\ttfamily [protected]}}
+
+saves tha shuffling sequence from local to global for a given index \mbox{\Hypertarget{classPencilDcmp_abdef25617d6bf992f58e2d8676e42024}\label{classPencilDcmp_abdef25617d6bf992f58e2d8676e42024}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!jax\+Size@{jax\+Size}}
+\index{jax\+Size@{jax\+Size}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{jax\+Size}{jaxSize}}
+{\footnotesize\ttfamily sint Pencil\+Dcmp\+::jax\+Size\hspace{0.3cm}{\ttfamily [protected]}}
+
+saves tha size of the jax array for copy operations \mbox{\Hypertarget{classPencilDcmp_a5f3b57ed2e3886b453b91dfdd3349f81}\label{classPencilDcmp_a5f3b57ed2e3886b453b91dfdd3349f81}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!jay@{jay}}
+\index{jay@{jay}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{jay}{jay}}
+{\footnotesize\ttfamily sint$\ast$ Pencil\+Dcmp\+::jay = N\+U\+LL\hspace{0.3cm}{\ttfamily [protected]}}
+
+saves the shuffling sequence from local to global in y direction \mbox{\Hypertarget{classPencilDcmp_aeb810ab0904e334d8ea573fb5000d795}\label{classPencilDcmp_aeb810ab0904e334d8ea573fb5000d795}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!jay\+Size@{jay\+Size}}
+\index{jay\+Size@{jay\+Size}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{jay\+Size}{jaySize}}
+{\footnotesize\ttfamily sint Pencil\+Dcmp\+::jay\+Size\hspace{0.3cm}{\ttfamily [protected]}}
+
+saves tha size of the jax array for copy operations \mbox{\Hypertarget{classPencilDcmp_a04ce960d67858cb869c100789e72be95}\label{classPencilDcmp_a04ce960d67858cb869c100789e72be95}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!nbr\+Comm@{nbr\+Comm}}
+\index{nbr\+Comm@{nbr\+Comm}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{nbr\+Comm}{nbrComm}}
+{\footnotesize\ttfamily M\+P\+I\+\_\+\+Comm Pencil\+Dcmp\+::nbr\+Comm\mbox{[}2\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}
+
+stores M\+PI communicators to be used for neighborhood collectives in x-\/ and y-\/directions \mbox{\Hypertarget{classPencilDcmp_a96b154d85babab87ec4373273ad9a4a1}\label{classPencilDcmp_a96b154d85babab87ec4373273ad9a4a1}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!nbr\+Comm0@{nbr\+Comm0}}
+\index{nbr\+Comm0@{nbr\+Comm0}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{nbr\+Comm0}{nbrComm0}}
+{\footnotesize\ttfamily M\+P\+I\+\_\+\+Comm Pencil\+Dcmp\+::nbr\+Comm0\hspace{0.3cm}{\ttfamily [protected]}}
+
+M\+PI communicator to use for neighborhood collectives in x-\/dir \mbox{\Hypertarget{classPencilDcmp_a708235c4b590cb76e8b88b5073828f25}\label{classPencilDcmp_a708235c4b590cb76e8b88b5073828f25}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!nbr\+Comm1@{nbr\+Comm1}}
+\index{nbr\+Comm1@{nbr\+Comm1}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{nbr\+Comm1}{nbrComm1}}
+{\footnotesize\ttfamily M\+P\+I\+\_\+\+Comm Pencil\+Dcmp\+::nbr\+Comm1\hspace{0.3cm}{\ttfamily [protected]}}
+
+M\+PI communicator to use for neighborhood collectives in y-\/dir \mbox{\Hypertarget{classPencilDcmp_a88d5d59f2e15bc6a1e7b4370b757f8ce}\label{classPencilDcmp_a88d5d59f2e15bc6a1e7b4370b757f8ce}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!Nbrs@{Nbrs}}
+\index{Nbrs@{Nbrs}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{Nbrs}{Nbrs}}
+{\footnotesize\ttfamily int$\ast$ Pencil\+Dcmp\+::\+Nbrs\mbox{[}2\mbox{]} = \{N\+U\+LL, N\+U\+LL\}\hspace{0.3cm}{\ttfamily [protected]}}
+
+Nbrs\mbox{[}0\mbox{]} is the stride 1 neighbor where as Nbrs\mbox{[}1\mbox{]} is the stride p0 \mbox{\Hypertarget{classPencilDcmp_a1f7f54dbd7adbfd03d171c72cbae865e}\label{classPencilDcmp_a1f7f54dbd7adbfd03d171c72cbae865e}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!n\+Chunk@{n\+Chunk}}
+\index{n\+Chunk@{n\+Chunk}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{n\+Chunk}{nChunk}}
+{\footnotesize\ttfamily int Pencil\+Dcmp\+::n\+Chunk\hspace{0.3cm}{\ttfamily [protected]}}
+
+number of chunks for each processor \mbox{\Hypertarget{classPencilDcmp_aedb528abdba6fa4a541af83f851e11c8}\label{classPencilDcmp_aedb528abdba6fa4a541af83f851e11c8}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!nz@{nz}}
+\index{nz@{nz}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{nz}{nz}}
+{\footnotesize\ttfamily int Pencil\+Dcmp\+::nz\hspace{0.3cm}{\ttfamily [protected]}}
+
+Number of points for each processor (includes all the chunks) \mbox{\Hypertarget{classPencilDcmp_af606d599e42ca97ed639e4b4a633e691}\label{classPencilDcmp_af606d599e42ca97ed639e4b4a633e691}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!nz\+Chunk@{nz\+Chunk}}
+\index{nz\+Chunk@{nz\+Chunk}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{nz\+Chunk}{nzChunk}}
+{\footnotesize\ttfamily int Pencil\+Dcmp\+::nz\+Chunk\hspace{0.3cm}{\ttfamily [protected]}}
+
+dimesnion of each chunk \mbox{\Hypertarget{classPencilDcmp_a8b8e20d0f2241d0e9f16b55647f35cc6}\label{classPencilDcmp_a8b8e20d0f2241d0e9f16b55647f35cc6}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!omega@{omega}}
+\index{omega@{omega}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{omega}{omega}}
+{\footnotesize\ttfamily double$\ast$ Pencil\+Dcmp\+::omega = N\+U\+LL\hspace{0.3cm}{\ttfamily [protected]}}
+
+frequency of the Manufactured Solution \mbox{\Hypertarget{classPencilDcmp_a5e2f2da0cb460d3307c9f4a4429a7104}\label{classPencilDcmp_a5e2f2da0cb460d3307c9f4a4429a7104}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!P@{P}}
+\index{P@{P}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{P}{P}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} Pencil\+Dcmp\+::P\hspace{0.3cm}{\ttfamily [protected]}}
+
+an instance of the chunked array which is the main pointer to hold and perform solve \mbox{\Hypertarget{classPencilDcmp_a38a178b9176b286ceb4daa5e5a27df0f}\label{classPencilDcmp_a38a178b9176b286ceb4daa5e5a27df0f}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!R@{R}}
+\index{R@{R}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{R}{R}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} Pencil\+Dcmp\+::R\hspace{0.3cm}{\ttfamily [protected]}}
+
+Recieve buff \mbox{\Hypertarget{classPencilDcmp_a6f614285fa414f35f63d2c6277b39bc0}\label{classPencilDcmp_a6f614285fa414f35f63d2c6277b39bc0}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!scale@{scale}}
+\index{scale@{scale}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{scale}{scale}}
+{\footnotesize\ttfamily double Pencil\+Dcmp\+::scale\hspace{0.3cm}{\ttfamily [protected]}}
+
+store the scaling factor for the two inverse transformations depending on the boundary conditons \mbox{\Hypertarget{classPencilDcmp_a551bc9ca5c23d551cf276c966d360399}\label{classPencilDcmp_a551bc9ca5c23d551cf276c966d360399}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!sub\+Diag@{sub\+Diag}}
+\index{sub\+Diag@{sub\+Diag}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{sub\+Diag}{subDiag}}
+{\footnotesize\ttfamily double$\ast$ restrict Pencil\+Dcmp\+::sub\+Diag = N\+U\+LL\hspace{0.3cm}{\ttfamily [protected]}}
+
+allocated with the size of 3, stores only the sub-\/diagonal elements of the tridiagonal system \mbox{\Hypertarget{classPencilDcmp_a1207ba2d374b1a9bf6b899d661adac96}\label{classPencilDcmp_a1207ba2d374b1a9bf6b899d661adac96}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!sup\+Diag@{sup\+Diag}}
+\index{sup\+Diag@{sup\+Diag}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{sup\+Diag}{supDiag}}
+{\footnotesize\ttfamily double$\ast$ restrict Pencil\+Dcmp\+::sup\+Diag = N\+U\+LL\hspace{0.3cm}{\ttfamily [protected]}}
+
+allocated with the size of 3, stores only the super-\/diagonal elements of the tridiagonal system \mbox{\Hypertarget{classPencilDcmp_ac6ad56d62e7f4d40db194b15fc7f3660}\label{classPencilDcmp_ac6ad56d62e7f4d40db194b15fc7f3660}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!tags@{tags}}
+\index{tags@{tags}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{tags}{tags}}
+{\footnotesize\ttfamily int$\ast$ restrict Pencil\+Dcmp\+::tags = N\+U\+LL\hspace{0.3cm}{\ttfamily [protected]}}
+
+0 \+: sine tranform, 1\+: coisne, 2\+: Periodic and -\/1 undefined \mbox{\Hypertarget{classPencilDcmp_a229ec3f8be3816c1b7ffe2e7979fe542}\label{classPencilDcmp_a229ec3f8be3816c1b7ffe2e7979fe542}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!temp@{temp}}
+\index{temp@{temp}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{temp}{temp}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} Pencil\+Dcmp\+::temp\hspace{0.3cm}{\ttfamily [protected]}}
+
+temporary array for transposing \mbox{\Hypertarget{classPencilDcmp_ab98fa8acc24281443f45521fd71de8d3}\label{classPencilDcmp_ab98fa8acc24281443f45521fd71de8d3}} 
+\index{Pencil\+Dcmp@{Pencil\+Dcmp}!transform@{transform}}
+\index{transform@{transform}!Pencil\+Dcmp@{Pencil\+Dcmp}}
+\subsubsection{\texorpdfstring{transform}{transform}}
+{\footnotesize\ttfamily char Pencil\+Dcmp\+::transform\mbox{[}3\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}
+
+\char`\"{}\+S\char`\"{} stands for D\+ST, \char`\"{}\+C\char`\"{} stands for D\+CT, \char`\"{}\+F\char`\"{} stands for Fourier Transform, both \char`\"{}\+S\char`\"{} or \char`\"{}\+D\char`\"{}, \char`\"{}\+C\char`\"{} 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/include/pencil\+Dcmp.\+h\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/pencil\+Dcmp.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,130 @@
+\hypertarget{classChunkedArray}{}\section{Chunked\+Array Class Reference}
+\label{classChunkedArray}\index{Chunked\+Array@{Chunked\+Array}}
+
+
+Stores complex number in a a contiguous way and overloads some operators to provide user-\/friendly interface.  
+
+
+
+
+{\ttfamily \#include $<$chunked\+Array.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classChunkedArray_a1ae58bbd5d8e5e628c43f1fc0c222427}{move\+Host\+To\+Device}} ()
+\item 
+void \mbox{\hyperlink{classChunkedArray_a06ea03d909d7072852e92bd159a6c719}{move\+Device\+To\+Host}} ()
+\item 
+Pitt\+Pack\+Result \mbox{\hyperlink{classChunkedArray_a61a06ae961bb5d45fe6a7268fe276ac3}{allocate}} (int $\ast$n, int nbl)
+\item 
+\mbox{\Hypertarget{classChunkedArray_a5b768db5d280d532e090e871b6297fc1}\label{classChunkedArray_a5b768db5d280d532e090e871b6297fc1}} 
+int {\bfseries size} ()
+\item 
+\mbox{\Hypertarget{classChunkedArray_a62f4acf8950745e13122cce62ed06ee3}\label{classChunkedArray_a62f4acf8950745e13122cce62ed06ee3}} 
+int {\bfseries get\+Chunk\+Size} ()
+\item 
+\mbox{\Hypertarget{classChunkedArray_ac7cafd1fd98f3256217c82887696ef99}\label{classChunkedArray_ac7cafd1fd98f3256217c82887696ef99}} 
+void {\bfseries set\+Direction} (int dir)
+\item 
+\mbox{\Hypertarget{classChunkedArray_ac34d626f2e0f3a39381287e14b75ef74}\label{classChunkedArray_ac34d626f2e0f3a39381287e14b75ef74}} 
+void {\bfseries set\+Coords} (double $\ast$X)
+\item 
+\mbox{\Hypertarget{classChunkedArray_aa245e2b758286956ce8986c75dd2bacb}\label{classChunkedArray_aa245e2b758286956ce8986c75dd2bacb}} 
+double \& {\bfseries operator()} (int i, int j, int k, int index)
+\item 
+\mbox{\Hypertarget{classChunkedArray_a2b34add05354d1cd850bd4dc43021c65}\label{classChunkedArray_a2b34add05354d1cd850bd4dc43021c65}} 
+double \& {\bfseries operator()} (int i, int j, int k)
+\item 
+double \& \mbox{\hyperlink{classChunkedArray_af75eed0a52df1e58499bd7f8fae03f49}{operator()}} (int chunk\+Id, int dir, int i, int j, int k, int index)
+\item 
+\mbox{\Hypertarget{classChunkedArray_a8a06e93755692d416d55c5dfde9ad020}\label{classChunkedArray_a8a06e93755692d416d55c5dfde9ad020}} 
+double \& {\bfseries operator()} (int i, int j, int k, int dir, int index)
+\item 
+\mbox{\Hypertarget{classChunkedArray_ad1048c7f8536caf5df66c7da482ffa94}\label{classChunkedArray_ad1048c7f8536caf5df66c7da482ffa94}} 
+double \& {\bfseries operator()} (int i)
+\item 
+void \mbox{\hyperlink{classChunkedArray_aba54bf85d48b125c234e6a97867b9a84}{get\+Address}} (double $\ast$rt)
+\item 
+\mbox{\hyperlink{classChunkedArray_a71913a12bb4934f6e01a594ff1e429fa}{$\sim$\+Chunked\+Array}} ()
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classChunkedArray_a89c0195380e113e4d774b5977badc321}\label{classChunkedArray_a89c0195380e113e4d774b5977badc321}} 
+class {\bfseries Pencil\+Dcmp}
+\item 
+\mbox{\Hypertarget{classChunkedArray_a54d4c5e140360c72f48810f28a2aa69c}\label{classChunkedArray_a54d4c5e140360c72f48810f28a2aa69c}} 
+class {\bfseries Poisson\+C\+PU}
+\item 
+\mbox{\Hypertarget{classChunkedArray_ae2456986f8cab7e4c0d7320415ec3c88}\label{classChunkedArray_ae2456986f8cab7e4c0d7320415ec3c88}} 
+class {\bfseries Poisson\+G\+PU}
+\item 
+\mbox{\Hypertarget{classChunkedArray_a02f17d3a7bcc6eadc9f257ad071c2d1b}\label{classChunkedArray_a02f17d3a7bcc6eadc9f257ad071c2d1b}} 
+class {\bfseries Signal\+Proc}
+\item 
+\mbox{\Hypertarget{classChunkedArray_a0efda7cf27257f3a95fdee8e922f2443}\label{classChunkedArray_a0efda7cf27257f3a95fdee8e922f2443}} 
+class {\bfseries Tri\+Diag}
+\item 
+\mbox{\Hypertarget{classChunkedArray_ac44d19d82c46351447effb00a192c573}\label{classChunkedArray_ac44d19d82c46351447effb00a192c573}} 
+class {\bfseries Mpi\+Com}
+\item 
+\mbox{\Hypertarget{classChunkedArray_a6081e6e462e5143c0faaafe3fe63406d}\label{classChunkedArray_a6081e6e462e5143c0faaafe3fe63406d}} 
+class {\bfseries Multi\+Grid}
+\item 
+\mbox{\Hypertarget{classChunkedArray_aee5becafbd48750c5ef7fbb178bec581}\label{classChunkedArray_aee5becafbd48750c5ef7fbb178bec581}} 
+class {\bfseries Phdf5}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Stores complex number in a a contiguous way and overloads some operators to provide user-\/friendly interface. 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classChunkedArray_a71913a12bb4934f6e01a594ff1e429fa}\label{classChunkedArray_a71913a12bb4934f6e01a594ff1e429fa}} 
+\index{Chunked\+Array@{Chunked\+Array}!````~Chunked\+Array@{$\sim$\+Chunked\+Array}}
+\index{````~Chunked\+Array@{$\sim$\+Chunked\+Array}!Chunked\+Array@{Chunked\+Array}}
+\subsubsection{\texorpdfstring{$\sim$\+Chunked\+Array()}{~ChunkedArray()}}
+{\footnotesize\ttfamily Chunked\+Array\+::$\sim$\+Chunked\+Array (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Destructor of the object
+
+the order is not important 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classChunkedArray_a61a06ae961bb5d45fe6a7268fe276ac3}\label{classChunkedArray_a61a06ae961bb5d45fe6a7268fe276ac3}} 
+\index{Chunked\+Array@{Chunked\+Array}!allocate@{allocate}}
+\index{allocate@{allocate}!Chunked\+Array@{Chunked\+Array}}
+\subsubsection{\texorpdfstring{allocate()}{allocate()}}
+{\footnotesize\ttfamily Pitt\+Pack\+Result Chunked\+Array\+::allocate (\begin{DoxyParamCaption}\item[{int $\ast$}]{n,  }\item[{int}]{nbl }\end{DoxyParamCaption})}
+
+chunk size refers to the size of the chunks, that is the whole array divided by nchunks, this is to get rid of multiplication by two \mbox{\Hypertarget{classChunkedArray_aba54bf85d48b125c234e6a97867b9a84}\label{classChunkedArray_aba54bf85d48b125c234e6a97867b9a84}} 
+\index{Chunked\+Array@{Chunked\+Array}!get\+Address@{get\+Address}}
+\index{get\+Address@{get\+Address}!Chunked\+Array@{Chunked\+Array}}
+\subsubsection{\texorpdfstring{get\+Address()}{getAddress()}}
+{\footnotesize\ttfamily void Chunked\+Array\+::get\+Address (\begin{DoxyParamCaption}\item[{double $\ast$}]{rt }\end{DoxyParamCaption})}
+
+used for debugging only \mbox{\Hypertarget{classChunkedArray_a06ea03d909d7072852e92bd159a6c719}\label{classChunkedArray_a06ea03d909d7072852e92bd159a6c719}} 
+\index{Chunked\+Array@{Chunked\+Array}!move\+Device\+To\+Host@{move\+Device\+To\+Host}}
+\index{move\+Device\+To\+Host@{move\+Device\+To\+Host}!Chunked\+Array@{Chunked\+Array}}
+\subsubsection{\texorpdfstring{move\+Device\+To\+Host()}{moveDeviceToHost()}}
+{\footnotesize\ttfamily void Chunked\+Array\+::move\+Device\+To\+Host (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Copys from G\+PU to C\+PU \mbox{\Hypertarget{classChunkedArray_a1ae58bbd5d8e5e628c43f1fc0c222427}\label{classChunkedArray_a1ae58bbd5d8e5e628c43f1fc0c222427}} 
+\index{Chunked\+Array@{Chunked\+Array}!move\+Host\+To\+Device@{move\+Host\+To\+Device}}
+\index{move\+Host\+To\+Device@{move\+Host\+To\+Device}!Chunked\+Array@{Chunked\+Array}}
+\subsubsection{\texorpdfstring{move\+Host\+To\+Device()}{moveHostToDevice()}}
+{\footnotesize\ttfamily void Chunked\+Array\+::move\+Host\+To\+Device (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Constructor Copys from G\+PU to C\+PU \mbox{\Hypertarget{classChunkedArray_af75eed0a52df1e58499bd7f8fae03f49}\label{classChunkedArray_af75eed0a52df1e58499bd7f8fae03f49}} 
+\index{Chunked\+Array@{Chunked\+Array}!operator()@{operator()}}
+\index{operator()@{operator()}!Chunked\+Array@{Chunked\+Array}}
+\subsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily double \& Chunked\+Array\+::operator() (\begin{DoxyParamCaption}\item[{int}]{chunk\+Id,  }\item[{int}]{dir,  }\item[{int}]{i,  }\item[{int}]{j,  }\item[{int}]{k,  }\item[{int}]{index }\end{DoxyParamCaption})}
+
+brief\+: rearrangement is consistent with the planes where (1,0,0) (0,1,0) and (0,0,1) around which rotation occurs 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/include/chunked\+Array.\+h\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/chunked\+Array.\+cpp\end{DoxyCompactItemize}

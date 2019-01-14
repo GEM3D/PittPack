@@ -1,0 +1,26 @@
+var classChunkedArray =
+[
+    [ "ChunkedArray", "classChunkedArray.html#aae4eb5521dd29ced227b18a9eb6c9913", null ],
+    [ "~ChunkedArray", "classChunkedArray.html#a71913a12bb4934f6e01a594ff1e429fa", null ],
+    [ "allocate", "classChunkedArray.html#a61a06ae961bb5d45fe6a7268fe276ac3", null ],
+    [ "getAddress", "classChunkedArray.html#aba54bf85d48b125c234e6a97867b9a84", null ],
+    [ "getChunkSize", "classChunkedArray.html#a62f4acf8950745e13122cce62ed06ee3", null ],
+    [ "moveDeviceToHost", "classChunkedArray.html#a06ea03d909d7072852e92bd159a6c719", null ],
+    [ "moveHostToDevice", "classChunkedArray.html#a1ae58bbd5d8e5e628c43f1fc0c222427", null ],
+    [ "operator()", "classChunkedArray.html#aa245e2b758286956ce8986c75dd2bacb", null ],
+    [ "operator()", "classChunkedArray.html#a2b34add05354d1cd850bd4dc43021c65", null ],
+    [ "operator()", "classChunkedArray.html#af75eed0a52df1e58499bd7f8fae03f49", null ],
+    [ "operator()", "classChunkedArray.html#a8a06e93755692d416d55c5dfde9ad020", null ],
+    [ "operator()", "classChunkedArray.html#ad1048c7f8536caf5df66c7da482ffa94", null ],
+    [ "setCoords", "classChunkedArray.html#ac34d626f2e0f3a39381287e14b75ef74", null ],
+    [ "setDirection", "classChunkedArray.html#ac7cafd1fd98f3256217c82887696ef99", null ],
+    [ "size", "classChunkedArray.html#a5b768db5d280d532e090e871b6297fc1", null ],
+    [ "MpiCom", "classChunkedArray.html#ac44d19d82c46351447effb00a192c573", null ],
+    [ "MultiGrid", "classChunkedArray.html#a6081e6e462e5143c0faaafe3fe63406d", null ],
+    [ "PencilDcmp", "classChunkedArray.html#a89c0195380e113e4d774b5977badc321", null ],
+    [ "Phdf5", "classChunkedArray.html#aee5becafbd48750c5ef7fbb178bec581", null ],
+    [ "PoissonCPU", "classChunkedArray.html#a54d4c5e140360c72f48810f28a2aa69c", null ],
+    [ "PoissonGPU", "classChunkedArray.html#ae2456986f8cab7e4c0d7320415ec3c88", null ],
+    [ "SignalProc", "classChunkedArray.html#a02f17d3a7bcc6eadc9f257ad071c2d1b", null ],
+    [ "TriDiag", "classChunkedArray.html#a0efda7cf27257f3a95fdee8e922f2443", null ]
+];

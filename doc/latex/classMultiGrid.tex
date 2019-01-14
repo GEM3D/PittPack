@@ -1,0 +1,260 @@
+\hypertarget{classMultiGrid}{}\section{Multi\+Grid Class Reference}
+\label{classMultiGrid}\index{Multi\+Grid@{Multi\+Grid}}
+
+
+Open\+A\+CC implementation of Multigrid algorithm for the solution of the Poisson equation in one dimension.  
+
+
+
+
+{\ttfamily \#include $<$multi\+Grid.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classMultiGrid_ae0bd1f5ad888a0b0791674d3273343f6}{Multi\+Grid}} (int n, double delx, char $\ast$sm, int iter1, int iter2, int iter3)
+\item 
+\mbox{\hyperlink{classMultiGrid_a5828418459e380cab698e100f046d69b}{Multi\+Grid}} (int n, double delx, int iter1, int iter2, int iter3)
+\item 
+void \mbox{\hyperlink{classMultiGrid_aa63b0787973db9e19fa207b1be21a2d8}{construct}} (int n, int iter1, int iter2, int iter3, double $\ast$sub, double $\ast$sup)
+\item 
+\mbox{\Hypertarget{classMultiGrid_a5878f45adf5383346fd11bda649eba1f}\label{classMultiGrid_a5878f45adf5383346fd11bda649eba1f}} 
+void {\bfseries set\+Delx} (double dx)
+\item 
+void \mbox{\hyperlink{classMultiGrid_a48269b6f9aa35ef98dbb6f963d4fc34a}{fill\+Indices}} ()
+\item 
+void \mbox{\hyperlink{classMultiGrid_a06c1e2774135f580e24438153f0ed8d6}{initialize}} (double $\ast$u\+In)
+\item 
+int \mbox{\hyperlink{classMultiGrid_a817929f266a2f1c00b6e42516cf3dd96}{get\+Index}} (int level)
+\item 
+int \mbox{\hyperlink{classMultiGrid_a0e184d70b17678ceb6707a8ddd7e6c87}{detect\+Max\+Level}} (int n)
+\item 
+void \mbox{\hyperlink{classMultiGrid_a0de44b871082fcd11fc75a97295c2d52}{get\+Required\+Size}} ()
+\item 
+\mbox{\Hypertarget{classMultiGrid_a2f1c7cba61d50bb37ed3bf402949031d}\label{classMultiGrid_a2f1c7cba61d50bb37ed3bf402949031d}} 
+void {\bfseries multi\+Grid\+Prolong} (int level)
+\item 
+void \mbox{\hyperlink{classMultiGrid_a4ae7a3a7c3898e86465d635f379f5828}{multi\+Grid\+Restrict}} (int level)
+\item 
+void \mbox{\hyperlink{classMultiGrid_a605e0a32f5f979b781b4a4b70c9c90f2}{residual}} (int level)
+\item 
+void \mbox{\hyperlink{classMultiGrid_afc18e9c07fe4359bcdb5d7999ef9672b}{smooth}} (int level, int iter)
+\item 
+void \mbox{\hyperlink{classMultiGrid_a679ace3c3a59b2c7e93708f6db0b237c}{solve\+Mono}} (double on\+Diag)
+\item 
+double \mbox{\hyperlink{classMultiGrid_a147206a8dd140649ef797a241d4ee258}{l1\+Norm}} ()
+\item 
+double \mbox{\hyperlink{classMultiGrid_a23ea3051d3d9a3fb43f2725b6e9f9efc}{l2\+Norm}} ()
+\item 
+\mbox{\Hypertarget{classMultiGrid_a8a2bfe3f2f4787c85bc17c0810ae4683}\label{classMultiGrid_a8a2bfe3f2f4787c85bc17c0810ae4683}} 
+void {\bfseries print} (double $\ast$u, double delx, int level)
+\item 
+\mbox{\Hypertarget{classMultiGrid_afa99ba5495e246f1b1c2102ab719f687}\label{classMultiGrid_afa99ba5495e246f1b1c2102ab719f687}} 
+void {\bfseries print} (double delx, int level)
+\item 
+\mbox{\Hypertarget{classMultiGrid_ac889eb3d68b716c93752d9d776873882}\label{classMultiGrid_ac889eb3d68b716c93752d9d776873882}} 
+void {\bfseries set\+Smoother} (char $\ast$sm)
+\item 
+void \mbox{\hyperlink{classMultiGrid_ac50d33d6af2436397cba05e0eecc02c2}{red\+Black\+Mono}} (double on\+Diag)
+\item 
+void \mbox{\hyperlink{classMultiGrid_ade19e917a66caba115c0fb1975ae9906}{weighted\+Jacobi\+Mono}} ()
+\item 
+void \mbox{\hyperlink{classMultiGrid_a7a81c22ab36afae5dc0b926423b6a91f}{weighted\+Jacobi\+Smoother}} (int index0, int upper\+Limit, double d)
+\item 
+void \mbox{\hyperlink{classMultiGrid_a6b14d3f7da004282770fd7606bd06a27}{solve\+Multi}} (double $\ast$out)
+\item 
+void \mbox{\hyperlink{classMultiGrid_a2c347faf3e1df3ec3dc30948550ec215}{exact}} ()
+\item 
+void \mbox{\hyperlink{classMultiGrid_aadd3312395446c9d0a1dcad780205844}{red\+Black\+Smoother}} (int index0, int upper\+Limit, double d)
+\item 
+void \mbox{\hyperlink{classMultiGrid_a5d3162dc383c2031dbd52395fb12edaf}{set\+Iter}} (int iter1, int iter2, int iter3)
+\item 
+\mbox{\Hypertarget{classMultiGrid_aa8bf25e31b2ffca02740fe3d2b3f89e3}\label{classMultiGrid_aa8bf25e31b2ffca02740fe3d2b3f89e3}} 
+void {\bfseries re\+Init} ()
+\item 
+\mbox{\Hypertarget{classMultiGrid_a9715421cd6c87064b998b2d93dcd37e9}\label{classMultiGrid_a9715421cd6c87064b998b2d93dcd37e9}} 
+void {\bfseries assign} (double $\ast$u\+In)
+\item 
+\mbox{\Hypertarget{classMultiGrid_a638a568e8193db34c3903d0546b334af}\label{classMultiGrid_a638a568e8193db34c3903d0546b334af}} 
+void {\bfseries set\+Diag} (double diag)
+\item 
+void \mbox{\hyperlink{classMultiGrid_ac392828b24eca28c66ba6a0937f1ef25}{red\+Black\+Smoother}} (int index0, int upper\+Limit, double d, int level)
+\item 
+\mbox{\Hypertarget{classMultiGrid_a7f499684b58c9431c9d0e1bc6287e302}\label{classMultiGrid_a7f499684b58c9431c9d0e1bc6287e302}} 
+void {\bfseries reset} ()
+\item 
+\mbox{\Hypertarget{classMultiGrid_ae82947988c34258ddad5e15f6553a0a1}\label{classMultiGrid_ae82947988c34258ddad5e15f6553a0a1}} 
+void {\bfseries re\+Fill} (double $\ast$out)
+\item 
+void \mbox{\hyperlink{classMultiGrid_ab84905fee399df9379238a11bd7cd308}{thomas\+Low\+Mem}} (double $\ast$out, double diag, int index)
+\item 
+\mbox{\Hypertarget{classMultiGrid_a5f461e7fa65160cd891ac8153bc83bc4}\label{classMultiGrid_a5f461e7fa65160cd891ac8153bc83bc4}} 
+void {\bfseries thomas\+Put\+Back} (double $\ast$tmp\+MG, int index)
+\item 
+\mbox{\Hypertarget{classMultiGrid_aab4206811c64845b3332e17ab2be689e}\label{classMultiGrid_aab4206811c64845b3332e17ab2be689e}} 
+void {\bfseries fill\+In\+Array\+Contig} (\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&P, int n\+Chunk, int nz\+Chunk, int i, int j, int index)
+\item 
+\mbox{\Hypertarget{classMultiGrid_af2470fdb5afbc19b40ea4eb09064200e}\label{classMultiGrid_af2470fdb5afbc19b40ea4eb09064200e}} 
+void {\bfseries fill\+In\+Array\+Back} (\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&P, int n\+Chunk, int nz\+Chunk, int i, int j, int index)
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classMultiGrid_a89c0195380e113e4d774b5977badc321}\label{classMultiGrid_a89c0195380e113e4d774b5977badc321}} 
+class {\bfseries Pencil\+Dcmp}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Open\+A\+CC implementation of Multigrid algorithm for the solution of the Poisson equation in one dimension. 
+
+\begin{eqnarray*} \Delta u &=& f \end{eqnarray*} 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classMultiGrid_ae0bd1f5ad888a0b0791674d3273343f6}\label{classMultiGrid_ae0bd1f5ad888a0b0791674d3273343f6}} 
+\index{Multi\+Grid@{Multi\+Grid}!Multi\+Grid@{Multi\+Grid}}
+\index{Multi\+Grid@{Multi\+Grid}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{Multi\+Grid()}{MultiGrid()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Multi\+Grid\+::\+Multi\+Grid (\begin{DoxyParamCaption}\item[{int}]{n,  }\item[{double}]{delx,  }\item[{char $\ast$}]{sm,  }\item[{int}]{iter1,  }\item[{int}]{iter2,  }\item[{int}]{iter3 }\end{DoxyParamCaption})}
+
+Class constructor \mbox{\Hypertarget{classMultiGrid_a5828418459e380cab698e100f046d69b}\label{classMultiGrid_a5828418459e380cab698e100f046d69b}} 
+\index{Multi\+Grid@{Multi\+Grid}!Multi\+Grid@{Multi\+Grid}}
+\index{Multi\+Grid@{Multi\+Grid}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{Multi\+Grid()}{MultiGrid()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Multi\+Grid\+::\+Multi\+Grid (\begin{DoxyParamCaption}\item[{int}]{n,  }\item[{double}]{delx,  }\item[{int}]{iter1,  }\item[{int}]{iter2,  }\item[{int}]{iter3 }\end{DoxyParamCaption})}
+
+Class constructor uses defaul smoother R\+B\+GS 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classMultiGrid_aa63b0787973db9e19fa207b1be21a2d8}\label{classMultiGrid_aa63b0787973db9e19fa207b1be21a2d8}} 
+\index{Multi\+Grid@{Multi\+Grid}!construct@{construct}}
+\index{construct@{construct}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{construct()}{construct()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::construct (\begin{DoxyParamCaption}\item[{int}]{n,  }\item[{int}]{iter1,  }\item[{int}]{iter2,  }\item[{int}]{iter3,  }\item[{double $\ast$}]{sub,  }\item[{double $\ast$}]{sup }\end{DoxyParamCaption})}
+
+Class constructor uses defaul smoother R\+B\+GS \mbox{\Hypertarget{classMultiGrid_a0e184d70b17678ceb6707a8ddd7e6c87}\label{classMultiGrid_a0e184d70b17678ceb6707a8ddd7e6c87}} 
+\index{Multi\+Grid@{Multi\+Grid}!detect\+Max\+Level@{detect\+Max\+Level}}
+\index{detect\+Max\+Level@{detect\+Max\+Level}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{detect\+Max\+Level()}{detectMaxLevel()}}
+{\footnotesize\ttfamily int Multi\+Grid\+::detect\+Max\+Level (\begin{DoxyParamCaption}\item[{int}]{n }\end{DoxyParamCaption})}
+
+calculates the maximum level assuming that the grid size is equal to 2$^\wedge$n+1 \mbox{\Hypertarget{classMultiGrid_a2c347faf3e1df3ec3dc30948550ec215}\label{classMultiGrid_a2c347faf3e1df3ec3dc30948550ec215}} 
+\index{Multi\+Grid@{Multi\+Grid}!exact@{exact}}
+\index{exact@{exact}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{exact()}{exact()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::exact (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+solve exactly using GS, be careful not to use weighted jacobi with one iteration at the coaresest level \mbox{\Hypertarget{classMultiGrid_a48269b6f9aa35ef98dbb6f963d4fc34a}\label{classMultiGrid_a48269b6f9aa35ef98dbb6f963d4fc34a}} 
+\index{Multi\+Grid@{Multi\+Grid}!fill\+Indices@{fill\+Indices}}
+\index{fill\+Indices@{fill\+Indices}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{fill\+Indices()}{fillIndices()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::fill\+Indices (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+fills out the required indices given a level \mbox{\Hypertarget{classMultiGrid_a817929f266a2f1c00b6e42516cf3dd96}\label{classMultiGrid_a817929f266a2f1c00b6e42516cf3dd96}} 
+\index{Multi\+Grid@{Multi\+Grid}!get\+Index@{get\+Index}}
+\index{get\+Index@{get\+Index}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{get\+Index()}{getIndex()}}
+{\footnotesize\ttfamily int Multi\+Grid\+::get\+Index (\begin{DoxyParamCaption}\item[{int}]{level }\end{DoxyParamCaption})}
+
+Calculates the index given a level \mbox{\Hypertarget{classMultiGrid_a0de44b871082fcd11fc75a97295c2d52}\label{classMultiGrid_a0de44b871082fcd11fc75a97295c2d52}} 
+\index{Multi\+Grid@{Multi\+Grid}!get\+Required\+Size@{get\+Required\+Size}}
+\index{get\+Required\+Size@{get\+Required\+Size}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{get\+Required\+Size()}{getRequiredSize()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::get\+Required\+Size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+calculates the required array\+Size for the full V-\/cycle multi-\/grid operations \mbox{\Hypertarget{classMultiGrid_a06c1e2774135f580e24438153f0ed8d6}\label{classMultiGrid_a06c1e2774135f580e24438153f0ed8d6}} 
+\index{Multi\+Grid@{Multi\+Grid}!initialize@{initialize}}
+\index{initialize@{initialize}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::initialize (\begin{DoxyParamCaption}\item[{double $\ast$}]{u\+In }\end{DoxyParamCaption})}
+
+initilaized the internal arrays \mbox{\Hypertarget{classMultiGrid_a147206a8dd140649ef797a241d4ee258}\label{classMultiGrid_a147206a8dd140649ef797a241d4ee258}} 
+\index{Multi\+Grid@{Multi\+Grid}!l1\+Norm@{l1\+Norm}}
+\index{l1\+Norm@{l1\+Norm}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{l1\+Norm()}{l1Norm()}}
+{\footnotesize\ttfamily double Multi\+Grid\+::l1\+Norm (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Calculates the l1-\/norm \mbox{\Hypertarget{classMultiGrid_a23ea3051d3d9a3fb43f2725b6e9f9efc}\label{classMultiGrid_a23ea3051d3d9a3fb43f2725b6e9f9efc}} 
+\index{Multi\+Grid@{Multi\+Grid}!l2\+Norm@{l2\+Norm}}
+\index{l2\+Norm@{l2\+Norm}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{l2\+Norm()}{l2Norm()}}
+{\footnotesize\ttfamily double Multi\+Grid\+::l2\+Norm (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Calculates the l2-\/norm \mbox{\Hypertarget{classMultiGrid_a4ae7a3a7c3898e86465d635f379f5828}\label{classMultiGrid_a4ae7a3a7c3898e86465d635f379f5828}} 
+\index{Multi\+Grid@{Multi\+Grid}!multi\+Grid\+Restrict@{multi\+Grid\+Restrict}}
+\index{multi\+Grid\+Restrict@{multi\+Grid\+Restrict}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{multi\+Grid\+Restrict()}{multiGridRestrict()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::multi\+Grid\+Restrict (\begin{DoxyParamCaption}\item[{int}]{level }\end{DoxyParamCaption})}
+
+prolongs the data back to the denser grid restructs residual to the coarser grid \mbox{\Hypertarget{classMultiGrid_ac50d33d6af2436397cba05e0eecc02c2}\label{classMultiGrid_ac50d33d6af2436397cba05e0eecc02c2}} 
+\index{Multi\+Grid@{Multi\+Grid}!red\+Black\+Mono@{red\+Black\+Mono}}
+\index{red\+Black\+Mono@{red\+Black\+Mono}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{red\+Black\+Mono()}{redBlackMono()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::red\+Black\+Mono (\begin{DoxyParamCaption}\item[{double}]{on\+Diag }\end{DoxyParamCaption})}
+
+solves using a weighted Jacobi on one grid, this is just for comparison \mbox{\Hypertarget{classMultiGrid_aadd3312395446c9d0a1dcad780205844}\label{classMultiGrid_aadd3312395446c9d0a1dcad780205844}} 
+\index{Multi\+Grid@{Multi\+Grid}!red\+Black\+Smoother@{red\+Black\+Smoother}}
+\index{red\+Black\+Smoother@{red\+Black\+Smoother}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{red\+Black\+Smoother()}{redBlackSmoother()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Multi\+Grid\+::red\+Black\+Smoother (\begin{DoxyParamCaption}\item[{int}]{index0,  }\item[{int}]{upper\+Limit,  }\item[{double}]{d }\end{DoxyParamCaption})}
+
+Red Black Gauss Seidel smoother \mbox{\Hypertarget{classMultiGrid_ac392828b24eca28c66ba6a0937f1ef25}\label{classMultiGrid_ac392828b24eca28c66ba6a0937f1ef25}} 
+\index{Multi\+Grid@{Multi\+Grid}!red\+Black\+Smoother@{red\+Black\+Smoother}}
+\index{red\+Black\+Smoother@{red\+Black\+Smoother}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{red\+Black\+Smoother()}{redBlackSmoother()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Multi\+Grid\+::red\+Black\+Smoother (\begin{DoxyParamCaption}\item[{int}]{index0,  }\item[{int}]{upper\+Limit,  }\item[{double}]{d,  }\item[{int}]{level }\end{DoxyParamCaption})}
+
+Red Black Gauss Seidel smoother \mbox{\Hypertarget{classMultiGrid_a605e0a32f5f979b781b4a4b70c9c90f2}\label{classMultiGrid_a605e0a32f5f979b781b4a4b70c9c90f2}} 
+\index{Multi\+Grid@{Multi\+Grid}!residual@{residual}}
+\index{residual@{residual}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{residual()}{residual()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::residual (\begin{DoxyParamCaption}\item[{int}]{level }\end{DoxyParamCaption})}
+
+calculates the residual \mbox{\Hypertarget{classMultiGrid_a5d3162dc383c2031dbd52395fb12edaf}\label{classMultiGrid_a5d3162dc383c2031dbd52395fb12edaf}} 
+\index{Multi\+Grid@{Multi\+Grid}!set\+Iter@{set\+Iter}}
+\index{set\+Iter@{set\+Iter}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{set\+Iter()}{setIter()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::set\+Iter (\begin{DoxyParamCaption}\item[{int}]{iter1,  }\item[{int}]{iter2,  }\item[{int}]{iter3 }\end{DoxyParamCaption})}
+
+sets the internal variables for iteration in the class \mbox{\Hypertarget{classMultiGrid_afc18e9c07fe4359bcdb5d7999ef9672b}\label{classMultiGrid_afc18e9c07fe4359bcdb5d7999ef9672b}} 
+\index{Multi\+Grid@{Multi\+Grid}!smooth@{smooth}}
+\index{smooth@{smooth}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{smooth()}{smooth()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::smooth (\begin{DoxyParamCaption}\item[{int}]{level,  }\item[{int}]{iter }\end{DoxyParamCaption})}
+
+smooth with either Jacobi of Red-\/\+Black Gauss-\/\+Seidel \mbox{\Hypertarget{classMultiGrid_a679ace3c3a59b2c7e93708f6db0b237c}\label{classMultiGrid_a679ace3c3a59b2c7e93708f6db0b237c}} 
+\index{Multi\+Grid@{Multi\+Grid}!solve\+Mono@{solve\+Mono}}
+\index{solve\+Mono@{solve\+Mono}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{solve\+Mono()}{solveMono()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::solve\+Mono (\begin{DoxyParamCaption}\item[{double}]{on\+Diag }\end{DoxyParamCaption})}
+
+solves using one grid \mbox{\Hypertarget{classMultiGrid_a6b14d3f7da004282770fd7606bd06a27}\label{classMultiGrid_a6b14d3f7da004282770fd7606bd06a27}} 
+\index{Multi\+Grid@{Multi\+Grid}!solve\+Multi@{solve\+Multi}}
+\index{solve\+Multi@{solve\+Multi}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{solve\+Multi()}{solveMulti()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::solve\+Multi (\begin{DoxyParamCaption}\item[{double $\ast$}]{out }\end{DoxyParamCaption})}
+
+solves using multi grid \mbox{\Hypertarget{classMultiGrid_ab84905fee399df9379238a11bd7cd308}\label{classMultiGrid_ab84905fee399df9379238a11bd7cd308}} 
+\index{Multi\+Grid@{Multi\+Grid}!thomas\+Low\+Mem@{thomas\+Low\+Mem}}
+\index{thomas\+Low\+Mem@{thomas\+Low\+Mem}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{thomas\+Low\+Mem()}{thomasLowMem()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::thomas\+Low\+Mem (\begin{DoxyParamCaption}\item[{double $\ast$}]{out,  }\item[{double}]{diag,  }\item[{int}]{index }\end{DoxyParamCaption})}
+
+For poisson equation uses only the coefiicients, does not save repetitive values in a array \mbox{\Hypertarget{classMultiGrid_ade19e917a66caba115c0fb1975ae9906}\label{classMultiGrid_ade19e917a66caba115c0fb1975ae9906}} 
+\index{Multi\+Grid@{Multi\+Grid}!weighted\+Jacobi\+Mono@{weighted\+Jacobi\+Mono}}
+\index{weighted\+Jacobi\+Mono@{weighted\+Jacobi\+Mono}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{weighted\+Jacobi\+Mono()}{weightedJacobiMono()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::weighted\+Jacobi\+Mono (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+solves using a weighted Jacobi on one grid, this is just for comparison \mbox{\Hypertarget{classMultiGrid_a7a81c22ab36afae5dc0b926423b6a91f}\label{classMultiGrid_a7a81c22ab36afae5dc0b926423b6a91f}} 
+\index{Multi\+Grid@{Multi\+Grid}!weighted\+Jacobi\+Smoother@{weighted\+Jacobi\+Smoother}}
+\index{weighted\+Jacobi\+Smoother@{weighted\+Jacobi\+Smoother}!Multi\+Grid@{Multi\+Grid}}
+\subsubsection{\texorpdfstring{weighted\+Jacobi\+Smoother()}{weightedJacobiSmoother()}}
+{\footnotesize\ttfamily void Multi\+Grid\+::weighted\+Jacobi\+Smoother (\begin{DoxyParamCaption}\item[{int}]{index0,  }\item[{int}]{upper\+Limit,  }\item[{double}]{d }\end{DoxyParamCaption})}
+
+Weighted jacobi is used as smoothe 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/include/multi\+Grid.\+h\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/multi\+Grid.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,248 @@
+\hypertarget{classFourier}{\section{Fourier Class Reference}
+\label{classFourier}\index{Fourier@{Fourier}}
+}
+
+
+Designed to solve Poisson's equation discretized by finite difference method. Given the appropriate boundary conditions in each diretion, it employs separation of variables using F\-F\-T. The solver uses cell-\/centered approach on the discretized domain.  
+
+
+
+
+{\ttfamily \#include $<$fft.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classFourier_a56003ca961eb3bd1caec48eb320903a7}{Fourier} (int n)
+\item 
+\hypertarget{classFourier_aeb302d1f719a360cf1a08a03511babcf}{{\bfseries Fourier} (int n, char $\ast$boundary)}\label{classFourier_aeb302d1f719a360cf1a08a03511babcf}
+
+\item 
+void \hyperlink{classFourier_a9dc1752ffd8a1f99c109f003308d6f8a}{estimate\-Size} (int $\ast$length)
+\item 
+\hypertarget{classFourier_a67b96468ace0838f1fe082e894785657}{void {\bfseries assign\-Coords} (double $\ast$X)}\label{classFourier_a67b96468ace0838f1fe082e894785657}
+
+\item 
+\hypertarget{classFourier_a844a3e6ffe6027a988cd232de72cf62d}{void {\bfseries assign\-Boundary} (char $\ast$boundary)}\label{classFourier_a844a3e6ffe6027a988cd232de72cf62d}
+
+\item 
+\hypertarget{classFourier_a1f74b27c03f745a385f7f6bd1f7a472a}{void {\bfseries set\-Source} ()}\label{classFourier_a1f74b27c03f745a385f7f6bd1f7a472a}
+
+\item 
+\hypertarget{classFourier_a2ee0ef96479ae0341dac74b8e009e23c}{void {\bfseries prepare\-For\-Fourier\-Transform} (const int j, const int k, const int direction, const int tag)}\label{classFourier_a2ee0ef96479ae0341dac74b8e009e23c}
+
+\item 
+\hypertarget{classFourier_a3de95ce38953778e883062600583dc54}{double {\bfseries exact\-Value} (double x, int tg)}\label{classFourier_a3de95ce38953778e883062600583dc54}
+
+\item 
+\hypertarget{classFourier_ad588616fc786bc591843673a21790d87}{void {\bfseries detect\-Transforms} ()}\label{classFourier_ad588616fc786bc591843673a21790d87}
+
+\item 
+void \hyperlink{classFourier_adad7350272b4e7b9a195851bc45d1e6a}{prepare\-For\-Fourier\-Transform} (const int direction, const int tag)
+\item 
+\hypertarget{classFourier_ab50bc164e1c34491f19ed9b6fa4387c5}{void {\bfseries set\-Exact} ()}\label{classFourier_ab50bc164e1c34491f19ed9b6fa4387c5}
+
+\item 
+\hypertarget{classFourier_a389f4684ba80d8611ee7f054e9a5b2c7}{void {\bfseries set\-Dxyz} ()}\label{classFourier_a389f4684ba80d8611ee7f054e9a5b2c7}
+
+\item 
+\hypertarget{classFourier_a1068b8011eed399c30ae984ead4ee40d}{void {\bfseries allocate} ()}\label{classFourier_a1068b8011eed399c30ae984ead4ee40d}
+
+\item 
+\hypertarget{classFourier_a84a202b757a32983dfaaa9d5c9fb464f}{void {\bfseries Test} (int i)}\label{classFourier_a84a202b757a32983dfaaa9d5c9fb464f}
+
+\item 
+\hypertarget{classFourier_a9515a6968ff52646a0d52bd8133b74e9}{void {\bfseries move\-Device\-To\-Host} ()}\label{classFourier_a9515a6968ff52646a0d52bd8133b74e9}
+
+\item 
+\hypertarget{classFourier_ac5a5f9f7097821ba14cce0045fc66526}{void {\bfseries move\-Device\-To\-Host\-Complex} ()}\label{classFourier_ac5a5f9f7097821ba14cce0045fc66526}
+
+\item 
+\hypertarget{classFourier_af0b4a4f59c05858f63649f61cf85f694}{void {\bfseries move\-Host\-To\-Device} ()}\label{classFourier_af0b4a4f59c05858f63649f61cf85f694}
+
+\item 
+\hypertarget{classFourier_afa8177aff11aaf2ff7ce95e4348a1a4b}{void {\bfseries reset\-Source} ()}\label{classFourier_afa8177aff11aaf2ff7ce95e4348a1a4b}
+
+\item 
+\hypertarget{classFourier_aeb6973f461a7eec7f57d787f5eb3ab47}{void {\bfseries set\-Eigen\-Val} ()}\label{classFourier_aeb6973f461a7eec7f57d787f5eb3ab47}
+
+\item 
+\hypertarget{classFourier_ad6c1d93675057031fd143ce550de3f7d}{void {\bfseries transform\-In\-Xdirection} ()}\label{classFourier_ad6c1d93675057031fd143ce550de3f7d}
+
+\item 
+\hypertarget{classFourier_a933dbaa3c8da67d79d65dd36c25d5b42}{void {\bfseries set\-Tri\-Diag\-Arrays} ()}\label{classFourier_a933dbaa3c8da67d79d65dd36c25d5b42}
+
+\item 
+\hypertarget{classFourier_a80a5e595af802782a22e0a4dc038d875}{void {\bfseries assign\-Exact\-Freqs} ()}\label{classFourier_a80a5e595af802782a22e0a4dc038d875}
+
+\item 
+\hypertarget{classFourier_aaa21d527b5b4bc93cce20e1a7d5025b7}{void {\bfseries extract\-Tag} ()}\label{classFourier_aaa21d527b5b4bc93cce20e1a7d5025b7}
+
+\item 
+\hypertarget{classFourier_a55b16445add800e6306358b9694c7bd1}{void {\bfseries exact} (\hyperlink{classPressure}{Pressure} \&Pex)}\label{classFourier_a55b16445add800e6306358b9694c7bd1}
+
+\item 
+\hypertarget{classFourier_a012bf56395b8df6637d611a407ba2080}{void {\bfseries preprocess\-Signal\-Accordingly} (const int j, const int k, const int direction, const int counter)}\label{classFourier_a012bf56395b8df6637d611a407ba2080}
+
+\item 
+\hypertarget{classFourier_a5c3cd85b7b552cac7ff4b41fabf4428b}{void {\bfseries preprocess\-Signal\-Accordingly} (const int direction, const int counter)}\label{classFourier_a5c3cd85b7b552cac7ff4b41fabf4428b}
+
+\item 
+\hypertarget{classFourier_addb8e829ef07afae67bcb645eff06e3e}{void {\bfseries preprocess\-Signal\-Accordingly\-Reverse} (const int j, const int k, const int direction, const int counter)}\label{classFourier_addb8e829ef07afae67bcb645eff06e3e}
+
+\item 
+\hypertarget{classFourier_a5f4a9a13795cc349d2212dd2f9e220eb}{void {\bfseries preprocess\-Signal\-Accordingly\-Reverse} (const int direction, const int counter)}\label{classFourier_a5f4a9a13795cc349d2212dd2f9e220eb}
+
+\item 
+\hypertarget{classFourier_ad3212ed20019097183d341c1cba3ab16}{void {\bfseries preprocess\-Signal\-D\-C\-T10} (const int j, const int k, const int direction)}\label{classFourier_ad3212ed20019097183d341c1cba3ab16}
+
+\item 
+\hypertarget{classFourier_a4d3f5a93664335cb671c6f66ca3a5e20}{void {\bfseries preprocess\-Signal\-D\-C\-T01} (const int j, const int k, const int direction)}\label{classFourier_a4d3f5a93664335cb671c6f66ca3a5e20}
+
+\item 
+\hypertarget{classFourier_a05da4d167ba9424a8bfde3fd304561b4}{void {\bfseries preprocess\-Signal\-D\-S\-T00} (const int direction)}\label{classFourier_a05da4d167ba9424a8bfde3fd304561b4}
+
+\item 
+\hypertarget{classFourier_a3f3da23e3d7813609573d02b16af1e23}{void {\bfseries preprocess\-Signal\-D\-C\-T10} (const int direction)}\label{classFourier_a3f3da23e3d7813609573d02b16af1e23}
+
+\item 
+\hypertarget{classFourier_a98376fa128963eb4f2b233d5df181a0a}{void {\bfseries preprocess\-Signal\-D\-S\-T00} (const int j, const int k, const int direction)}\label{classFourier_a98376fa128963eb4f2b233d5df181a0a}
+
+\item 
+\hypertarget{classFourier_a007e9dae4561b8a0691965350586a274}{void {\bfseries postprocess\-Signal\-D\-C\-T10} (const int j, const int k, const int direction)}\label{classFourier_a007e9dae4561b8a0691965350586a274}
+
+\item 
+\hypertarget{classFourier_a39a4fb3d8b9f123eba8aa4817b103e81}{void {\bfseries postprocess\-Signal\-D\-S\-T00} (const int j, const int k, const int direction)}\label{classFourier_a39a4fb3d8b9f123eba8aa4817b103e81}
+
+\item 
+\hypertarget{classFourier_ab93d1bb7f9e6782e4da50064cd40d848}{void {\bfseries postprocess\-Signal\-D\-C\-T01} (const int j, const int k, const int direction)}\label{classFourier_ab93d1bb7f9e6782e4da50064cd40d848}
+
+\item 
+\hypertarget{classFourier_ac798a8bd3f9a7bacaa4704374aa38072}{void {\bfseries postprocess\-Signal\-Accordingly} (const int direction, const int counter)}\label{classFourier_ac798a8bd3f9a7bacaa4704374aa38072}
+
+\item 
+\hypertarget{classFourier_a3a87d5183bb42fc4b741579965e221ca}{void {\bfseries preprocess\-Signal\-D\-S\-T00\-Reverse} (const int j, const int k, const int direction)}\label{classFourier_a3a87d5183bb42fc4b741579965e221ca}
+
+\item 
+\hypertarget{classFourier_a0fd0f5871c9743c89b12a6923f9104a5}{void {\bfseries postprocess\-Signal\-Accordingly\-Reverse} (const int direction, const int counter)}\label{classFourier_a0fd0f5871c9743c89b12a6923f9104a5}
+
+\item 
+\hypertarget{classFourier_a49c1837b58491442977d029ce9d57748}{void {\bfseries write\-X\-Line} (int j, int k, fftw\-\_\-complex $\ast$out\-C)}\label{classFourier_a49c1837b58491442977d029ce9d57748}
+
+\item 
+\hypertarget{classFourier_a41301dd8e1444c5b7608667255ba9013}{void {\bfseries write\-Y\-Line} (int j, int k, fftw\-\_\-complex $\ast$out\-C)}\label{classFourier_a41301dd8e1444c5b7608667255ba9013}
+
+\item 
+\hypertarget{classFourier_ad1c692b8f1673a4dadc6d313e50be4a2}{void {\bfseries read\-X\-Line} (int j, int k, fftw\-\_\-complex $\ast$out)}\label{classFourier_ad1c692b8f1673a4dadc6d313e50be4a2}
+
+\item 
+\hypertarget{classFourier_a2bd51e53f51e649e90d9386858e8f759}{void {\bfseries read\-Y\-Line} (int j, int k, fftw\-\_\-complex $\ast$out)}\label{classFourier_a2bd51e53f51e649e90d9386858e8f759}
+
+\item 
+\hypertarget{classFourier_a1a54dd2621780ba38c3336c4bfed4ac5}{void {\bfseries perform\-Transform\-Ydir} ()}\label{classFourier_a1a54dd2621780ba38c3336c4bfed4ac5}
+
+\item 
+\hypertarget{classFourier_aeae4df419baa831f440cc4c0e5287c18}{void {\bfseries perform\-Inverse\-Transform\-Ydir} ()}\label{classFourier_aeae4df419baa831f440cc4c0e5287c18}
+
+\item 
+\hypertarget{classFourier_a2c0b90f7b858848a6890e6803e45116a}{void {\bfseries perform\-Inverse\-Transform\-Xdir} ()}\label{classFourier_a2c0b90f7b858848a6890e6803e45116a}
+
+\item 
+\hypertarget{classFourier_a41a47f2ab875bbc6664d456fed64284d}{void {\bfseries perform\-Transform\-Xdir} ()}\label{classFourier_a41a47f2ab875bbc6664d456fed64284d}
+
+\item 
+\hypertarget{classFourier_ac5285609fa1af3b722c9881994f9626d}{void {\bfseries thomas} (int i, int j, int index)}\label{classFourier_ac5285609fa1af3b722c9881994f9626d}
+
+\item 
+void \hyperlink{classFourier_ad64563559b45e05bb52babb0de43be9e}{thomas\-Periodic} (int i, int j, int index)
+\item 
+\hypertarget{classFourier_abd4fc72b93d3fa99ff8e42ad9847291d}{void {\bfseries struct3\-D\-Coords} (double Xa, double Xb, double Ya, double Yb, double Za, double Zb, double $\ast$$\ast$X, double $\ast$$\ast$Y, double $\ast$$\ast$Z, int N)}\label{classFourier_abd4fc72b93d3fa99ff8e42ad9847291d}
+
+\item 
+\hypertarget{classFourier_a1426338be6f9c689e0f6aefdae64535d}{void {\bfseries V\-T\-Kout\-Cell\-Center} (double $\ast$X, double $\ast$Y, double $\ast$Z, int N)}\label{classFourier_a1426338be6f9c689e0f6aefdae64535d}
+
+\item 
+\hypertarget{classFourier_ae3a5049705d07c80249dbcd172fb2059}{void {\bfseries show} (int i, int j, int k)}\label{classFourier_ae3a5049705d07c80249dbcd172fb2059}
+
+\item 
+\hypertarget{classFourier_ace03aa6f48d433b00d13850b82d8dfc3}{void {\bfseries show\-Source} (int i, int j, int k)}\label{classFourier_ace03aa6f48d433b00d13850b82d8dfc3}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classFourier_a308674607bc1e936369290f5b9e96ab6}{static double {\bfseries sine} (double x)}\label{classFourier_a308674607bc1e936369290f5b9e96ab6}
+
+\item 
+\hypertarget{classFourier_a500f2eddd378e4589cb7279879187126}{static double {\bfseries cosine} (double x)}\label{classFourier_a500f2eddd378e4589cb7279879187126}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classFourier_a89a010125e37458723fd6a3d2e7f0ac4}{poisson} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Designed to solve Poisson's equation discretized by finite difference method. Given the appropriate boundary conditions in each diretion, it employs separation of variables using F\-F\-T. The solver uses cell-\/centered approach on the discretized domain. 
+
+This Class solves 3\-D poisson's equation using central difference enhanced by Separation of Variables by F\-F\-T.
+
+We are using Makhoul D\-C\-T and hence the logical scaling factor for this tranformation is N 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classFourier_a56003ca961eb3bd1caec48eb320903a7}{\index{Fourier@{Fourier}!Fourier@{Fourier}}
+\index{Fourier@{Fourier}!Fourier@{Fourier}}
+\subsubsection[{Fourier}]{\setlength{\rightskip}{0pt plus 5cm}Fourier\-::\-Fourier (
+\begin{DoxyParamCaption}
+\item[{int}]{n}
+\end{DoxyParamCaption}
+)}}\label{classFourier_a56003ca961eb3bd1caec48eb320903a7}
+dx=dxyz\mbox{[}0\mbox{]}; dy=dxyz\mbox{[}1\mbox{]}; dz=dxyz\mbox{[}2\mbox{]} 
+
+\subsection{Member Function Documentation}
+\hypertarget{classFourier_a9dc1752ffd8a1f99c109f003308d6f8a}{\index{Fourier@{Fourier}!estimate\-Size@{estimate\-Size}}
+\index{estimate\-Size@{estimate\-Size}!Fourier@{Fourier}}
+\subsubsection[{estimate\-Size}]{\setlength{\rightskip}{0pt plus 5cm}void Fourier\-::estimate\-Size (
+\begin{DoxyParamCaption}
+\item[{int $\ast$}]{length}
+\end{DoxyParamCaption}
+)}}\label{classFourier_a9dc1752ffd8a1f99c109f003308d6f8a}
+Everything \hyperlink{classComplex}{Complex} \hypertarget{classFourier_adad7350272b4e7b9a195851bc45d1e6a}{\index{Fourier@{Fourier}!prepare\-For\-Fourier\-Transform@{prepare\-For\-Fourier\-Transform}}
+\index{prepare\-For\-Fourier\-Transform@{prepare\-For\-Fourier\-Transform}!Fourier@{Fourier}}
+\subsubsection[{prepare\-For\-Fourier\-Transform}]{\setlength{\rightskip}{0pt plus 5cm}void Fourier\-::prepare\-For\-Fourier\-Transform (
+\begin{DoxyParamCaption}
+\item[{const int}]{direction, }
+\item[{const int}]{tag}
+\end{DoxyParamCaption}
+)}}\label{classFourier_adad7350272b4e7b9a195851bc45d1e6a}
+Detects the required transformations in different directions \hypertarget{classFourier_ad64563559b45e05bb52babb0de43be9e}{\index{Fourier@{Fourier}!thomas\-Periodic@{thomas\-Periodic}}
+\index{thomas\-Periodic@{thomas\-Periodic}!Fourier@{Fourier}}
+\subsubsection[{thomas\-Periodic}]{\setlength{\rightskip}{0pt plus 5cm}void Fourier\-::thomas\-Periodic (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{index}
+\end{DoxyParamCaption}
+)}}\label{classFourier_ad64563559b45e05bb52babb0de43be9e}
+using already stored arrays to perform inplace thomas algorithm 
+
+\subsection{Friends And Related Function Documentation}
+\hypertarget{classFourier_a89a010125e37458723fd6a3d2e7f0ac4}{\index{Fourier@{Fourier}!poisson@{poisson}}
+\index{poisson@{poisson}!Fourier@{Fourier}}
+\subsubsection[{poisson}]{\setlength{\rightskip}{0pt plus 5cm}void poisson (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [friend]}}}\label{classFourier_a89a010125e37458723fd6a3d2e7f0ac4}
+distance between batches
+
+for 1\-D transforms these are ignored
+
+for 1\-D transforms these are ignored 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/pylon5/ac561fp/hasbesta/\-Hybrid\-F\-F\-T/src/include/fft.\-h\item 
+/pylon5/ac561fp/hasbesta/\-Hybrid\-F\-F\-T/src/fft.\-cpp\end{DoxyCompactItemize}

@@ -1,0 +1,121 @@
+\hypertarget{classSignalProc}{}\section{Signal\+Proc Class Reference}
+\label{classSignalProc}\index{Signal\+Proc@{Signal\+Proc}}
+
+
+This class contains the preprocessing and past processing methods to perform real transform using complex transform ~\newline
+ to be able to use same amount of memory for all the possible transfmroation, we utilize the relation between D\+C\+T10 (D\+C\+T01) ~\newline
+ and D\+S\+T10 to calculate D\+S\+T10 (D\+S\+T01).  
+
+
+
+
+{\ttfamily \#include $<$signal\+Proc.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classSignalProc_a5f3eedc058066d233a1fc8f9d7bc4ea4}{postprocess\+Signal\+D\+C\+T10}} (\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&P, const int size, const int i, const int direction)
+\item 
+void \mbox{\hyperlink{classSignalProc_af9130e26afc367410205f564ee69d8df}{postprocess\+Signal\+D\+C\+T01}} (\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&P, const int size, const int j, const int direction)
+\item 
+void \mbox{\hyperlink{classSignalProc_a524c586ab4356908dfc87f049a202285}{preprocess\+Signal\+D\+C\+T01}} (\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&P, const int size, const int i, const int direction)
+\item 
+void \mbox{\hyperlink{classSignalProc_abe604e9fda0e105619688c7524c96137}{preprocess\+Signal\+D\+C\+T10}} (\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&P, const int size, const int i, const int direction)
+\item 
+void \mbox{\hyperlink{classSignalProc_a76b93fa1929f4f80d1ddeb93c5d3eac1}{preprocess\+Signal\+D\+S\+T10}} (\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&P, const int size, const int i, const int direction)
+\item 
+void \mbox{\hyperlink{classSignalProc_ada9700d179aee4007811a3aa61a3fad5}{postprocess\+Signal\+D\+S\+T10}} (\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&P, const int size, const int i, const int direction)
+\item 
+void \mbox{\hyperlink{classSignalProc_a163a1a849ac2a30aa756c8d45b40dde1}{preprocess\+Signal\+D\+S\+T01}} (\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&P, const int size, const int i, const int direction)
+\item 
+void \mbox{\hyperlink{classSignalProc_a686e7c9a474f519a204782145e6a2c8e}{postprocess\+Signal\+D\+S\+T01}} (\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&P, const int size, const int i, const int direction)
+\item 
+void \mbox{\hyperlink{classSignalProc_a9bae65ace51f0ea5cf62283a20dc9a27}{swap}} (\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&P, const int size, const int i, const int direction)
+\item 
+void \mbox{\hyperlink{classSignalProc_a8cd947bf0b29450012a8ec2939cf8cdc}{copyin}} ()
+\item 
+\mbox{\hyperlink{classSignalProc_a8a38a90716c66a1e634135f4e76d434b}{$\sim$\+Signal\+Proc}} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class contains the preprocessing and past processing methods to perform real transform using complex transform ~\newline
+ to be able to use same amount of memory for all the possible transfmroation, we utilize the relation between D\+C\+T10 (D\+C\+T01) ~\newline
+ and D\+S\+T10 to calculate D\+S\+T10 (D\+S\+T01). 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classSignalProc_a8a38a90716c66a1e634135f4e76d434b}\label{classSignalProc_a8a38a90716c66a1e634135f4e76d434b}} 
+\index{Signal\+Proc@{Signal\+Proc}!````~Signal\+Proc@{$\sim$\+Signal\+Proc}}
+\index{````~Signal\+Proc@{$\sim$\+Signal\+Proc}!Signal\+Proc@{Signal\+Proc}}
+\subsubsection{\texorpdfstring{$\sim$\+Signal\+Proc()}{~SignalProc()}}
+{\footnotesize\ttfamily Signal\+Proc\+::$\sim$\+Signal\+Proc (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Class destructor 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classSignalProc_a8cd947bf0b29450012a8ec2939cf8cdc}\label{classSignalProc_a8cd947bf0b29450012a8ec2939cf8cdc}} 
+\index{Signal\+Proc@{Signal\+Proc}!copyin@{copyin}}
+\index{copyin@{copyin}!Signal\+Proc@{Signal\+Proc}}
+\subsubsection{\texorpdfstring{copyin()}{copyin()}}
+{\footnotesize\ttfamily void Signal\+Proc\+::copyin (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+copies \textquotesingle{}this\textquotesingle{} object of the class to the G\+PU \mbox{\Hypertarget{classSignalProc_af9130e26afc367410205f564ee69d8df}\label{classSignalProc_af9130e26afc367410205f564ee69d8df}} 
+\index{Signal\+Proc@{Signal\+Proc}!postprocess\+Signal\+D\+C\+T01@{postprocess\+Signal\+D\+C\+T01}}
+\index{postprocess\+Signal\+D\+C\+T01@{postprocess\+Signal\+D\+C\+T01}!Signal\+Proc@{Signal\+Proc}}
+\subsubsection{\texorpdfstring{postprocess\+Signal\+D\+C\+T01()}{postprocessSignalDCT01()}}
+{\footnotesize\ttfamily void Signal\+Proc\+::postprocess\+Signal\+D\+C\+T01 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&}]{P,  }\item[{const int}]{size,  }\item[{const int}]{j,  }\item[{const int}]{direction }\end{DoxyParamCaption})}
+
+Discrete Cosine Transformation Post Process D\+C\+T01 \mbox{\Hypertarget{classSignalProc_a5f3eedc058066d233a1fc8f9d7bc4ea4}\label{classSignalProc_a5f3eedc058066d233a1fc8f9d7bc4ea4}} 
+\index{Signal\+Proc@{Signal\+Proc}!postprocess\+Signal\+D\+C\+T10@{postprocess\+Signal\+D\+C\+T10}}
+\index{postprocess\+Signal\+D\+C\+T10@{postprocess\+Signal\+D\+C\+T10}!Signal\+Proc@{Signal\+Proc}}
+\subsubsection{\texorpdfstring{postprocess\+Signal\+D\+C\+T10()}{postprocessSignalDCT10()}}
+{\footnotesize\ttfamily void Signal\+Proc\+::postprocess\+Signal\+D\+C\+T10 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&}]{P,  }\item[{const int}]{size,  }\item[{const int}]{i,  }\item[{const int}]{direction }\end{DoxyParamCaption})}
+
+class constructor Discrete Cosine Transformation Post Process D\+C\+T10 \mbox{\Hypertarget{classSignalProc_a686e7c9a474f519a204782145e6a2c8e}\label{classSignalProc_a686e7c9a474f519a204782145e6a2c8e}} 
+\index{Signal\+Proc@{Signal\+Proc}!postprocess\+Signal\+D\+S\+T01@{postprocess\+Signal\+D\+S\+T01}}
+\index{postprocess\+Signal\+D\+S\+T01@{postprocess\+Signal\+D\+S\+T01}!Signal\+Proc@{Signal\+Proc}}
+\subsubsection{\texorpdfstring{postprocess\+Signal\+D\+S\+T01()}{postprocessSignalDST01()}}
+{\footnotesize\ttfamily void Signal\+Proc\+::postprocess\+Signal\+D\+S\+T01 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&}]{P,  }\item[{const int}]{size,  }\item[{const int}]{i,  }\item[{const int}]{direction }\end{DoxyParamCaption})}
+
+postprocessing to obtain D\+S\+T01 tranmsform \mbox{\Hypertarget{classSignalProc_ada9700d179aee4007811a3aa61a3fad5}\label{classSignalProc_ada9700d179aee4007811a3aa61a3fad5}} 
+\index{Signal\+Proc@{Signal\+Proc}!postprocess\+Signal\+D\+S\+T10@{postprocess\+Signal\+D\+S\+T10}}
+\index{postprocess\+Signal\+D\+S\+T10@{postprocess\+Signal\+D\+S\+T10}!Signal\+Proc@{Signal\+Proc}}
+\subsubsection{\texorpdfstring{postprocess\+Signal\+D\+S\+T10()}{postprocessSignalDST10()}}
+{\footnotesize\ttfamily void Signal\+Proc\+::postprocess\+Signal\+D\+S\+T10 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&}]{P,  }\item[{const int}]{size,  }\item[{const int}]{i,  }\item[{const int}]{direction }\end{DoxyParamCaption})}
+
+postprocessing to obtain D\+S\+T10 tranmsform \mbox{\Hypertarget{classSignalProc_a524c586ab4356908dfc87f049a202285}\label{classSignalProc_a524c586ab4356908dfc87f049a202285}} 
+\index{Signal\+Proc@{Signal\+Proc}!preprocess\+Signal\+D\+C\+T01@{preprocess\+Signal\+D\+C\+T01}}
+\index{preprocess\+Signal\+D\+C\+T01@{preprocess\+Signal\+D\+C\+T01}!Signal\+Proc@{Signal\+Proc}}
+\subsubsection{\texorpdfstring{preprocess\+Signal\+D\+C\+T01()}{preprocessSignalDCT01()}}
+{\footnotesize\ttfamily void Signal\+Proc\+::preprocess\+Signal\+D\+C\+T01 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&}]{P,  }\item[{const int}]{size,  }\item[{const int}]{i,  }\item[{const int}]{direction }\end{DoxyParamCaption})}
+
+preparing the signal for D\+C\+T01 tranmsform \mbox{\Hypertarget{classSignalProc_abe604e9fda0e105619688c7524c96137}\label{classSignalProc_abe604e9fda0e105619688c7524c96137}} 
+\index{Signal\+Proc@{Signal\+Proc}!preprocess\+Signal\+D\+C\+T10@{preprocess\+Signal\+D\+C\+T10}}
+\index{preprocess\+Signal\+D\+C\+T10@{preprocess\+Signal\+D\+C\+T10}!Signal\+Proc@{Signal\+Proc}}
+\subsubsection{\texorpdfstring{preprocess\+Signal\+D\+C\+T10()}{preprocessSignalDCT10()}}
+{\footnotesize\ttfamily void Signal\+Proc\+::preprocess\+Signal\+D\+C\+T10 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&}]{P,  }\item[{const int}]{size,  }\item[{const int}]{i,  }\item[{const int}]{direction }\end{DoxyParamCaption})}
+
+preparing the signal for D\+C\+T10 tranmsform \mbox{\Hypertarget{classSignalProc_a163a1a849ac2a30aa756c8d45b40dde1}\label{classSignalProc_a163a1a849ac2a30aa756c8d45b40dde1}} 
+\index{Signal\+Proc@{Signal\+Proc}!preprocess\+Signal\+D\+S\+T01@{preprocess\+Signal\+D\+S\+T01}}
+\index{preprocess\+Signal\+D\+S\+T01@{preprocess\+Signal\+D\+S\+T01}!Signal\+Proc@{Signal\+Proc}}
+\subsubsection{\texorpdfstring{preprocess\+Signal\+D\+S\+T01()}{preprocessSignalDST01()}}
+{\footnotesize\ttfamily void Signal\+Proc\+::preprocess\+Signal\+D\+S\+T01 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&}]{P,  }\item[{const int}]{size,  }\item[{const int}]{i,  }\item[{const int}]{direction }\end{DoxyParamCaption})}
+
+preparing the signal for D\+S\+T01 tranmsform \mbox{\Hypertarget{classSignalProc_a76b93fa1929f4f80d1ddeb93c5d3eac1}\label{classSignalProc_a76b93fa1929f4f80d1ddeb93c5d3eac1}} 
+\index{Signal\+Proc@{Signal\+Proc}!preprocess\+Signal\+D\+S\+T10@{preprocess\+Signal\+D\+S\+T10}}
+\index{preprocess\+Signal\+D\+S\+T10@{preprocess\+Signal\+D\+S\+T10}!Signal\+Proc@{Signal\+Proc}}
+\subsubsection{\texorpdfstring{preprocess\+Signal\+D\+S\+T10()}{preprocessSignalDST10()}}
+{\footnotesize\ttfamily void Signal\+Proc\+::preprocess\+Signal\+D\+S\+T10 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&}]{P,  }\item[{const int}]{size,  }\item[{const int}]{i,  }\item[{const int}]{direction }\end{DoxyParamCaption})}
+
+preparing the signal for D\+S\+T10 tranmsform \mbox{\Hypertarget{classSignalProc_a9bae65ace51f0ea5cf62283a20dc9a27}\label{classSignalProc_a9bae65ace51f0ea5cf62283a20dc9a27}} 
+\index{Signal\+Proc@{Signal\+Proc}!swap@{swap}}
+\index{swap@{swap}!Signal\+Proc@{Signal\+Proc}}
+\subsubsection{\texorpdfstring{swap()}{swap()}}
+{\footnotesize\ttfamily void Signal\+Proc\+::swap (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classChunkedArray}{Chunked\+Array}} \&}]{P,  }\item[{const int}]{size,  }\item[{const int}]{i,  }\item[{const int}]{direction }\end{DoxyParamCaption})}
+
+reorganizes the elements for transformation 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/include/signal\+Proc.\+h\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/signal\+Proc.\+cpp\end{DoxyCompactItemize}

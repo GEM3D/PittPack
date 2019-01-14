@@ -1,0 +1,8 @@
+div.image img[src="sample_poisson.png"]{ 
+    width:10px; 
+}
+div.image img[src="NSF.png"]{ 
+    width:10px; 
+    text-align: left;
+}
+

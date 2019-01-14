@@ -1,0 +1,161 @@
+\hypertarget{structMpiCom}{}\section{Mpi\+Com Class Reference}
+\label{structMpiCom}\index{Mpi\+Com@{Mpi\+Com}}
+
+
+class for embedding data related to the communicator  
+
+
+
+
+{\ttfamily \#include $<$communicate.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structMpiCom_a5099477d534468bdaffed3bb75e31152}{Mpi\+Com}} (M\+P\+I\+\_\+\+Comm Com)
+\item 
+\mbox{\hyperlink{structMpiCom_a32daad0b1965c35cdf7485a565cd0d8c}{Mpi\+Com}} ()
+\item 
+\mbox{\Hypertarget{structMpiCom_ad53c1f9050c890c3552e6878caca43f2}\label{structMpiCom_ad53c1f9050c890c3552e6878caca43f2}} 
+{\bfseries Mpi\+Com} (int nx, int ny, int nz, int p0, int p1)
+\item 
+\mbox{\Hypertarget{structMpiCom_a2e7a74f288b0838d1a24b203b4e78080}\label{structMpiCom_a2e7a74f288b0838d1a24b203b4e78080}} 
+void {\bfseries get\+Chunk\+Size} ()
+\item 
+\mbox{\Hypertarget{structMpiCom_a346940138300eb16c2b74f74dae6342b}\label{structMpiCom_a346940138300eb16c2b74f74dae6342b}} 
+void {\bfseries change\+Ownership} ()
+\item 
+\mbox{\Hypertarget{structMpiCom_ac7df8694f98dd05d0438823271d4f0e8}\label{structMpiCom_ac7df8694f98dd05d0438823271d4f0e8}} 
+void {\bfseries allocate\+Chunks} ()
+\item 
+\mbox{\Hypertarget{structMpiCom_a532458ac72c5930c59afafbd36101db6}\label{structMpiCom_a532458ac72c5930c59afafbd36101db6}} 
+void {\bfseries get\+No\+Of\+Chunk} ()
+\item 
+\mbox{\Hypertarget{structMpiCom_a2158d7556843141b98ce293444137988}\label{structMpiCom_a2158d7556843141b98ce293444137988}} 
+void {\bfseries initialize} ()
+\item 
+\mbox{\Hypertarget{structMpiCom_adc08d6425b2e805562e5f741755772d2}\label{structMpiCom_adc08d6425b2e805562e5f741755772d2}} 
+void {\bfseries construct\+Connectivity} ()
+\item 
+\mbox{\Hypertarget{structMpiCom_affba5dc6e99efb80e820f98a4ed28565}\label{structMpiCom_affba5dc6e99efb80e820f98a4ed28565}} 
+void {\bfseries change\+Ownership\+Pairwise\+Exchange\+ZX} ()
+\item 
+\mbox{\Hypertarget{structMpiCom_af1cef3da300b89e37a0ecf353ea70c50}\label{structMpiCom_af1cef3da300b89e37a0ecf353ea70c50}} 
+int {\bfseries get\+Periodic\+Rank} (int rank)
+\item 
+\mbox{\Hypertarget{structMpiCom_aa5b66001754035269b1ff41ef33d8e31}\label{structMpiCom_aa5b66001754035269b1ff41ef33d8e31}} 
+int {\bfseries get\+Periodic\+Index} (int rank)
+\item 
+\mbox{\Hypertarget{structMpiCom_ab538d16d98a8b4b72753688112092ecf}\label{structMpiCom_ab538d16d98a8b4b72753688112092ecf}} 
+void {\bfseries change\+Ownership\+Pairwise\+Exchange\+XY} ()
+\item 
+\mbox{\Hypertarget{structMpiCom_a903120d2408f86afe2edf4ec5947bf50}\label{structMpiCom_a903120d2408f86afe2edf4ec5947bf50}} 
+void {\bfseries change\+Ownership\+Pairwise\+Exchange\+YZ} ()
+\item 
+\mbox{\Hypertarget{structMpiCom_a58c523846ef78d30d553a6fccad2aa08}\label{structMpiCom_a58c523846ef78d30d553a6fccad2aa08}} 
+int {\bfseries get\+Periodic\+Rank\+XY} (int rank)
+\item 
+\mbox{\Hypertarget{structMpiCom_aaa1993d090f1b3db7b46357e4da935e6}\label{structMpiCom_aaa1993d090f1b3db7b46357e4da935e6}} 
+int {\bfseries get\+Periodic\+Rank\+YZ} (int rank)
+\item 
+void \mbox{\hyperlink{structMpiCom_a0e7f0633348f928e92f5bfe22f48a40d}{graph\+Create}} ()
+\item 
+void \mbox{\hyperlink{structMpiCom_a8e3a47d8f20b9ac6960cddf641050d44}{nbr\+All\+To\+All\+ZX}} ()
+\item 
+void \mbox{\hyperlink{structMpiCom_a19fa8f600a430ba4e5e3ea6f53deb649}{nbr\+All\+To\+All\+XY}} ()
+\item 
+void \mbox{\hyperlink{structMpiCom_a003eaf50d2715dd49bfa1ef3e1d8c09a}{nbr\+All\+To\+All\+YZ}} ()
+\item 
+\mbox{\Hypertarget{structMpiCom_a24444ee55e0a7a2776f53b23b280b058}\label{structMpiCom_a24444ee55e0a7a2776f53b23b280b058}} 
+void {\bfseries check\+Graph} (int index)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+M\+P\+I\+\_\+\+Comm \mbox{\hyperlink{structMpiCom_a9ebe073c2a5d866e2eeeffeddc5d6ed9}{mpi\+Com}}
+\item 
+integer \mbox{\hyperlink{structMpiCom_a822a5db15cf1bf27f846cec23de7c785}{my\+Rank}}
+\item 
+integer \mbox{\hyperlink{structMpiCom_a4eed91926f470dfd8f21e1ad8c6fdcec}{com\+Size}}
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structMpiCom_abf858174faa5fb6573824cbcbddf7924}\label{structMpiCom_abf858174faa5fb6573824cbcbddf7924}} 
+class {\bfseries V\+TK}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+class for embedding data related to the communicator 
+
+This Class performs intra-\/node communications to carry-\/out F\+FT with the help of G\+PU. 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{structMpiCom_a5099477d534468bdaffed3bb75e31152}\label{structMpiCom_a5099477d534468bdaffed3bb75e31152}} 
+\index{Mpi\+Com@{Mpi\+Com}!Mpi\+Com@{Mpi\+Com}}
+\index{Mpi\+Com@{Mpi\+Com}!Mpi\+Com@{Mpi\+Com}}
+\subsubsection{\texorpdfstring{Mpi\+Com()}{MpiCom()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Mpi\+Com\+::\+Mpi\+Com (\begin{DoxyParamCaption}\item[{M\+P\+I\+\_\+\+Comm}]{Com }\end{DoxyParamCaption})}
+
+constructor second constructor \mbox{\Hypertarget{structMpiCom_a32daad0b1965c35cdf7485a565cd0d8c}\label{structMpiCom_a32daad0b1965c35cdf7485a565cd0d8c}} 
+\index{Mpi\+Com@{Mpi\+Com}!Mpi\+Com@{Mpi\+Com}}
+\index{Mpi\+Com@{Mpi\+Com}!Mpi\+Com@{Mpi\+Com}}
+\subsubsection{\texorpdfstring{Mpi\+Com()}{MpiCom()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Mpi\+Com\+::\+Mpi\+Com (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Nbrs\mbox{[}0\mbox{]} is the stride 1 neighbor where as Nbrs\mbox{[}1\mbox{]} is the stride p0 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{structMpiCom_a0e7f0633348f928e92f5bfe22f48a40d}\label{structMpiCom_a0e7f0633348f928e92f5bfe22f48a40d}} 
+\index{Mpi\+Com@{Mpi\+Com}!graph\+Create@{graph\+Create}}
+\index{graph\+Create@{graph\+Create}!Mpi\+Com@{Mpi\+Com}}
+\subsubsection{\texorpdfstring{graph\+Create()}{graphCreate()}}
+{\footnotesize\ttfamily void Mpi\+Com\+::graph\+Create (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Two different communicators are required due to the presence of stride in X to Y to rotation \mbox{\Hypertarget{structMpiCom_a19fa8f600a430ba4e5e3ea6f53deb649}\label{structMpiCom_a19fa8f600a430ba4e5e3ea6f53deb649}} 
+\index{Mpi\+Com@{Mpi\+Com}!nbr\+All\+To\+All\+XY@{nbr\+All\+To\+All\+XY}}
+\index{nbr\+All\+To\+All\+XY@{nbr\+All\+To\+All\+XY}!Mpi\+Com@{Mpi\+Com}}
+\subsubsection{\texorpdfstring{nbr\+All\+To\+All\+X\+Y()}{nbrAllToAllXY()}}
+{\footnotesize\ttfamily void Mpi\+Com\+::nbr\+All\+To\+All\+XY (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Two different communicators are required due to the presence of stride in X to Y to rotation \mbox{\Hypertarget{structMpiCom_a003eaf50d2715dd49bfa1ef3e1d8c09a}\label{structMpiCom_a003eaf50d2715dd49bfa1ef3e1d8c09a}} 
+\index{Mpi\+Com@{Mpi\+Com}!nbr\+All\+To\+All\+YZ@{nbr\+All\+To\+All\+YZ}}
+\index{nbr\+All\+To\+All\+YZ@{nbr\+All\+To\+All\+YZ}!Mpi\+Com@{Mpi\+Com}}
+\subsubsection{\texorpdfstring{nbr\+All\+To\+All\+Y\+Z()}{nbrAllToAllYZ()}}
+{\footnotesize\ttfamily void Mpi\+Com\+::nbr\+All\+To\+All\+YZ (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Two different communicators are required due to the presence of stride in X to Y to rotation \mbox{\Hypertarget{structMpiCom_a8e3a47d8f20b9ac6960cddf641050d44}\label{structMpiCom_a8e3a47d8f20b9ac6960cddf641050d44}} 
+\index{Mpi\+Com@{Mpi\+Com}!nbr\+All\+To\+All\+ZX@{nbr\+All\+To\+All\+ZX}}
+\index{nbr\+All\+To\+All\+ZX@{nbr\+All\+To\+All\+ZX}!Mpi\+Com@{Mpi\+Com}}
+\subsubsection{\texorpdfstring{nbr\+All\+To\+All\+Z\+X()}{nbrAllToAllZX()}}
+{\footnotesize\ttfamily void Mpi\+Com\+::nbr\+All\+To\+All\+ZX (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Two different communicators are required due to the presence of stride in X to Y to rotation 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structMpiCom_a4eed91926f470dfd8f21e1ad8c6fdcec}\label{structMpiCom_a4eed91926f470dfd8f21e1ad8c6fdcec}} 
+\index{Mpi\+Com@{Mpi\+Com}!com\+Size@{com\+Size}}
+\index{com\+Size@{com\+Size}!Mpi\+Com@{Mpi\+Com}}
+\subsubsection{\texorpdfstring{com\+Size}{comSize}}
+{\footnotesize\ttfamily integer Mpi\+Com\+::com\+Size}
+
+size of the communicator \mbox{\Hypertarget{structMpiCom_a9ebe073c2a5d866e2eeeffeddc5d6ed9}\label{structMpiCom_a9ebe073c2a5d866e2eeeffeddc5d6ed9}} 
+\index{Mpi\+Com@{Mpi\+Com}!mpi\+Com@{mpi\+Com}}
+\index{mpi\+Com@{mpi\+Com}!Mpi\+Com@{Mpi\+Com}}
+\subsubsection{\texorpdfstring{mpi\+Com}{mpiCom}}
+{\footnotesize\ttfamily M\+P\+I\+\_\+\+Comm Mpi\+Com\+::mpi\+Com}
+
+Communicator \mbox{\Hypertarget{structMpiCom_a822a5db15cf1bf27f846cec23de7c785}\label{structMpiCom_a822a5db15cf1bf27f846cec23de7c785}} 
+\index{Mpi\+Com@{Mpi\+Com}!my\+Rank@{my\+Rank}}
+\index{my\+Rank@{my\+Rank}!Mpi\+Com@{Mpi\+Com}}
+\subsubsection{\texorpdfstring{my\+Rank}{myRank}}
+{\footnotesize\ttfamily integer Mpi\+Com\+::my\+Rank}
+
+rank of the processor 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/include/communicate.\+h\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/include/mpi\+Com.\+h\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/mpi\+Com.\+cpp\end{DoxyCompactItemize}

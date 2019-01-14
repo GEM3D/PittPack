@@ -1,0 +1,6 @@
+\form#0:\begin{eqnarray*} \Delta u &=& f \end{eqnarray*}
+\form#1:$iax, iay, jax, jay$
+\form#2:$short int$
+\form#3:$int$
+\form#4:$sin(\omega x)$
+\form#5:$cos(\omega)$

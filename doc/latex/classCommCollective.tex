@@ -1,0 +1,121 @@
+\hypertarget{classCommCollective}{}\section{Comm\+Collective$<$ Type $>$ Class Template Reference}
+\label{classCommCollective}\index{Comm\+Collective$<$ Type $>$@{Comm\+Collective$<$ Type $>$}}
+
+
+is a template wrapper around M\+PI functions for collective communicatios  
+
+
+
+
+{\ttfamily \#include $<$communicate.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classCommCollective_ad583efe49e3dd7883f76dcb82b34cebb}{Comm\+Collective}} (void $\ast$buf, uint size, uint root)
+\item 
+\mbox{\hyperlink{classCommCollective_a9315504a2e5e83cb04f3b8e80b7ff3d5}{Comm\+Collective}} (void $\ast$buff, uint size)
+\item 
+void \mbox{\hyperlink{classCommCollective_a438805e16ba8c74b0682a0bf27b4b0f3}{bcast}} ()
+\item 
+void \mbox{\hyperlink{classCommCollective_af79e85456fe4bf007ccb6ad0c7e41151}{Ibcast}} ()
+\item 
+void \mbox{\hyperlink{classCommCollective_a2a300899ded8e81afa840f06497716f9}{get\+Total\+Number}} (uint $\ast$offset, uint $\ast$myvalue, uint $\ast$totalvalue)
+\item 
+void \mbox{\hyperlink{classCommCollective_a0b8611d0fce41f5b6629ebf702e7aa4b}{Iget\+Total\+Number}} (uint $\ast$offset, uint $\ast$myvalue, uint $\ast$totalvalue)
+\item 
+\mbox{\Hypertarget{classCommCollective_af9b5d68df879f888a107009d783e20f6}\label{classCommCollective_af9b5d68df879f888a107009d783e20f6}} 
+void {\bfseries wait\+On\+Request} ()
+\item 
+{\footnotesize template$<$$>$ }\\void \mbox{\hyperlink{classCommCollective_a493fba4b35a6f42599753b48c431684a}{get\+Total\+Number}} (uint $\ast$offset, uint $\ast$myvalue, uint $\ast$totalvalue)
+\item 
+{\footnotesize template$<$$>$ }\\void \mbox{\hyperlink{classCommCollective_a2603f0331222a5f76a29a0bf3a187ae4}{Iget\+Total\+Number}} (uint $\ast$offset, uint $\ast$myvalue, uint $\ast$totalvalue)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class Type$>$\newline
+class Comm\+Collective$<$ Type $>$}
+
+is a template wrapper around M\+PI functions for collective communicatios 
+
+This class is specialized for collective communications and functions 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classCommCollective_ad583efe49e3dd7883f76dcb82b34cebb}\label{classCommCollective_ad583efe49e3dd7883f76dcb82b34cebb}} 
+\index{Comm\+Collective@{Comm\+Collective}!Comm\+Collective@{Comm\+Collective}}
+\index{Comm\+Collective@{Comm\+Collective}!Comm\+Collective@{Comm\+Collective}}
+\subsubsection{\texorpdfstring{Comm\+Collective()}{CommCollective()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class Type $>$ \\
+\mbox{\hyperlink{classCommCollective}{Comm\+Collective}}$<$ Type $>$\+::\mbox{\hyperlink{classCommCollective}{Comm\+Collective}} (\begin{DoxyParamCaption}\item[{void $\ast$}]{buf,  }\item[{uint}]{size,  }\item[{uint}]{root }\end{DoxyParamCaption})}
+
+constructor 
+\begin{DoxyParams}{Parameters}
+{\em root} & another constructor for Communicator class \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classCommCollective_a9315504a2e5e83cb04f3b8e80b7ff3d5}\label{classCommCollective_a9315504a2e5e83cb04f3b8e80b7ff3d5}} 
+\index{Comm\+Collective@{Comm\+Collective}!Comm\+Collective@{Comm\+Collective}}
+\index{Comm\+Collective@{Comm\+Collective}!Comm\+Collective@{Comm\+Collective}}
+\subsubsection{\texorpdfstring{Comm\+Collective()}{CommCollective()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class Type $>$ \\
+\mbox{\hyperlink{classCommCollective}{Comm\+Collective}}$<$ Type $>$\+::\mbox{\hyperlink{classCommCollective}{Comm\+Collective}} (\begin{DoxyParamCaption}\item[{void $\ast$}]{buff,  }\item[{uint}]{size }\end{DoxyParamCaption})}
+
+constructor specialized for root=comsize-\/1 
+\begin{DoxyParams}{Parameters}
+{\em size} & another constructor for Communicator class, this one sets the root as com\+Size-\/1 for hdf5 \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classCommCollective_a438805e16ba8c74b0682a0bf27b4b0f3}\label{classCommCollective_a438805e16ba8c74b0682a0bf27b4b0f3}} 
+\index{Comm\+Collective@{Comm\+Collective}!bcast@{bcast}}
+\index{bcast@{bcast}!Comm\+Collective@{Comm\+Collective}}
+\subsubsection{\texorpdfstring{bcast()}{bcast()}}
+{\footnotesize\ttfamily template$<$class Type $>$ \\
+void \mbox{\hyperlink{classCommCollective}{Comm\+Collective}}$<$ Type $>$\+::bcast (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+blockin broadcast \mbox{\Hypertarget{classCommCollective_a2a300899ded8e81afa840f06497716f9}\label{classCommCollective_a2a300899ded8e81afa840f06497716f9}} 
+\index{Comm\+Collective@{Comm\+Collective}!get\+Total\+Number@{get\+Total\+Number}}
+\index{get\+Total\+Number@{get\+Total\+Number}!Comm\+Collective@{Comm\+Collective}}
+\subsubsection{\texorpdfstring{get\+Total\+Number()}{getTotalNumber()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class Type $>$ \\
+void \mbox{\hyperlink{classCommCollective}{Comm\+Collective}}$<$ Type $>$\+::get\+Total\+Number (\begin{DoxyParamCaption}\item[{uint $\ast$}]{offset,  }\item[{uint $\ast$}]{myvalue,  }\item[{uint $\ast$}]{totalvalue }\end{DoxyParamCaption})}
+
+calculates the world population for a given variable \mbox{\Hypertarget{classCommCollective_a493fba4b35a6f42599753b48c431684a}\label{classCommCollective_a493fba4b35a6f42599753b48c431684a}} 
+\index{Comm\+Collective@{Comm\+Collective}!get\+Total\+Number@{get\+Total\+Number}}
+\index{get\+Total\+Number@{get\+Total\+Number}!Comm\+Collective@{Comm\+Collective}}
+\subsubsection{\texorpdfstring{get\+Total\+Number()}{getTotalNumber()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$$>$ \\
+void \mbox{\hyperlink{classCommCollective}{Comm\+Collective}}$<$ uint $>$\+::get\+Total\+Number (\begin{DoxyParamCaption}\item[{uint $\ast$}]{offset,  }\item[{uint $\ast$}]{myvalue,  }\item[{uint $\ast$}]{totalvalue }\end{DoxyParamCaption})}
+
+$<$ the largest offset belongs to the processor with highest rank, add this to its number of cubes will give us the total value \mbox{\Hypertarget{classCommCollective_af79e85456fe4bf007ccb6ad0c7e41151}\label{classCommCollective_af79e85456fe4bf007ccb6ad0c7e41151}} 
+\index{Comm\+Collective@{Comm\+Collective}!Ibcast@{Ibcast}}
+\index{Ibcast@{Ibcast}!Comm\+Collective@{Comm\+Collective}}
+\subsubsection{\texorpdfstring{Ibcast()}{Ibcast()}}
+{\footnotesize\ttfamily template$<$class Type $>$ \\
+void \mbox{\hyperlink{classCommCollective}{Comm\+Collective}}$<$ Type $>$\+::Ibcast (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+non-\/blocking broadcast
+
+I spoecialized this function since this is only needed for unsigned ints \mbox{\Hypertarget{classCommCollective_a0b8611d0fce41f5b6629ebf702e7aa4b}\label{classCommCollective_a0b8611d0fce41f5b6629ebf702e7aa4b}} 
+\index{Comm\+Collective@{Comm\+Collective}!Iget\+Total\+Number@{Iget\+Total\+Number}}
+\index{Iget\+Total\+Number@{Iget\+Total\+Number}!Comm\+Collective@{Comm\+Collective}}
+\subsubsection{\texorpdfstring{Iget\+Total\+Number()}{IgetTotalNumber()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class Type $>$ \\
+void \mbox{\hyperlink{classCommCollective}{Comm\+Collective}}$<$ Type $>$\+::Iget\+Total\+Number (\begin{DoxyParamCaption}\item[{uint $\ast$}]{offset,  }\item[{uint $\ast$}]{myvalue,  }\item[{uint $\ast$}]{totalvalue }\end{DoxyParamCaption})}
+
+calculates the world population for a given variable in a non-\/blocking fashion \mbox{\Hypertarget{classCommCollective_a2603f0331222a5f76a29a0bf3a187ae4}\label{classCommCollective_a2603f0331222a5f76a29a0bf3a187ae4}} 
+\index{Comm\+Collective@{Comm\+Collective}!Iget\+Total\+Number@{Iget\+Total\+Number}}
+\index{Iget\+Total\+Number@{Iget\+Total\+Number}!Comm\+Collective@{Comm\+Collective}}
+\subsubsection{\texorpdfstring{Iget\+Total\+Number()}{IgetTotalNumber()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$$>$ \\
+void \mbox{\hyperlink{classCommCollective}{Comm\+Collective}}$<$ uint $>$\+::Iget\+Total\+Number (\begin{DoxyParamCaption}\item[{uint $\ast$}]{offset,  }\item[{uint $\ast$}]{myvalue,  }\item[{uint $\ast$}]{totalvalue }\end{DoxyParamCaption})}
+
+$<$ the largest offset belongs to the processor with highest rank, add this to its number of cubes will give us the total value 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/include/communicate.\+h\item 
+/home/jaber/\+Hybrid\+F\+F\+T/src/communicate.\+cpp\end{DoxyCompactItemize}

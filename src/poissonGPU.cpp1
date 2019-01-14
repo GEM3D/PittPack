@@ -1,0 +1,361 @@
+#include "definitions.h"
+#include "cufft.h"
+#include "pencilDcmp.h"
+
+void PoissonGPU::performTransformXdir() /*!< Called on Host and Ran on GPU*/
+{
+    cufftHandle plan;
+    double *ptr = PencilDcmp::P.P;
+#pragma acc host_data use_device( ptr )
+    {
+
+        cufftPlan1d( &plan, nx, CUFFT_Z2Z, nyChunk * nzChunk );
+        cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_FORWARD );
+        cufftDestroy( plan );
+    }
+}
+
+void PoissonGPU::performInverseTransformXdir() /*!< Called on Host and Ran on GPU*/
+{
+    cufftHandle plan;
+    double *ptr = PencilDcmp::P.P;
+#pragma acc host_data use_device( ptr )
+    {
+
+        cufftPlan1d( &plan, nx, CUFFT_Z2Z, nyChunk * nzChunk );
+        cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_INVERSE );
+        cufftDestroy( plan );
+    }
+}
+void PoissonGPU::performTransformYdir() /*!< Called on Host and Ran on GPU*/
+{
+    cufftHandle plan;
+    double *ptr = PencilDcmp::P.P;
+#pragma acc host_data use_device( ptr )
+    {
+
+        cufftPlan1d( &plan, ny, CUFFT_Z2Z, nxChunk * nzChunk );
+        cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_FORWARD );
+        cufftDestroy( plan );
+    }
+}
+void PoissonGPU::performInverseTransformYdir() /*!< Called on Host and Ran on GPU*/
+{
+    cufftHandle plan;
+    double *ptr = PencilDcmp::P.P;
+#pragma acc host_data use_device( ptr )
+    {
+
+        cufftPlan1d( &plan, ny, CUFFT_Z2Z, nxChunk * nzChunk );
+        cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_INVERSE );
+        cufftDestroy( plan );
+    }
+}
+
+void PoissonGPU::pittPack()
+{
+
+#if ( OPENACC )
+
+    int numDevice = acc_get_num_devices( acc_device_nvidia );
+
+    cout << endl;
+    cout << " num devices " << numDevice << endl;
+
+    if ( numDevice == 0 )
+    {    
+        throw std::runtime_error( "Code is for Single gpu" );
+    }    
+
+    cout << endl;
+    cout << " num devices " << numDevice << endl;
+
+    cout << " FFTX  " << FFTX << " FFTY " << FFTY << " IFFTX " << IFFTX << " IFFTY  " << IFFTY << endl;
+
+#endif
+
+#if ( DEBUG2 )
+    ofstream myfile;
+
+    std::string filename = "data";
+    filename.append( to_string( myRank ) ); 
+    //  ofstream myfile;
+    myfile.open( filename );
+
+    myfile << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << endl;
+    myfile << "     Start" << endl;
+
+    printX( myfile );
+
+#endif
+
+    MPI_Barrier( MPI_COMM_WORLD );
+    double t1 = MPI_Wtime();
+
+//    P.moveHostToDevice();
+
+#pragma acc data present( P[0 : 2 * nxChunk *nyChunk *nzChunk *nChunk] )
+    {    
+
+#if ( POSS )
+
+        changeOwnershipPairwiseExchangeZX();
+        P.moveHostToDevice();
+
+#if ( FFTX )
+
+// perform FFT in x direction
+// remember, need to rearrange and restore each time
+
+// step 2) change location of the array such that FFT can be performed on a contegeous array
+#pragma acc parallel
+        changeLocationX();
+        // step 3) perform  FFT
+
+        performTransformXdir();
+
+// step 4) restore the array to original status before FFT
+#pragma acc parallel
+        restoreLocationX();
+
+#endif
+
+#if ( FFTY )
+        // step 5) pencils with n(1,0,0) is converted to pencil with n(0,1,0)
+        P.moveDeviceToHost();
+        changeOwnershipPairwiseExchangeXY();
+        P.moveHostToDevice();
+// step 6) swaps X and Y coordinates, now X is Y and nx is ny
+
+#pragma acc parallel
+        rearrangeX2Y();
+
+// step 7) change location of the array such that FFT can be performed on a contegeous array in the transverse direction
+
+#pragma acc parallel
+        changeLocationY();
+
+        // step 8) perform  FFT transform can be performed
+        performTransformYdir();
+// M.printX( myfile );
+
+// step 9) restore the array to original status before FFT
+
+#pragma acc parallel
+        restoreLocationY();
+
+#endif
+
+#if ( SOLVE )
+        // step 10) pencils with n(0,1,0) is converted to pencil with n(0,0,1)
+
+        //   M.changeOwnershipPairwiseExchangeYZ();
+        P.moveDeviceToHost();
+        changeOwnershipPairwiseExchangeZX();
+        P.moveHostToDevice();
+
+// step 11) Customized multiBlock Thomas and periodic Thomas (with Sherman-Morrison modification)
+#pragma acc parallel
+        solve();
+        // M.printX( myfile );
+
+      // M.printX( myfile );
+
+        // step 12) pencils with n(0,0,1) is converted to pencil with n(0,1,0)
+        // M.changeOwnershipPairwiseExchangeYZ();
+        P.moveDeviceToHost();
+        changeOwnershipPairwiseExchangeZX();
+        P.moveHostToDevice();
+#endif
+
+#if ( IFFTY )
+// step 13) prepre for contigeuous FFT
+#pragma acc parallel
+        changeLocationY();
+
+        // step 14) perform IFFT
+
+        performInverseTransformYdir();
+
+// step 15) restore the array to original status before IFFT
+
+#pragma acc parallel
+        restoreLocationY();
+
+// step 16) swaps X and Y coordinates, now X is Y and nx is ny
+// need to redefine the function ??????????????????????????????????????????????????????????????????????????
+// now again switching to x-direction arrangement so printX is fine
+#pragma acc parallel
+        rearrangeX2YInverse();
+
+        // step 17) pencils with n(0,1,0) is converted to pencil with n(1,0,0)
+
+        P.moveDeviceToHost();
+        changeOwnershipPairwiseExchangeXY();
+        P.moveHostToDevice();
+#endif
+
+#if ( IFFTX )
+// step 18) change location of the array such that IFFT can be performed on a contegeous array
+
+#pragma acc parallel
+        changeLocationX();
+
+        // step 19) perform  IFFT
+
+        performInverseTransformXdir();
+
+// step 20) restore the array to original status before FFT
+#pragma acc parallel
+        restoreLocationX();
+
+#pragma acc parallel
+        rescale();
+
+#endif
+
+#endif
+ P.moveDeviceToHost();
+
+#if ( DEBUG2 )
+    printX( myfile );
+    myfile.close();
+#endif
+    cout << " *********************************" << endl;
+
+    for ( int k = 0; k < 1; k++ )
+    {
+        for ( int j = 0; j < nyChunk; j++ )
+        {
+            for ( int i = 0; i < nxChunk; i++ )
+            {
+                cout << "\t " << P( i, j, k );
+            }
+            cout << endl;
+        }
+    }
+}
+}
+
+#if ( OPENACC )
+#pragma acc routine vector
+#endif
+void PoissonGPU::changeLocationX()
+{
+
+    double tmp[2 * NXCHUNK];
+/*
+#if( OPENACC )
+    double tmp[2 * NXCHUNK];
+#else
+    double tmp[2 * nxChunk];
+#endif
+*/
+//   cout << " iaxsize " << iaxSize << endl;
+
+#if ( OPENACC )
+#pragma acc loop vector private( tmp[0 : 2 * NXCHUNK] )
+#endif
+    for ( sint i = 0; i < iaxSize; i++ )
+    {
+        saveToTmp( jax[iax[i + 1] - 1], tmp, 0 );
+        //       cout<<" iax "<< iax[i]<<" iax+1  "<<iax[i+1]<<endl;
+        //#if ( OPENACC )
+        //#pragma acc loop worker
+        //#endif
+        for ( sint j = iax[i + 1] - 1; j > iax[i]; j-- )
+        {
+            // set the last one to tmp
+            saveToDest( jax[j - 1], jax[j], 0 );
+        }
+       saveTmpToDest( tmp, jax[iax[i]], 0 );
+    }
+}
+
+#if ( OPENACC )
+#pragma acc routine vector
+#endif
+void PoissonGPU::saveToTmp( const sint id, double *tmp, sint dir )
+{
+    int N;
+    if ( dir == 0 )
+    {
+        N = nxChunk;
+    }
+    else if ( dir == 1 )
+    {
+        N = nyChunk;
+    }
+    else if ( dir == 2 )
+    {
+        N = nzChunk;
+    }
+#if ( OPENACC )
+#pragma acc loop vector
+#endif
+    for ( int i = 0; i < 2 * N; i++ )
+    {
+        tmp[i] = P( 2 * N * id + i );
+    }
+}
+
+
+#if ( OPENACC )
+#pragma acc routine vector
+#endif
+void PoissonGPU::saveToDest( const sint source, const sint dest, sint dir )
+{
+    int N;
+
+    if ( dir == 0 )
+    {
+        N = nxChunk;
+    }
+    else if ( dir == 1 )
+    {
+        N = nyChunk;
+    }
+    else if ( dir == 2 )
+    {
+        N = nzChunk;
+    }
+
+#if ( OPENACC )
+#pragma acc loop vector
+#endif
+    for ( sint i = 0; i < 2 * N; i++ )
+    {
+
+        P( 2 *dest *N + i ) = P( 2 * source * N + i );
+    }
+}
+
+#if ( OPENACC )
+#pragma acc routine vector
+#endif
+void PoissonGPU::saveTmpToDest( const double *tmp, const sint dest, sint dir )
+{
+    int N;
+    if ( dir == 0 )
+    {
+        N = nxChunk;
+    }
+    else if ( dir == 1 )
+    {
+        N = nyChunk;
+    }
+    else if ( dir == 2 )
+    {
+        N = nzChunk;
+    }
+#if ( OPENACC )
+#pragma acc loop vector
+#endif
+    for ( sint i = 0; i < 2 * N; i++ )
+    {
+
+        P( 2 *dest *N + i ) = tmp[i];
+    }
+}
+
+

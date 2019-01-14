@@ -1,2 +1,14 @@
-# PittPack
-Parallel direct solver for Poisson's equation for pressure  
+# HybridFFT
+
+# Automatically configures the code to run on Stampede2 (TACC), Comet (SD) and Bridges (PSC) and Titan (ORNL) 
+
+# source config.sh 
+## enter 0 for CPU 
+## enter 1 for GPU
+
+# run ./start.sh
+## enter 0 for CPU 
+## enter 1 for GPU
+
+for complete documentation visit pittpack.com
+

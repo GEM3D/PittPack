@@ -15,7 +15,7 @@
 #include "signalProc.h"
 #include "triDiag.h"
 
-#define restrict __restrict__
+//#define restrict __restrict__
 
 /*!    \class PencilDcmp
  *     \brief  This Class performs pencil decomposition and encapsulates all the necessary communications required for FFT transformation
@@ -41,7 +41,8 @@ class PencilDcmp
     protected:
     SignalProc Sig;
     TriDiag    T;
-    MultiGrid  MG;
+    MultiGrid  MG; /*!< Multigrid object to solve the real part of the transformation */
+    MultiGrid  MGC; /*! Multigrid object to solve the imaginary part of the transformation */
     int        nx, ny, nz;                /*!<Number of points for each processor (includes all the chunks) */
     int        nxChunk, nyChunk, nzChunk; /*!< dimesnion of each chunk  */
     // since depending on the transformation we will be permutating
@@ -55,31 +56,40 @@ class PencilDcmp
     MPI_Comm nbrComm[2]; /*!< stores MPI communicators to be used for neighborhood collectives in x- and y-directions */
     MPI_Comm nbrComm0;   /*!< MPI communicator to use for neighborhood collectives in x-dir */
     MPI_Comm nbrComm1;   /*!< MPI communicator to use for neighborhood collectives in y-dir */
-    double *restrict Xbox      = NULL;
-    double *restrict coords    = NULL;
+//    MPI_Comm nodalComm;  /*!< nodal communicator created to assure one-on-one mapping with GPU */
+
+    double *__restrict__ Xbox      = NULL;
+    double *__restrict__ coords    = NULL;
     double *tmp                    = NULL;
     double *tmpX                   = NULL;
-    double *restrict tmpY      = NULL;
-    double *restrict tmpMGReal = NULL;
-    double *restrict tmpMGImag = NULL;
+    double * __restrict__ tmpY      = NULL;
+    double * __restrict__ tmpMGReal = NULL;
+    double * __restrict__ tmpMGImag = NULL;
+    double * __restrict__ x1 = NULL;
+    double * __restrict__ x2 = NULL;
+    double * __restrict__ crpcr_lower=NULL;
+    double * __restrict__ crpcr_upper=NULL;
+    double * __restrict__ crpcr_rhs=NULL;
+
+//   double *restrict 
 //    double *selectPointer[2]       = NULL; later on to solidfiy the rela amd imaginary functions
     //    double *tmpZ = NULL;
     double scale; /*!< store the scaling factor for the two inverse transformations depending on the boundary conditons */
     sint * faceTag = NULL;
 
     double finalErr;
-    double *restrict num   = NULL;
-    double *restrict denum = NULL;
+    double *__restrict__ num   = NULL;
+    double *__restrict__ denum = NULL;
     double *omega              = NULL; /*!< frequency of the Manufactured Solution*/
-    double *restrict subDiag
+    double *__restrict__ subDiag
     = NULL; /*!< allocated with the size of 3, stores only the sub-diagonal elements of the tridiagonal system  */
-    double *restrict supDiag
+    double *__restrict__ supDiag
     = NULL; /*!< allocated with the size of 3, stores only the super-diagonal elements of the tridiagonal system  */
     int * length = NULL;
     char *bc     = NULL;              /*!< boundary conditions of the entire domain specified at Xmin,Xmax, Ymin,Ymax, Zmin and Zmax  */
     char  transform[3];               /*!< "S" stands for DST, "C" stands for DCT, "F" stands for Fourier Transform, both "S" or "D", "C"*/
-    int *restrict tags    = NULL; /*!< 0 : sine tranform, 1: coisne, 2: Periodic and -1 undefined */
-    double *restrict dxyz = NULL; /*!< dx=dxyz[0]; dy=dxyz[1]; dz=dxyz[2]   */
+    int * __restrict__ tags    = NULL; /*!< 0 : sine tranform, 1: coisne, 2: Periodic and -1 undefined */
+    double *__restrict__ dxyz = NULL; /*!< dx=dxyz[0]; dy=dxyz[1]; dz=dxyz[2]   */
     double *     freqs;
     ChunkedArray P;    /*!< an instance of the chunked array which is the main pointer to hold and perform solve  */
     ChunkedArray R;    /*!< Recieve buff */
@@ -100,6 +110,11 @@ class PencilDcmp
     sint  jaySize;    /*!< saves tha size of the jax array for copy operations*/
 
     int *Nbrs[2] = {NULL, NULL}; /*!< Nbrs[0] is the stride 1 neighbor where as Nbrs[1] is the stride p0 */
+    double *__restrict__ dl = NULL; /*!< subDiagonal Values of the coefficient matrix */
+    double *__restrict__ ds = NULL; /*!< Diagonal Matrices of the coefficient matrix  */
+    double *__restrict__ du = NULL; /*!<  superDiagonal Matrices of the coefficient matrix  */
+
+
 
     public:
     PencilDcmp(){};                                                 /*!< Class constructor */
@@ -124,8 +139,9 @@ class PencilDcmp
     void changeOwnershipPairwiseExchangeXY(); /*!< Redistributes data by rotating from X to Y direction using pairwise exchange*/
 
     static int getPeriodicRankYZ( int rank );
-
+#if ( OPENACC )
 #pragma acc routine worker
+#endif
     void modifyRhsDirichlet();
 
     // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -171,16 +187,16 @@ class PencilDcmp
 #pragma acc routine vector
     void saveTmpToDest( const double *tmp, const sint dest, sint dir );
 
-#pragma acc routine worker
+#pragma acc routine gang
     void restoreLocationX(); /*!< restores the data stored at each chunk to its original x-major lay-out  */
 
-#pragma acc routine worker
+#pragma acc routine gang
     void restoreLocationY(); /*!< restores the data stored at each chunk to its original y-major lay-out */
 
-#pragma acc routine worker
+#pragma acc routine gang
     void changeLocationX(); /*!<changes storage layout from local to global for perfoming FFT in x-dir*/
 
-#pragma acc routine worker
+#pragma acc routine gang
     void changeLocationY(); /*!<changes storage layout from local to global for perfoming FFT in y-dir*/
 
 #pragma acc routine gang
@@ -229,7 +245,11 @@ class PencilDcmp
     int solveThm( const int index ); /*!< Performs the solve operaton by calling thomas method */
 
 #pragma acc routine gang
-    void solveMG( const int index ); /*!< index=0 solves for the real part and index=1 solves for the immaginary part */
+    void solveMG(  ); /*!< index=0 solves for the real part and index=1 solves for the immaginary part */
+
+#pragma acc routine gang
+    void solveMGC(  ); /*!< index=0 solves for the real part and index=1 solves for the immaginary part */
+
 
     void eigenVal( ofstream &myfile ); /*!< prints the eigenvcalues to a file for debugging*/
 
@@ -302,18 +322,53 @@ class PencilDcmp
     void postprocessSignalAccordingly( const int direction, const int counter );
 
 #pragma acc routine gang
-    void fillInArrayContigMG( const int i, const int j, const int index );
+    void fillInArrayContig( const int i, const int j, const int index );
 
 #pragma acc routine gang
     void fillInArrayBack( const int i, const int j, const int index );
 
     PittPackResult checkInput();
 
-#pragma acc routine  gang 
-void copyAnsFromMG(  );
+#pragma acc routine gang
+void setDiag(int i,int j );
 
 #pragma acc routine  gang 
-void copySourceToMG(  );
+void copyAnsFromMG(int index);
+
+#pragma acc routine  gang 
+void copySourceToMG(int index  );
+
+#pragma acc routine  gang 
+int solveThmBatch( const int index );
+
+#pragma acc routine worker 
+void fillInArrayContig( const int i, const int j,int index, double *container );
+
+#pragma acc routine worker 
+void fillInArrayBack( const int i, const int j, const int index, double *container );
+
+#pragma acc routine seq
+void thomasLowMem( double *tmpMG, double *rh , double diag, int index );
+
+#pragma acc routine vector 
+void pcr(int n, double *a, double *c, double *d); /*!< Parallel Cyclic Reduction */
+
+#pragma acc routine worker 
+void fillInArrayContigNormalize( const int i, const int j,int index, double *container,double eig );
+
+#pragma acc routine gang 
+void solveCRP( const int index );
+
+#pragma acc routine gang 
+void solvePCR( const int index );
+
+#pragma acc routine vector 
+void offDiagNormalize( const int i, const int j,double *lower,double *upper,double eig );
+
+#pragma acc routine worker 
+void fillInArrayBack( const int i, const int j,double *container, const int index );
+
+int createNodalCommunicator();
 
 
     ~PencilDcmp(); /*!< Class destructor*/
@@ -358,7 +413,9 @@ class PoissonCPU : public PencilDcmp
 
 class PoissonGPU : public PencilDcmp
 {
-    public:
+//   private:
+   
+   public:
     PoissonGPU( int nx, int ny, int nz, int p0 ) : PencilDcmp( nx, ny, nz, p0, p0 ){}; /*!< constructor */
     PoissonGPU( int argcs, char *pArgs[], int nx, int ny, int nz )
     : PencilDcmp( argcs, pArgs, nx, ny, nz ){}; /*!< Alternative Class constructor */
@@ -369,6 +426,12 @@ class PoissonGPU : public PencilDcmp
     void performInverseTransformXdir(); /*!< Performs IFFT complex transformation in X direction*/
     void performTransformYdir();        /*!<Perform FFT complex transformation in Y-direction */
     void performInverseTransformYdir(); /*!<Perform IFFT complex transformation in Y-direction */
+  
+    //void thomasCusparse(double *rhs);
+    //void triDiagCusparse(double *rhs);
+
+    void triDiagCusparse(double *dl, double*ds,double *du,double *rhs);
+
 
     void pittPack(); /*!<  method to call FFT and Thomas for solve  */
                      //   static const char *PittPackGetErrorEnum(PittPackResult error);

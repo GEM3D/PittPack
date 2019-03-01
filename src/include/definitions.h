@@ -23,11 +23,13 @@
 #include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
-#include <unordered_map>
 #include <vector>
 #ifdef _OPENACC
 #include "math.h"
 #include "openacc.h"
+#include "cusparse.h"
+#include <cublas_v2.h>
+#include <cuda_runtime.h>
 #endif
 
 typedef int integer;
@@ -38,7 +40,7 @@ typedef double real;
 
 using namespace std;
 
-#if ( SHORT )
+#if ( SHORT_ )
 typedef unsigned short sint;
 #else
 // typedef unsigned int sint;

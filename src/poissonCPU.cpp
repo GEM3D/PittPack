@@ -6,8 +6,8 @@ void PoissonCPU::writeYLine( int j, fftw_complex *outC )
 {
     for ( int i = 0; i < nChunk * nyChunk; i++ )
     {
-        PencilDcmp::P( 2 * nyChunk * nChunk * j + 2 * i )     = outC[i][0];
-        PencilDcmp::P( 2 * nyChunk * nChunk * j + 2 * i + 1 ) = outC[i][1];
+        PencilDcmp::P( 2 *nyChunk *nChunk *j + 2 *i ) = outC[i][0];
+        PencilDcmp::P( 2 *nyChunk *nChunk *j + 2 *i + 1 ) = outC[i][1];
 #if ( DEBUG0 )
         cout << outC[i][0] << " " << outC[i][1] << '\t';
 #endif
@@ -58,7 +58,7 @@ void PoissonCPU::performTransformYdir()
 
 void PoissonCPU::performInverseTransformYdir()
 {
-    fftw_plan     pl;
+    fftw_plan pl;
     fftw_complex *in;
     in = (fftw_complex *)malloc( nChunk * nyChunk * sizeof( fftw_complex ) );
 
@@ -126,8 +126,8 @@ void PoissonCPU::writeXLine( int j, fftw_complex *outC )
 {
     for ( int i = 0; i < nChunk * nxChunk; i++ )
     {
-        PencilDcmp::P( 2 * nxChunk * nChunk * j + 2 * i )     = outC[i][0];
-        PencilDcmp::P( 2 * nxChunk * nChunk * j + 2 * i + 1 ) = outC[i][1];
+        PencilDcmp::P( 2 *nxChunk *nChunk *j + 2 *i ) = outC[i][0];
+        PencilDcmp::P( 2 *nxChunk *nChunk *j + 2 *i + 1 ) = outC[i][1];
 //     cout << " ???????????????????????" << out[i] << endl;
 #if ( DEBUG0 )
         if ( This == myRank )
@@ -146,7 +146,7 @@ void PoissonCPU::writeXLine( int j, fftw_complex *outC )
 
 void PoissonCPU::performInverseTransformXdir()
 {
-    fftw_plan     pl;
+    fftw_plan pl;
     fftw_complex *in;
     in = (fftw_complex *)malloc( nChunk * nxChunk * sizeof( fftw_complex ) );
 
@@ -250,8 +250,8 @@ void PoissonCPU::pittPack()
 
         changeOwnershipPairwiseExchangeZX();
 
-        //    M.rearrange( 0, 0, 1 );
-        //   M.rearrange( 0, 2 );
+//    M.rearrange( 0, 0, 1 );
+//   M.rearrange( 0, 2 );
 
 #if ( DEBUG0 )
         myfile << "     Z to X rotation" << endl;
@@ -348,7 +348,7 @@ void PoissonCPU::pittPack()
 #endif
 
         performTransformYdir();
-        // M.printX( myfile );
+// M.printX( myfile );
 
 #if ( DEBUG0 )
         myfile << "     FFTY" << endl;
@@ -389,25 +389,37 @@ void PoissonCPU::pittPack()
         // step 11) Customized multiBlock Thomas and periodic Thomas (with Sherman-Morrison modification)
 
         //
-        if ( MULTIGRID == 0 )
+        if ( SOLUTIONMETHOD == 0 || SOLUTIONMETHOD==2 )
         {
+
+/*
             if ( solveThm( 0 ) != SUCCESS )
             {
+
                 solveThm( 1 );
                 cout << "Exit Code: " << THOMAS_FAIL << endl;
                 cout << BLUE << PittPackGetErrorEnum( THOMAS_FAIL ) << RESET << endl;
                 exit( 1 );
+
+
             }
+
+     //    solveThmBatch( 0 );
+*/
+
+//           solveThm(0);
+
+         solveCRP(0);
         }
-        else
+        else if(SOLUTIONMETHOD==1)
         {
             // "0" solves for the real part and "1" solves for imaginary part
-            solveMG( 0 );
-            solveMG( 1 );
+           // solveMG();
+            //   solveMGC( );
         }
 
-            // M.printX( myfile );
-            //
+// M.printX( myfile );
+//
 
 #if ( DEBUG0 )
         myfile << "      Thomasing" << endl;
@@ -563,8 +575,8 @@ void PoissonCPU::pittPack()
     {
         // cout << " Method " << COMM_PATTERN << " total_time " << t2 - t1 << endl;
         runTime = t2 - t1;
+        runInfo();
     }
-    runInfo();
 }
 
 /* absolute value version
@@ -749,8 +761,8 @@ void PoissonCPU::testDST01()
     fftw_plan pl;
 
     double *inEx = new double[2 * ( mysize )];
-    double *in   = new double[2 * ( mysize )];
-    double *out  = new double[2 * mysize];
+    double *in = new double[2 * ( mysize )];
+    double *out = new double[2 * mysize];
 
     // to obtain DST2
     for ( int i = 0; i < mysize; i++ )
@@ -778,7 +790,7 @@ void PoissonCPU::testDST01()
         cout << out[i] << endl;
     }
 
-    double *inC  = new double[2 * ( mysize )];
+    double *inC = new double[2 * ( mysize )];
     double *outC = new double[2 * mysize];
 
     for ( int i = 0; i < mysize; i++ )
@@ -830,8 +842,8 @@ void PoissonCPU::testDST10()
     fftw_plan pl;
 
     double *inEx = new double[2 * ( mysize )];
-    double *in   = new double[2 * ( mysize )];
-    double *out  = new double[2 * mysize];
+    double *in = new double[2 * ( mysize )];
+    double *out = new double[2 * mysize];
 
     // to obtain DST2
     for ( int i = 0; i < mysize; i++ )
@@ -859,7 +871,7 @@ void PoissonCPU::testDST10()
         cout << out[i] << endl;
     }
 
-    double *inC  = new double[2 * ( mysize )];
+    double *inC = new double[2 * ( mysize )];
     double *outC = new double[2 * mysize];
 
     for ( int i = 0; i < mysize; i++ )

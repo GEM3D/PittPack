@@ -9,8 +9,8 @@
 
 #define SIZEMG 0
 #define OFFS 0
-#define INNERITER 10
-#define OUTERITER 1000
+//#define INNERITER 2
+//#define OUTERITER 1000
 
 using namespace std;
 
@@ -53,21 +53,32 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
     }
 #endif
 
-    coords    = new double[6];
-    dxyz      = new double[3];
-    tmp       = new double[2 * nxChunk * nyChunk * nzChunk];
-    tmpMGReal = new double[nz + SIZEMG];
-    tmpMGImag = new double[nz + SIZEMG];
+    coords = new double[6];
+    dxyz = new double[3];
+    tmp = new double[2 * nxChunk * nyChunk * nzChunk];
+
+#if(MULTIGRIDON)
+    tmpMGReal = new double[nz];
+    tmpMGImag = new double[nz];
+#endif
+
+    x1=new double[nxChunk*nz];
+    x2=new double[nxChunk*nz];
+
+    crpcr_lower=new double[nxChunk*nz];
+    crpcr_upper=new double[nxChunk*nz];
+    crpcr_rhs=new double[nxChunk*nz];
+
 
     subDiag = new double[3];
     supDiag = new double[3];
-    length  = new int[3];
-    omega   = new double[3];
-    tags    = new int[3];
-    freqs   = new double[2];
-    bc      = new char[6];
-    num     = new double[2];
-    denum   = new double[2];
+    length = new int[3];
+    omega = new double[3];
+    tags = new int[3];
+    freqs = new double[2];
+    bc = new char[6];
+    num = new double[2];
+    denum = new double[2];
 
     subDiag[0] = 0.0;
     subDiag[1] = 1.0;
@@ -77,31 +88,56 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
     supDiag[1] = 1.0;
     supDiag[2] = 0.0;
 
+    dl = new double[nz];
+    ds = new double[nz];
+    du = new double[nz];
+
+    dl[0] = 0.0;
+    du[nz - 1] = 0.0;
+
+    for ( int i = 1; i < nz; i++ )
+    {
+        dl[i] = 1.0;
+        du[i - 1] = 1.0;
+    }
+
     Xbox = new double[6];
 
     faceTag = new sint[6];
 
 // allocate some indices for help swap the data in-place rather than allocating a whole matrix
 #if ( OPENACC )
-#pragma acc enter data create( this [0:1] )
+#pragma acc enter data create( this[0 : 1] )
 #pragma acc update device( this )
-#pragma acc enter data create( omega [0:3] )
-#pragma acc enter data create( dxyz [0:3] )
-#pragma acc enter data create( coords [0:6] )
-#pragma acc enter data create( tags [0:3] )
-#pragma acc enter data create( subDiag [0:3] )
-#pragma acc enter data create( freqs [0:2] )
-#pragma acc enter data create( supDiag [0:3] )
-#pragma acc enter data create( length [0:3] )
-#pragma acc enter data create( num [0:2] )
-#pragma acc enter data create( denum [0:2] )
-#pragma acc enter data create( bc [0:6] )
-#pragma acc enter data create( faceTag [0:6] )
-#pragma acc enter data create( tmpMGReal [0:nz + SIZEMG] )
-#pragma acc enter data create( tmpMGImag [0:nz + SIZEMG] )
-#pragma acc enter data create( Xbox [0:6] )
-#pragma acc update device( subDiag [0:3] )
-#pragma acc update device( supDiag [0:3] )
+#pragma acc enter data create( omega[0 : 3] )
+#pragma acc enter data create( dxyz[0 : 3] )
+#pragma acc enter data create( coords[0 : 6] )
+#pragma acc enter data create( tags[0 : 3] )
+#pragma acc enter data create( subDiag[0 : 3] )
+#pragma acc enter data create( freqs[0 : 2] )
+#pragma acc enter data create( supDiag[0 : 3] )
+#pragma acc enter data create( length[0 : 3] )
+#pragma acc enter data create( num[0 : 2] )
+#pragma acc enter data create( denum[0 : 2] )
+#pragma acc enter data create( bc[0 : 6] )
+#pragma acc enter data create( faceTag[0 : 6] )
+#if(MULTIGRIDON)
+#pragma acc enter data create( tmpMGReal[0 : nz + SIZEMG] )
+#pragma acc enter data create( tmpMGImag[0 : nz + SIZEMG] )
+#endif
+#pragma acc enter data create( Xbox[0 : 6] )
+#pragma acc update device( subDiag[0 : 3] )
+#pragma acc update device( supDiag[0 : 3] )
+#pragma acc enter data create( dl[0 : nz] )
+#pragma acc enter data create( ds[0 : nz] )
+#pragma acc enter data create( du[0 : nz] )
+#pragma acc update device( dl[0 : nz] )
+#pragma acc update device( du[0 : nz] )
+#pragma acc enter data create( x1[0 : nz*nxChunk] )
+#pragma acc enter data create( x2[0 : nz*nxChunk] )
+#pragma acc enter data create( crpcr_lower[0 : nz*nxChunk] )
+#pragma acc enter data create( crpcr_upper[0 : nz*nxChunk] )
+#pragma acc enter data create( crpcr_rhs[0 : nz*nxChunk] )
 #endif
     /* impoartant note about nested classes is that we need to go from top to bottom, first have the highest level
          class copyin 'this' for that class and then once the address are set on the GPU, then copyin the lower level class
@@ -114,9 +150,8 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
     T.setElems( nChunk, nzChunk, subDiag, supDiag );
 
     // Ghost cell required for iterative solve
-
     MG.construct( ( nz + SIZEMG ), INNERITER, INNERITER, OUTERITER, subDiag, supDiag );
-
+    MGC.construct( ( nz + SIZEMG ), INNERITER, INNERITER, OUTERITER, subDiag, supDiag );
 
 #if ( DEBUG )
     cout << "iaxsize " << iaxSize << endl;
@@ -140,7 +175,7 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
     // check if MPI has already initialized, if not initialize it here
 
     int initFlag;
-    if ( MPI_Initialized( &initFlag ) != MPI_SUCCESS && myRank==0 )
+    if ( MPI_Initialized( &initFlag ) != MPI_SUCCESS && myRank == 0 )
     {
         cout << "failure in checking if MPI has already initialize" << endl;
         exit( 1 );
@@ -149,7 +184,7 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
     // cout<<" init flag "<<initFlag<<endl;
     if ( initFlag == 0 )
     {
-        if ( MPI_Init( &argcs, &pArgs ) != MPI_SUCCESS && myRank==0 )
+        if ( MPI_Init( &argcs, &pArgs ) != MPI_SUCCESS && myRank == 0 )
         {
             cout << " Exit Code : " << PittPackGetErrorEnum( MPI_INIT_FAIL ) << endl;
             exit( 1 );
@@ -179,21 +214,30 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
     }
 #endif
 
-    coords    = new double[6];
-    dxyz      = new double[3];
-    tmp       = new double[2 * nxChunk * nyChunk * nzChunk];
+    coords = new double[6];
+    dxyz = new double[3];
+    tmp = new double[2 * nxChunk * nyChunk * nzChunk];
+#if(MULTIGRIDON)
     tmpMGReal = new double[nz + SIZEMG];
     tmpMGImag = new double[nz + SIZEMG];
+#endif
+
+    x1=new double[nxChunk*nz];
+    x2=new double[nxChunk*nz];
+
+    crpcr_lower=new double[nxChunk*nz];
+    crpcr_upper=new double[nxChunk*nz];
+    crpcr_rhs=new double[nxChunk*nz];
 
     subDiag = new double[3];
     supDiag = new double[3];
-    length  = new int[3];
-    omega   = new double[3];
-    tags    = new int[3];
-    freqs   = new double[2];
-    bc      = new char[6];
-    num     = new double[2];
-    denum   = new double[2];
+    length = new int[3];
+    omega = new double[3];
+    tags = new int[3];
+    freqs = new double[2];
+    bc = new char[6];
+    num = new double[2];
+    denum = new double[2];
 
     subDiag[0] = 0.0;
     subDiag[1] = 1.0;
@@ -202,46 +246,91 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
     supDiag[0] = 1.0;
     supDiag[1] = 1.0;
     supDiag[2] = 0.0;
-    Xbox       = new double[6];
-    faceTag    = new sint[6];
+    Xbox = new double[6];
+    faceTag = new sint[6];
+
+    dl = new double[nz];
+    ds = new double[nz];
+    du = new double[nz];
+
+    dl[0] = 0.0;
+    du[nz - 1] = 0.0;
+
+    for ( int i = 1; i < nz; i++ )
+    {
+        dl[i] = 1.0;
+        du[i - 1] = 1.0;
+    }
 
 // allocate some indices for help swap the data in-place rather than allocating a whole matrix
 #if ( OPENACC )
-#pragma acc enter data create( this [0:1] )
+#pragma acc enter data create( this[0 : 1] )
 #pragma acc update device( this )
-#pragma acc enter data create( omega [0:3] )
-#pragma acc enter data create( dxyz [0:3] )
-#pragma acc enter data create( coords [0:6] )
-#pragma acc enter data create( tags [0:3] )
-#pragma acc enter data create( subDiag [0:3] )
-#pragma acc enter data create( freqs [0:2] )
-#pragma acc enter data create( supDiag [0:3] )
-#pragma acc enter data create( length [0:3] )
-#pragma acc enter data create( num [0:2] )
-#pragma acc enter data create( denum [0:2] )
-#pragma acc enter data create( bc [0:6] )
-#pragma acc enter data create( faceTag [0:6] )
-#pragma acc enter data create( Xbox [0:6] )
-#pragma acc enter data create( tmpMGReal [0:nz + SIZEMG] )
-#pragma acc enter data create( tmpMGImag [0:nz + SIZEMG] )
-#pragma acc update device( subDiag [0:3] )
-#pragma acc update device( supDiag [0:3] )
+#pragma acc enter data create( omega[0 : 3] )
+#pragma acc enter data create( dxyz[0 : 3] )
+#pragma acc enter data create( coords[0 : 6] )
+#pragma acc enter data create( tags[0 : 3] )
+#pragma acc enter data create( subDiag[0 : 3] )
+#pragma acc enter data create( freqs[0 : 2] )
+#pragma acc enter data create( supDiag[0 : 3] )
+#pragma acc enter data create( length[0 : 3] )
+#pragma acc enter data create( num[0 : 2] )
+#pragma acc enter data create( denum[0 : 2] )
+#pragma acc enter data create( bc[0 : 6] )
+#pragma acc enter data create( faceTag[0 : 6] )
+#pragma acc enter data create( Xbox[0 : 6] )
+
+#if(MULTIGRIDON)
+#pragma acc enter data create( tmpMGReal[0 : nz + SIZEMG] )
+#pragma acc enter data create( tmpMGImag[0 : nz + SIZEMG] )
+#endif
+
+#pragma acc update device( subDiag[0 : 3] )
+#pragma acc update device( supDiag[0 : 3] )
+#pragma acc enter data create( dl[0 : nz] )
+#pragma acc enter data create( ds[0 : nz] )
+#pragma acc enter data create( du[0 : nz] )
+#pragma acc update device( du[0 : nz] )
+#pragma acc update device( dl[0 : nz] )
+#pragma acc enter data create( x1[0 : nz*nxChunk] )
+#pragma acc enter data create( x2[0 : nz*nxChunk] )
+#pragma acc enter data create( crpcr_lower[0 : nz*nxChunk] )
+#pragma acc enter data create( crpcr_upper[0 : nz*nxChunk] )
+#pragma acc enter data create( crpcr_rhs[0 : nz*nxChunk] )
 #endif
     /* impoartant note about nested classes is that we need to go from top to bottom, first have the highest level
          class copyin 'this' for that class and then once the address are set on the GPU, then copyin the lower level class
          in our case it is in this order 1. pencil 2. chunked array*/
-
     allocateChunks();
     constructShuffleVectorX();
     constructShuffleVectorY();
     //   Sig.copyin();
     T.setElems( nChunk, nzChunk, subDiag, supDiag );
     MG.construct( ( nz + SIZEMG ), INNERITER, INNERITER, OUTERITER, subDiag, supDiag );
+    MGC.construct( ( nz + SIZEMG ), INNERITER, INNERITER, OUTERITER, subDiag, supDiag );
 
 #if ( DEBUG )
     cout << "iaxsize " << iaxSize << endl;
     cout << "iaysize " << iaySize << endl;
 #endif
+}
+
+#if ( OPENACC )
+#pragma acc routine gang
+#endif
+void PencilDcmp::setDiag( int i, int j )
+{
+
+double eig = getEigenVal( i, j ); 
+
+#if ( OPENACC )
+#pragma acc loop
+#endif
+    for ( int i = 0; i < nz; i++ )
+    {
+        ds[i] = eig;
+        // ds[i] = -2.0;
+    }
 }
 
 void PencilDcmp::setBox( double *X )
@@ -251,7 +340,9 @@ void PencilDcmp::setBox( double *X )
         Xbox[i] = X[i];
     }
 
-#pragma acc update device( Xbox [0:6] )
+#if ( OPENACC )
+#pragma acc update device( Xbox[0 : 6] )
+#endif
 }
 
 PittPackResult PencilDcmp::checkInput()
@@ -275,7 +366,7 @@ PittPackResult PencilDcmp::checkInput()
 
 void PencilDcmp::MPIStartUp()
 {
-    if ( MPI_SUCCESS != MPI_Comm_dup( MPI_COMM_WORLD, &Comm )  )
+    if ( MPI_SUCCESS != MPI_Comm_dup( MPI_COMM_WORLD, &Comm ) )
     {
         cout << BLUE << " Rank(" << myRank << ") > Exit Code : " << MPI_DUP_FAIL << RESET << endl;
         cout << BLUE << PittPackGetErrorEnum( MPI_DUP_FAIL ) << RESET << endl;
@@ -309,6 +400,9 @@ void PencilDcmp::MPIStartUp()
 
 PencilDcmp::~PencilDcmp()
 {
+
+    int initFlag;
+
     if ( Nbrs[0] != NULL )
     {
         delete[] Nbrs[0];
@@ -336,8 +430,6 @@ PencilDcmp::~PencilDcmp()
         delete[] iay;
     }
 
-    int initFlag;
-
 // freeing the resources should be in reverse order
 #if ( OPENACC )
 #pragma acc exit data delete ( coords )
@@ -353,8 +445,15 @@ PencilDcmp::~PencilDcmp()
 #pragma acc exit data delete ( tmpX )
 #pragma acc exit data delete ( Xbox )
 #pragma acc exit data delete ( tmpY )
+#if(MULTIGRIDON)
 #pragma acc exit data delete ( tmpMGReal )
 #pragma acc exit data delete ( tmpMGImag )
+#endif
+#pragma acc exit data delete ( du )
+#pragma acc exit data delete ( dl )
+#pragma acc exit data delete ( ds )
+#pragma acc exit data delete ( x1 )
+#pragma acc exit data delete ( x2 )
 #pragma acc exit data delete ( this )
 #endif
 
@@ -362,8 +461,11 @@ PencilDcmp::~PencilDcmp()
     delete[] dxyz;
 
     delete[] tmp;
+
+#if(MULTIGRIDON)
     delete[] tmpMGReal;
     delete[] tmpMGImag;
+#endif
     delete[] subDiag;
     delete[] supDiag;
     delete[] length;
@@ -376,10 +478,15 @@ PencilDcmp::~PencilDcmp()
     delete[] tmpY;
     delete[] Xbox;
 
+    delete[] dl;
+    delete[] ds;
+    delete[] du;
+    delete[] x1;
+    delete[] x2;
 
-     // free the duplicated communicator
+    // free the duplicated communicator
 
-   MPI_Comm_free(&Comm);
+    MPI_Comm_free( &Comm );
 
     if ( MPI_Finalized( &initFlag ) != MPI_SUCCESS )
     {
@@ -403,7 +510,7 @@ PencilDcmp::~PencilDcmp()
 //
 void PencilDcmp::allocateChunks()
 {
-    int n[3]   = {nx / p0, ny / p0, nz};
+    int n[3] = {nx / p0, ny / p0, nz};
     int nChunk = p0;
 
 #if ( DISABLE_CHECKS )
@@ -538,7 +645,7 @@ void PencilDcmp::setCoords( int dir )
             X[5] = X[4] + dz;
             break;
     }
-            // modifying this from previous to monitor move of the chunks for Debug
+// modifying this from previous to monitor move of the chunks for Debug
 
 #if ( DEBUG )
     cout << GREEN " rank= " << myRank << " Xa= " << X[0] << " Xb= " << X[1] << " dx " << dx << endl;
@@ -558,9 +665,9 @@ void PencilDcmp::setCoords( int dir )
     setDxyz( Xbox );
 //   P.setDxyz();
 #if ( OPENACC )
-#pragma acc update device( dxyz [0:3] )
-#pragma acc update device( coords [0:6] )
-#pragma acc enter data copyin( X [0:6] )
+#pragma acc update device( dxyz[0 : 3] )
+#pragma acc update device( coords[0 : 6] )
+#pragma acc enter data copyin( X[0 : 6] )
 #endif
 }
 // potential bug, need to incorporate directions
@@ -644,7 +751,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
 {
 #if ( COMM_ON )
     MPI_Request request0, request1, request2, request3;
-    MPI_Status  status;
+    MPI_Status status;
 
 #if ( DEBUG_COMM )
     std::string filename = "rank";
@@ -670,18 +777,18 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
 
     //#pragma acc update self( P.P[myRank%p0*chunkSize : (myRank%p0+1)*chunkSize] )
 
-    int     start = 0;
-    int     end   = 0;
-    double *ptr   = P.P;
+    int start = 0;
+    int end = 0;
+    double *ptr = P.P;
     for ( int j = 1; j < ( p0 ) / 2 + 1; j++ )
     {
         //       P.moveDeviceToHost( 1 );
 
         start = getPeriodicIndex( i + j ) * P.chunkSize;
-        end   = P.chunkSize;
-        ptr   = &P( 0 ) + start;
+        end = P.chunkSize;
+        ptr = &P( 0 ) + start;
 #if ( OPENACC )
-#pragma acc update self( ptr [0:end] ) async( 1 )
+#pragma acc update self( ptr[0 : end] ) async( 1 )
 #endif
         //   cout<<"start "<<start<<" end "<<end<<" periodic index "<<  getPeriodicIndex( i + j ) <<" chunkSize "<<P.chunkSize<<" ptr "
         // <<ptr<<endl;
@@ -701,7 +808,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
         end = P.chunkSize;
 // P.moveDeviceToHost( getPeriodicIndex( i - j ) );
 #if ( OPENACC )
-#pragma acc update self( ptr [0:end] ) async( 2 )
+#pragma acc update self( ptr[0 : end] ) async( 2 )
 #endif
         /// switch send/recv order
 
@@ -722,14 +829,11 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
         ptr = &P( 0 ) + getPeriodicIndex( i + j ) * P.chunkSize;
         end = P.chunkSize;
 #if ( OPENACC )
-#pragma acc update device( ptr [0:end] ) async( 3 )
+#pragma acc update device( ptr[0 : end] ) async( 3 )
 #endif
 
 #if ( DEBUG_COMM )
-        dicIndex( i - j ) << endl
-
-                             myfile
-                          << "**********************************" << endl;
+        dicIndex( i - j ) << endl myfile << "**********************************" << endl;
         myfile << " ZX myRank " << myRank << " destination " << getPeriodicRank( i - j ) << " tag and chunk id "
                << getPeriodicIndex( i - j ) << endl;
         myfile << " ZX myRank " << myRank << " source " << getPeriodicRank( i + j ) << " chunk ID " << getPeriodicIndex( i + j ) << endl;
@@ -742,18 +846,18 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
 #endif
         for ( int k = 0; k < P.chunkSize; k++ )
         {
-            P( k + P.chunkSize * getPeriodicIndex( i - j ) ) = R( k );
+            P( k + P.chunkSize *getPeriodicIndex( i - j ) ) = R( k );
         }
         //        P.moveHostToDevice( getPeriodicIndex( i - j ) );
         ptr = &P( 0 ) + getPeriodicIndex( i - j ) * P.chunkSize;
         end = P.chunkSize;
 #if ( OPENACC )
-#pragma acc update device( ptr [0:end] )
+#pragma acc update device( ptr[0 : end] )
 #endif
         //        #pragma acc wait
     }
 
-        //        #pragma acc wait(4)
+//        #pragma acc wait(4)
 
 #if ( DEBUG )
     // cout<<"SUCCESS " <<endl;
@@ -776,12 +880,12 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
 {
 #if ( COMM_ON )
     MPI_Request request0, request1, request2, request3;
-    MPI_Status  status;
-    int         stride = p0;
+    MPI_Status status;
+    int stride = p0;
 
-    // uses too much memory, use pairwise exhchange instead
-    //
-    // network congestion
+// uses too much memory, use pairwise exhchange instead
+//
+// network congestion
 
 #if ( DEBUG_COMM )
     std::string filename = "rank";
@@ -801,17 +905,17 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
     cout << " loop= " << ( p0 + 1 ) / 2 << endl;
 #endif
 
-    int     start = 0;
-    int     end   = 0;
-    double *ptr   = P.P;
+    int start = 0;
+    int end = 0;
+    double *ptr = P.P;
 
     for ( int j = 1; j < ( p0 ) / 2 + 1; j++ )
     {
         start = getPeriodicIndexStride( j ) * P.chunkSize;
-        end   = P.chunkSize;
-        ptr   = &P( 0 ) + start;
+        end = P.chunkSize;
+        ptr = &P( 0 ) + start;
 #if ( OPENACC )
-#pragma acc update self( ptr [0:end] )
+#pragma acc update self( ptr[0 : end] )
 #endif
         MPI_Irecv( &R( 0 ), P.chunkSize, MPI_DOUBLE, getPeriodicRankStride( -j ), getPeriodicRankStride( -j ), Comm, &request1 );
 
@@ -833,10 +937,10 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
 
         ptr = &P( 0 ) + getPeriodicIndexStride( -j ) * P.chunkSize;
         end = P.chunkSize;
-        // P.moveDeviceToHost( getPeriodicIndex( i - j ) );
+// P.moveDeviceToHost( getPeriodicIndex( i - j ) );
 
 #if ( OPENACC )
-#pragma acc update self( ptr [0:end] )
+#pragma acc update self( ptr[0 : end] )
 #endif
         MPI_Irecv( &P( 0 ) + P.chunkSize * getPeriodicIndexStride( j ), P.chunkSize, MPI_DOUBLE, getPeriodicRankStride( j ),
                    getPeriodicRankStride( j ), Comm, &request3 );
@@ -849,7 +953,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
         ptr = &P( 0 ) + getPeriodicIndexStride( j ) * P.chunkSize;
         end = P.chunkSize;
 #if ( OPENACC )
-#pragma acc update device( ptr [0:end] )
+#pragma acc update device( ptr[0 : end] )
 #endif
         // transfer from container to the desired location
         // cout<<nChunk<<endl;
@@ -858,12 +962,12 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
 
         for ( int k = 0; k < P.chunkSize; k++ )
         {
-            P( k + P.chunkSize * getPeriodicIndexStride( -j ) ) = R( k );
+            P( k + P.chunkSize *getPeriodicIndexStride( -j ) ) = R( k );
         }
         ptr = &P( 0 ) + getPeriodicIndexStride( -j ) * P.chunkSize;
         end = P.chunkSize;
 #if ( OPENACC )
-#pragma acc update device( ptr [0:end] )
+#pragma acc update device( ptr[0 : end] )
 #endif
 
 #if ( DEBUG_COMM )
@@ -885,8 +989,10 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
 
 #endif
 
+#if ( OPENACC )
 #pragma acc routine
-inline int  PencilDcmp::getPeriodicRank( int index )
+#endif
+inline int PencilDcmp::getPeriodicRank( int index )
 {
     //
     // return the rank in a periodic way
@@ -919,7 +1025,7 @@ inline void PencilDcmp::adjustIndex( int &index )
     }
     else if ( index < 0 )
     {
-        qt    = ( index + 1 ) / p0;
+        qt = ( index + 1 ) / p0;
         index = index + ( -qt + 1 ) * p0;
     }
 }
@@ -939,7 +1045,7 @@ inline int PencilDcmp::getPeriodicRankStride( int index )
 
     adjustIndex( index );
 #if ( DEBUG )
-    cout << " stride myrank " << myRank << " new index " << index << " nbr[index]" << myRank % p0 + p0 * index << endl;
+    cout << " stride myrank " << myRank << " new index " << index << " nbr[index]" << myRank % p0 + p0 *index << endl;
 #endif
     // return ( Nbrs[stride][rank] );
     return ( myRank % p0 + p0 * index );
@@ -952,7 +1058,7 @@ int PencilDcmp::getPeriodicIndexStride( int index )
     // 0,1,2,3,4 as the ranks, if the index is 5, 0,1,2,3,4,0,1,2,3
     //
     int location = getIndex( myRank );
-    index        = location + index;
+    index = location + index;
 
     // note that the index grows with a stride here
     // int qt=index/comSize;
@@ -980,9 +1086,9 @@ void PencilDcmp::graphCreate() /*!Two different communicators are required due
                                   to the presence of stride in X to Y to
                                   rotation */
 {
-    int indegree  = p0;
+    int indegree = p0;
     int outdegree = p0;
-    int reorder   = 0;
+    int reorder = 0;
     int ierr;
 
     ierr = MPI_Dist_graph_create_adjacent( Comm, indegree, Nbrs[0], MPI_UNWEIGHTED, indegree, Nbrs[0], MPI_UNWEIGHTED, MPI_INFO_NULL,
@@ -1012,8 +1118,8 @@ void PencilDcmp::graphCreate() /*!Two different communicators are required due
 void PencilDcmp::checkGraph( int index )
 {
     int nneighbors = 0;
-    int indegree   = 0;
-    int outdegree  = 0;
+    int indegree = 0;
+    int outdegree = 0;
 
     if ( index > 1 )
     {
@@ -1026,7 +1132,7 @@ void PencilDcmp::checkGraph( int index )
     MPI_Dist_graph_neighbors_count( nbrComm[index], &indegree, &outdegree, &weight );
 
     int *neighbors = new int[indegree];
-    nneighbors     = indegree;
+    nneighbors = indegree;
 
 #if ( DEBUG )
     cout << " nneighbors is = " << nneighbors << endl;
@@ -1036,10 +1142,10 @@ void PencilDcmp::checkGraph( int index )
         exit( 0 );
     }
 #endif
-    int *sources       = new int[indegree];
+    int *sources = new int[indegree];
     int *sourceweights = new int[indegree];
-    int *destinations  = new int[outdegree];
-    int *destweights   = new int[outdegree];
+    int *destinations = new int[outdegree];
+    int *destweights = new int[outdegree];
 
     MPI_Dist_graph_neighbors( nbrComm[index], indegree, sources, sourceweights, outdegree, destinations, destweights );
 
@@ -1070,7 +1176,7 @@ void PencilDcmp::nbrAllToAllZX()
 
 #if ( DEBUG )
     int *sndCnts = new int[p0];
-    int *disp    = new int[p0];
+    int *disp = new int[p0];
 
     for ( int i = 0; i < p0; i++ )
     {
@@ -1091,8 +1197,8 @@ void PencilDcmp::nbrAllToAllZX()
 #endif
 
     MPI_Request request;
-    MPI_Status  status;
-    int         ierr;
+    MPI_Status status;
+    int ierr;
 
     ierr = MPI_Ineighbor_alltoall( &P( 0 ), P.chunkSize, MPI_DOUBLE, &R( 0 ), P.chunkSize, MPI_DOUBLE, nbrComm[0], &request );
     // blocking fails   ierr = MPI_Neighbor_alltoall( &P( 0 ), P.chunkSize, MPI_DOUBLE, MPI_IN_PLACE, P.chunkSize, MPI_DOUBLE, nbrComm[0] );
@@ -1126,7 +1232,7 @@ void PencilDcmp::nbrAllToAllXY()
 // for All to allV
 #if ( DEBUG )
     int *sndCnts = new int[p0];
-    int *disp    = new int[p0];
+    int *disp = new int[p0];
 
     for ( int i = 0; i < p0; i++ )
     {
@@ -1158,8 +1264,8 @@ void PencilDcmp::nbrAllToAllXY()
     // in the present algorithm for simplicity ever processor sends message to itself, making a blocking allto all might deadlock
 
     MPI_Request request;
-    MPI_Status  status;
-    int         ierr;
+    MPI_Status status;
+    int ierr;
 
     ierr = MPI_Ineighbor_alltoall( &P( 0 ), P.chunkSize, MPI_DOUBLE, &R( 0 ), P.chunkSize, MPI_DOUBLE, nbrComm[1], &request );
 
@@ -1207,23 +1313,23 @@ void PencilDcmp::IO( int app, int dir, int aligndir )
     IO.writeMultiBlockCellCenter( P, app, dir, aligndir );
 }
 
-    /*
-    #if ( OPENACC )
-    #pragma acc routine seq
-    #endif
-    static double sine( double x )
-    {
-        return ( sin( x ) );
-    }
+/*
+#if ( OPENACC )
+#pragma acc routine seq
+#endif
+static double sine( double x )
+{
+    return ( sin( x ) );
+}
 
-    #if ( OPENACC )
-    #pragma acc routine seq
-    #endif
-    static double cosine( double x )
-    {
-        return ( cos( x ) );
-    }
-    */
+#if ( OPENACC )
+#pragma acc routine seq
+#endif
+static double cosine( double x )
+{
+    return ( cos( x ) );
+}
+*/
 
 #if ( OPENACC )
 #pragma acc routine seq
@@ -1289,12 +1395,12 @@ void PencilDcmp::initializeTrigonometric()
         c2 = dxyz[1];
         c3 = dxyz[2];
     }
-        //   c3 = dxyz[2];
+//   c3 = dxyz[2];
 
 #if ( DEBUG )
     cout << " rank " << myRank << " c1  " << c1 << " " << c2 << " " << c3 << endl;
     cout << " rank " << myRank << " N:  " << Nx << " " << Ny << " " << Nz << endl;
-    cout << "xmin = " << Xa + 0 * c1 + shift * c1 * .5 << " xmax " << Xa + ( Nx - 1 ) * c1 + shift * c1 * .5 << endl;
+    cout << "xmin = " << Xa + 0 * c1 + shift *c1 * .5 << " xmax " << Xa + ( Nx - 1 ) * c1 + shift * c1 * .5 << endl;
     ;
 #endif
     double omega[3] = {pi, 2. * pi, 3. * pi};
@@ -1341,7 +1447,7 @@ void PencilDcmp::initializeTrigonometric()
                     x = Xa + i * c1 + shift * c1 * .5;
                 }
 
-                    // cout << " rank "<<myRank <<" xyz  " << x << " " << y << " " << z << endl;
+// cout << " rank "<<myRank <<" xyz  " << x << " " << y << " " << z << endl;
 
 #if ( !EXACT )
 
@@ -1373,15 +1479,14 @@ void PencilDcmp::initializeTrigonometric()
                 }
                 else
                 {
-                    P( i, j, k ) = ( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
-                                     * exactValue( omega[2] * z, tags[2] )
-                                     + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
-                                       * exactValue( omega[2] * z, tags[2] )
-                                     + ( omega[2] * omega[2] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
-                                       * exactValue( omega[2] * z, tags[2] ) )
-                                   * c3 * c3;
+                    P( i, j, k )
+                    = ( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                        * exactValue( omega[2] * z, tags[2] ) + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] )
+                                                                * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
+                        + ( omega[2] * omega[2] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                          * exactValue( omega[2] * z, tags[2] ) ) * c3 * c3;
 
-                       P( i, j, k, 1 ) = 0.0;
+                    P( i, j, k, 1 ) = 0.0;
                 }
 //   P(i,j,k,0)=(x*y*z);
 //   P(i,j,k,1)=(x*y*z);
@@ -1397,10 +1502,10 @@ void PencilDcmp::initializeTrigonometric()
 
                 //                  P( i, j, k, 0 ) = cos( omega[1] * ( x + y + z ) );
                 //                  P( i, j, k, 1 ) = sin( omega[1] * ( x + y + z ) );
-                P( i, j, k )
-                = -exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                P( i, j, k ) =
+                -exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
 
-                // all periodic
+// all periodic
 
 #endif
                 //
@@ -1467,7 +1572,7 @@ double PencilDcmp::getError()
 #endif
     double omega[3] = {pi, 2. * pi, 3. * pi};
 
-    double val  = 0.0;
+    double val = 0.0;
     double val1 = 0.0;
 #if ( 1 )
 #if ( OPENACC )
@@ -1521,8 +1626,8 @@ double PencilDcmp::getError()
                   */
                 // P(i,j,k)+=omega[1]*omega[1]*(sin(omega[1]*z)*sin(omega[1]*(x+y)));
 
-                val = P( i, j, k )
-                      + exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                val = P( i, j, k ) + exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                                     * exactValue( omega[2] * z, tags[2] );
 
                 val1 = 0.0;
                 // cout<<"val 1 "<<val1<<endl;
@@ -1535,7 +1640,7 @@ double PencilDcmp::getError()
         }
     }
 
-    double err      = 0.0;
+    double err = 0.0;
     double finalErr = 0.0;
 
 //#pragma acc loop vector reduction(+:err)
@@ -1547,6 +1652,7 @@ double PencilDcmp::getError()
         err = err + P( 2 * i );
     }
     err = err / ( unitSize );
+    err = sqrt( err );
 
     /*
         MPI_Allreduce( &err, &finalErr, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
@@ -1560,10 +1666,14 @@ double PencilDcmp::getError()
 #endif
 }
 
+#if ( OPENACC )
 #pragma acc routine gang
-void                PencilDcmp::debug()
+#endif
+void PencilDcmp::debug()
 {
+#if ( OPENACC )
 #pragma acc loop gang
+#endif
     for ( int i = 0; i < 6; i++ )
     {
         P( i ) = scale;
@@ -1588,7 +1698,7 @@ void PencilDcmp::rearrangeX2Y()
 */
 // rearranges x to y
 #if ( OPENACC )
-#pragma acc loop gang private( tmp[2 * nxChunk * nyChunk] )
+#pragma acc loop gang private( tmp[2 * nxChunk *nyChunk] )
 #endif
     for ( int id = 0; id < nChunk; id++ )
     {
@@ -1617,7 +1727,7 @@ void PencilDcmp::rearrangeX2Y()
         }
     }
 }
-    //#endif
+//#endif
 
 #else
 
@@ -1650,7 +1760,7 @@ void PencilDcmp::assignTempX2Y( const int chunkId, const int k, double *tmp )
 #endif
         for ( int i = 0; i < nxChunk; i++ )
         {
-            tmp[2 * ( nxChunk * j + i )]     = P( chunkId, 0, i, j, k, 0 );
+            tmp[2 * ( nxChunk * j + i )] = P( chunkId, 0, i, j, k, 0 );
             tmp[2 * ( nxChunk * j + i ) + 1] = P( chunkId, 0, i, j, k, 1 );
         }
     }
@@ -1727,7 +1837,6 @@ void PencilDcmp::assignBackTempX2Y( const int chunkId )
 #if ( OPENACC )
 #pragma acc routine gang
 #endif
-
 void PencilDcmp::assignTempY2X( const int chunkId )
 {
 #if ( OPENACC )
@@ -2038,9 +2147,9 @@ void PencilDcmp::constructShuffleVectorX()
 
     // need to save this due to parallelization issue,
     // might lead to race condition if done on GPU
-    shuffle0         b;
+    shuffle0 b;
     vector<shuffle0> a;
-    sint             count = 0;
+    sint count = 0;
 
     for ( sint i = 1; i < size - 1; i++ )
     {
@@ -2060,7 +2169,7 @@ void PencilDcmp::constructShuffleVectorX()
 
         while ( bol[id] != '0' )
         {
-            dest    = getDestinationLocX( id );
+            dest = getDestinationLocX( id );
             bol[id] = '0';
 
             if ( id != dest )
@@ -2103,7 +2212,7 @@ void PencilDcmp::constructShuffleVectorX()
 // This is only one on the host once and passed onto the device
 void PencilDcmp::setUpShuffleArraysX( vector<shuffle0> &a )
 {
-    iaxSize    = a.size();
+    iaxSize = a.size();
     sint count = 0;
 
     for ( sint i = 0; i < a.size(); i++ )
@@ -2130,7 +2239,7 @@ void PencilDcmp::setUpShuffleArraysX( vector<shuffle0> &a )
         }
     }
 
-    iax    = new sint[a.size() + 1];
+    iax = new sint[a.size() + 1];
     iax[0] = 0;
 
     jaxSize = finalsize;
@@ -2159,22 +2268,22 @@ void PencilDcmp::setUpShuffleArraysX( vector<shuffle0> &a )
     */
 
     int xSize = 2 * a.size() * nxChunk + 1;
-    tmpX      = new double[xSize];
+    tmpX = new double[xSize];
 
-    cout << " xSize " << xSize << endl;
+    cout << " xSize  " << xSize <<" iaxSize  "<< endl;
 
 #if ( OPENACC )
 #pragma acc update device( iaxSize )
 #pragma acc update device( jaxSize )
 
-#pragma acc enter data create( iax [0:iaxSize + 1] )
-#pragma acc update device( iax [0:iaxSize + 1] )
+#pragma acc enter data create( iax[0 : iaxSize + 1] )
+#pragma acc update device( iax[0 : iaxSize + 1] )
 
-#pragma acc enter data create( jax [0:jaxSize] )
-#pragma acc update device( jax [0:jaxSize] )
+#pragma acc enter data create( jax[0 : jaxSize] )
+#pragma acc update device( jax[0 : jaxSize] )
 
-#pragma acc enter data create( tmpX [0:xSize] )
-#pragma acc update device( tmpX [0:xSize] )
+#pragma acc enter data create( tmpX[0 : xSize] )
+#pragma acc update device( tmpX[0 : xSize] )
 #endif
 }
 
@@ -2210,8 +2319,8 @@ inline sint PencilDcmp::getDestinationLocX( const sint id )
 inline void PencilDcmp::decomposeOldIndexX( const sint id, sint &chunkId, sint &j, sint &k )
 {
     chunkId = id / nyChunk / nzChunk;
-    k       = ( id % ( nyChunk * nzChunk ) ) / nyChunk;
-    j       = ( id % ( nyChunk * nzChunk ) ) % nyChunk;
+    k = ( id % ( nyChunk * nzChunk ) ) / nyChunk;
+    j = ( id % ( nyChunk * nzChunk ) ) % nyChunk;
 }
 
 // note that for y-direction every calculation should be independent of ny
@@ -2229,9 +2338,9 @@ void PencilDcmp::constructShuffleVectorY()
 
     // need to save this due to parallelization issue,
     // might lead to race condition if done on GPU
-    shuffle0         b;
+    shuffle0 b;
     vector<shuffle0> a;
-    sint             count = 0;
+    sint count = 0;
 
     for ( sint i = 1; i < size - 1; i++ )
     {
@@ -2251,7 +2360,7 @@ void PencilDcmp::constructShuffleVectorY()
 
         while ( bol[id] != '0' )
         {
-            dest    = getDestinationLocY( id );
+            dest = getDestinationLocY( id );
             bol[id] = '0';
 
             if ( id != dest )
@@ -2329,7 +2438,7 @@ void PencilDcmp::setUpShuffleArraysY( vector<shuffle0> &a )
         cout << " jay[" << i << "] = " << jay[i] << endl;
     }
 #endif
-    iay    = new sint[a.size() + 1];
+    iay = new sint[a.size() + 1];
     iay[0] = 0;
     for ( sint i = 0; i < a.size(); i++ )
     {
@@ -2345,20 +2454,20 @@ void PencilDcmp::setUpShuffleArraysY( vector<shuffle0> &a )
 
     // I added one to prvent seg fault for allocation of size 0 while deleting
     int ySize = 2 * a.size() * nyChunk + 1;
-    tmpY      = new double[ySize];
+    tmpY = new double[ySize];
 
 #if ( OPENACC )
 #pragma acc update device( iaySize )
 #pragma acc update device( jaySize )
 
-#pragma acc enter data create( iay [0:iaySize + 1] )
-#pragma acc update device( iay [0:iaySize + 1] )
+#pragma acc enter data create( iay[0 : iaySize + 1] )
+#pragma acc update device( iay[0 : iaySize + 1] )
 
-#pragma acc enter data create( jay [0:jaySize] )
-#pragma acc update device( jay [0:jaySize] )
+#pragma acc enter data create( jay[0 : jaySize] )
+#pragma acc update device( jay[0 : jaySize] )
 
-#pragma acc enter data create( tmpY [0:ySize] )
-#pragma acc update device( tmpY [0:ySize] )
+#pragma acc enter data create( tmpY[0 : ySize] )
+#pragma acc update device( tmpY[0 : ySize] )
 #
 
 #endif
@@ -2391,8 +2500,8 @@ inline sint PencilDcmp::getDestinationLocY( const sint id )
 inline void PencilDcmp::decomposeOldIndexY( const sint id, sint &chunkId, sint &i, sint &k )
 {
     chunkId = id / ( nxChunk * nzChunk );
-    k       = ( id % ( nxChunk * nzChunk ) ) / nxChunk;
-    i       = ( id % ( nxChunk * nzChunk ) ) % nxChunk;
+    k = ( id % ( nxChunk * nzChunk ) ) / nxChunk;
+    i = ( id % ( nxChunk * nzChunk ) ) % nxChunk;
 }
 
 #if ( OPENACC )
@@ -2446,19 +2555,20 @@ void PencilDcmp::restoreTmp( const sint id, double *tmp, sint dir )
 #endif
     for ( sint i = 0; i < 2 * N; i++ )
     {
-        P( 2 * N * id + i ) = tmp[i];
+        P( 2 *N *id + i ) = tmp[i];
     }
 }
 
 #if ( OPENACC )
-#pragma acc routine worker
+#pragma acc routine gang
 #endif
 void PencilDcmp::changeLocationX()
 {
     double *tm;
 
 #if ( OPENACC )
-#pragma acc loop worker private( tm[1] )
+//#pragma acc loop worker private( tm[1] )
+#pragma acc loop private( tm[1] )
 #endif
     for ( sint i = 0; i < iaxSize; i++ )
     {
@@ -2481,14 +2591,14 @@ void PencilDcmp::changeLocationX()
 }
 
 #if ( OPENACC )
-#pragma acc routine worker
+#pragma acc routine gang
 #endif
 void PencilDcmp::changeLocationY()
 {
     double *tm;
 
 #if ( OPENACC )
-#pragma acc loop worker private( tm[1] )
+#pragma acc loop gang private( tm[1] )
 #endif
     for ( sint i = 0; i < iaySize; i++ )
     {
@@ -2503,14 +2613,15 @@ void PencilDcmp::changeLocationY()
 }
 
 #if ( OPENACC )
-#pragma acc routine worker
+#pragma acc routine gang
+//#pragma acc routine gang
 #endif
 void PencilDcmp::restoreLocationY()
 {
     double *tm;
 
 #if ( OPENACC )
-#pragma acc loop worker private( tm[1] )
+#pragma acc loop gang private( tm[1] )
 #endif
     for ( sint i = 0; i < iaySize; i++ )
     {
@@ -2527,7 +2638,7 @@ void PencilDcmp::restoreLocationY()
 }
 
 #if ( OPENACC )
-#pragma acc routine worker
+#pragma acc routine gang
 //#pragma acc routine vector
 #endif
 void PencilDcmp::restoreLocationX()
@@ -2535,7 +2646,7 @@ void PencilDcmp::restoreLocationX()
     double *tm;
 
 #if ( OPENACC )
-#pragma acc loop worker private( tm[1] )
+#pragma acc loop gang private( tm[1] )
 #endif
     for ( sint i = 0; i < iaxSize; i++ )
     {
@@ -2576,7 +2687,7 @@ void PencilDcmp::saveToDest( const sint source, const sint dest, sint dir )
 #endif
     for ( sint i = 0; i < 2 * N; i++ )
     {
-        P( 2 * dest * N + i ) = P( 2 * source * N + i );
+        P( 2 *dest *N + i ) = P( 2 * source * N + i );
     }
 }
 
@@ -2603,7 +2714,7 @@ void PencilDcmp::saveTmpToDest( const double *tmp, const sint dest, sint dir )
 #endif
     for ( sint i = 0; i < 2 * N; i++ )
     {
-        P( 2 * dest * N + i ) = tmp[i];
+        P( 2 *dest *N + i ) = tmp[i];
     }
 }
 void PencilDcmp::printX( ofstream &myfile )
@@ -2672,8 +2783,8 @@ void PencilDcmp::rescale()
 #endif
                 for ( int k = 0; k < nzChunk; k++ )
                 {
-                    P( id, 0, i, j, k, 0 ) = 1. / (scale)*P( id, 0, i, j, k, 0 );
-                    P( id, 0, i, j, k, 1 ) = 1. / (scale)*P( id, 0, i, j, k, 1 );
+                    P( id, 0, i, j, k, 0 ) = 1. / ( scale ) * P( id, 0, i, j, k, 0 );
+                    P( id, 0, i, j, k, 1 ) = 1. / ( scale ) * P( id, 0, i, j, k, 1 );
                 }
             }
         }
@@ -2687,41 +2798,41 @@ void PencilDcmp::setEigenVal()
 
     if ( tags[0] == 0 )
     {
-        num[0]   = 1.0;
+        num[0] = 1.0;
         denum[0] = 0.0;
     }
     else if ( tags[0] == 1 )
     {
-        num[0]   = 0.0;
+        num[0] = 0.0;
         denum[0] = 0.0;
     }
     else if ( tags[0] == 2 )
     {
-        num[0]   = 0.0;
+        num[0] = 0.0;
         denum[0] = 0.0;
         freqs[0] = 2 * freqs[0];
     }
 
     if ( tags[1] == 0 )
     {
-        num[1]   = 1.0;
+        num[1] = 1.0;
         denum[1] = 0.0;
     }
     else if ( tags[1] == 1 )
     {
-        num[1]   = 0.0;
+        num[1] = 0.0;
         denum[1] = 0.0;
     }
     else if ( tags[1] == 2 )
     {
-        num[1]   = 0.0;
+        num[1] = 0.0;
         denum[1] = 0.0;
         freqs[1] = 2 * freqs[1];
     }
 #if ( OPENACC )
-#pragma acc update device( num [0:2] )
-#pragma acc update device( denum [0:2] )
-#pragma acc update device( freqs [0:2] )
+#pragma acc update device( num[0 : 2] )
+#pragma acc update device( denum[0 : 2] )
+#pragma acc update device( freqs[0 : 2] )
 #endif
 }
 
@@ -2768,18 +2879,18 @@ void PencilDcmp::assignBoundary( char *boundary )
 
 //#pragma acc enter data create( bc[0 : 6] )
 #if ( OPENACC )
-#pragma acc update device( bc [0:6] )
-#pragma acc update device( faceTag [0:6] )
+#pragma acc update device( bc[0 : 6] )
+#pragma acc update device( faceTag[0 : 6] )
 #endif
     detectTransforms();
     extractTag();
     setEigenVal();
     setScale();
 
-    //  runInfo();
+//  runInfo();
 
 #if ( OPENACC )
-#pragma acc update device( tags [0:3] )
+#pragma acc update device( tags[0 : 3] )
 #endif
 }
 
@@ -2894,7 +3005,6 @@ int PencilDcmp::thomas( int i, int j, int dir, int index )
     int result = SUCCESS;
 
     double onDiag[3];
-    //   double Sn[ZSIZE];
     onDiag[1] = getEigenVal( i, j );
 
     int this_rank = 1;
@@ -2907,7 +3017,7 @@ int PencilDcmp::thomas( int i, int j, int dir, int index )
     }
     else if ( bc[4] == 'N' )
     {
-        onDiag[0]                   = -1.0;
+        onDiag[0] = -1.0;
         P( 0, dir, i, j, 0, index ) = 0.0;
     }
     else if ( bc[4] == 'P' )
@@ -2921,7 +3031,7 @@ int PencilDcmp::thomas( int i, int j, int dir, int index )
     }
     else if ( bc[5] == 'N' )
     {
-        onDiag[2]                                      = -1.0;
+        onDiag[2] = -1.0;
         P( nChunk - 1, dir, i, j, nzChunk - 1, index ) = 0.0;
     }
     else if ( bc[5] == 'P' )
@@ -2959,7 +3069,7 @@ if(T.thomasReal( P, onDiag, i, j, dir )!=SUCCESS) !slower
 result=THOMAS_FAIL;
 }
 */
-                                                       //         T.thomas( P, onDiag, i, j, dir, index );
+        //         T.thomas( P, onDiag, i, j, dir, index );
     }
     /*
    cout<<" ----- solved --------- "<<endl;
@@ -2979,7 +3089,7 @@ result=THOMAS_FAIL;
 void PencilDcmp::thomasSingleBlock( int i, int j, int dir, int index )
 {
     double bet;
-    int    n;
+    int n;
 
     //    double Sn[ZSIZE];
 
@@ -2999,7 +3109,7 @@ void PencilDcmp::thomasSingleBlock( int i, int j, int dir, int index )
     }
     else if ( bc[4] == 'N' )
     {
-        onDiag[0]                   = -1.0;
+        onDiag[0] = -1.0;
         P( 0, dir, i, j, 0, index ) = 0.0;
     }
     else if ( bc[4] == 'P' )
@@ -3013,7 +3123,7 @@ void PencilDcmp::thomasSingleBlock( int i, int j, int dir, int index )
     }
     else if ( bc[5] == 'N' )
     {
-        onDiag[2]                             = -1.0;
+        onDiag[2] = -1.0;
         P( 0, dir, i, j, nzChunk - 1, index ) = 0.0;
     }
     else if ( bc[5] == 'P' )
@@ -3030,7 +3140,7 @@ void PencilDcmp::thomasSingleBlock( int i, int j, int dir, int index )
 void PencilDcmp::thomasPeriodic( int i, int j, int dir, int index )
 {
     double bet;
-    int    n;
+    int n;
 
     // the enterior is always set according to eigenvalues
     // the two ends decided by BC
@@ -3038,7 +3148,7 @@ void PencilDcmp::thomasPeriodic( int i, int j, int dir, int index )
     double onDiag[3];
 
     double alpha = 1.0;
-    double beta  = 1.0;
+    double beta = 1.0;
 
     onDiag[1] = getEigenVal( i, j );
 
@@ -3141,19 +3251,19 @@ int PencilDcmp::solve()
 }
 #endif
 
-    // continue form here
+// continue form here
 
 #if ( 1 )
 #if ( OPENACC )
 #pragma acc routine gang
 #endif
-void PencilDcmp::fillInArrayContigMG( const int i, const int j, int index )
+void PencilDcmp::fillInArrayContig( const int i, const int j, int index )
 {
 
 //    int dir = 3;
-
-//    double *tm[2];
 /*
+    double *tm[2];
+
     tm[0] = tmpMGReal;
     tm[1] = tmpMGImag;
 */
@@ -3171,59 +3281,66 @@ tm=tmpMGImag;
 // tmpMGReal[0]=0.0;
 // tmpMGReal[16-1]=0.0;
 
-    //    cout<<"before inside fill in"<<endl;
-#pragma acc loop gang  
+//    cout<<"before inside fill in"<<endl;
+#pragma acc loop gang
     for ( int id = 0; id < nChunk; id++ )
     {
-#pragma acc loop vector 
+#pragma acc loop vector
         for ( int k = 0; k < nzChunk; k++ )
         {
-          tmpMGReal[id * nzChunk + k + OFFS] =P( id, 3, i, j, k, index );
-//      tmpMGReal[id * nzChunk + k + OFFS] =4.*scale*k;
+            if ( index == 0 )
+            {
+                tmpMGReal[id * nzChunk + k + OFFS] = P( id, 3, i, j, k, index );
+            }
+            else
+            {
+                tmpMGImag[id * nzChunk + k + OFFS] = P( id, 3, i, j, k, index );
+            }
+            //      tmpMGReal[id * nzChunk + k + OFFS] =4.*scale*k;
             // cout<<" ( " << i <<" , "<< j <<" , "<< k<<" ) "<<tmpMGReal[k]<<endl;
             //     cout<<P( id, dir, i, j, k, index )<<endl;
         }
     }
-
 }
 
 #if ( OPENACC )
 #pragma acc routine gang
 #endif
-void PencilDcmp::solveMG( const int index )
+void PencilDcmp::solveMG()
 {
     // not that rhs already scaled for initialization for Thomas so here we need to rescale
     //  back as MultiGrid has its own scaling
     //
     //    MultiGrid  MG;
-//    double diag[3];
+    //    double diag[3];
     double eig;
+    int index = 0;
     // cout<< RED<<"multiGrid" <<RESET<<endl;
     int count = 0;
+
+    int bol = MG.gridSizePowerTwoPlusOne;
 
 //    int i=2;
 //    int j=1;
 
-#if ( 1 )
-#pragma acc loop seq private(eig)
-   for ( int k = 0; k < nxChunk*nyChunk; k++ )
-//   for ( int j = 0; j < nxChunk; j++ )
+#pragma acc loop seq private( eig )
+    for ( int k = 0; k < nxChunk * nyChunk; k++ )
+    //   for ( int j = 0; j < nxChunk; j++ )
     {
-//#pragma acc loop seq
-//        for ( int i = 0; i < nyChunk; i++ )
+        //#pragma acc loop seq
+        //        for ( int i = 0; i < nyChunk; i++ )
         {
-    int j= k / nyChunk;
-    int i= k % nyChunk;
-      // debugged work fine 
-          MG.fillInArrayContig(P,nChunk, nzChunk,  i, j, index );
-
-          eig = getEigenVal( i, j );
-          MG.setDiag( eig );
-          MG.solveMono(eig);
- 
-          MG.fillInArrayBack(P,nChunk, nzChunk,  i, j, index );
-          MG.reset();
-#if(0)
+            int j = k / nyChunk;
+            int i = k % nyChunk;
+// debugged work fine
+#if ( 0 )
+            MG.fillInArrayContig( P, nChunk, nzChunk, i, j, index );
+            eig = getEigenVal( i, j );
+            MG.setDiag( eig );
+            MG.solveMono( eig );
+            MG.fillInArrayBack( P, nChunk, nzChunk, i, j, index );
+            MG.reset();
+#else
 //            eig=2.0;
 /*
             for ( int k = 0; k < 3; k++ )
@@ -3234,75 +3351,144 @@ void PencilDcmp::solveMG( const int index )
 
              /*diag[0]=eig;
              diag[1]=eig;
-             diag[2]=eig; 
+             diag[2]=eig;
 */
+
+#if ( 1 )
+            eig = getEigenVal( i, j );
             MG.setDiag( eig );
-           
-            //int i= 2;
-            fillInArrayContigMG( i, j, index );
+            //          MG.setDiag( eig );
 
-            copySourceToMG(  );
-//            MG.reset();
-//            MG.assign( tmpMGReal );
+            // int i= 2;
+            //  fillInArrayContig( i, j, index );
+            MG.fillInArrayContig( P, nChunk, nzChunk, i, j, index );
 
-// for debug            MG.redBlackMono();
-#if(1)
-            if ( eig < -2.08 )
-         //    if( 0 )
+            copySourceToMG( index );
+            //            MG.reset();
+            //            MG.assign( tmpMGReal );
+            // if(0)
+            // for debug            MG.redBlackMono();
+            if ( eig < -2.1 )
             {
-                //    printf("multi solving");
-                //    printf("%lf======\n ", eig);
-                /*
-                  for(int ii=0;ii<5;ii++)
-                  {
-                  printf("%lf \n",tm[ii]);
-                  }
-              */
-
+                // printf("EIGGGGGGGGGGGGGGGi =%lf  \n",eig);
                 MG.solveMulti( tmpMGReal );
             }
             else
             {
-
-                MG.solveMono();
+                MG.solveMono( eig );
                 //   printf("eig= %lf\n",eig);
                 //  count++;
             }
-#endif
-            copyAnsFromMG(  );
 
-//            MG.reFill();
-            fillInArrayBack( i, j, index );
-//            MG.reset();
+            copyAnsFromMG( index );
+
+            //            MG.reFill();
+            MG.fillInArrayBack( P, nChunk, nzChunk, i, j, index );
+            //            fillInArrayBack( i, j, index );
+
+            MG.reset();
+#endif
 #endif
         }
     }
-// printf("number without MG %d\n",count );
-#endif
+    // printf("number without MG %d\n",count );
 }
+
+#if ( OPENACC )
+#pragma acc routine gang
+#endif
+void PencilDcmp::solveMGC()
+{
+    double eig;
+    int count = 0;
+    int index = 1;
+    int bol = MGC.gridSizePowerTwoPlusOne;
+
+#pragma acc loop seq private( eig )
+    for ( int k = 0; k < nxChunk * nyChunk; k++ )
+    {
+        int j = k / nyChunk;
+        int i = k % nyChunk;
+// debugged work fine
+#if ( 0 )
+        MGC.fillInArrayContig( P, nChunk, nzChunk, i, j, index );
+        eig = getEigenVal( i, j );
+        MGC.setDiag( eig );
+        MGC.solveMono( eig );
+        MGC.fillInArrayBack( P, nChunk, nzChunk, i, j, index );
+        MGC.reset();
+#else
+        //            eig=2.0;
+        /*
+                    for ( int k = 0; k < 3; k++ )
+                    {
+                        diag[k] = eig;
+                        //       cout<<" main diagonal "<<diag[k]<<endl;
+                    }
+
+                     /*diag[0]=eig;
+                     diag[1]=eig;
+                     diag[2]=eig;
+        */
+        eig = getEigenVal( i, j );
+        MGC.setDiag( eig );
+        //          MG.setDiag( eig );
+
+        // int i= 2;
+        //  fillInArrayContig( i, j, index );
+        MGC.fillInArrayContig( P, nChunk, nzChunk, i, j, index );
+
+        copySourceToMG( index );
+//            MG.reset();
+//            MG.assign( tmpMGReal );
+
+// for debug            MG.redBlackMono();
+#if ( 1 )
+        if ( eig < -2.1 && bol == 1 )
+        //           if( 0 )
+        {
+            MGC.solveMulti( tmpMGImag );
+        }
+        else
+        {
+            MGC.solveMono( eig );
+            //   printf("eig= %lf\n",eig);
+            //  count++;
+        }
+#endif
+        copyAnsFromMG( index );
+
+        //            MG.reFill();
+        MGC.fillInArrayBack( P, nChunk, nzChunk, i, j, index );
+        //            fillInArrayBack( i, j, index );
+
+        MGC.reset();
+#endif
+    }
+    // printf("number without MG %d\n",count );
+}
+
 #if ( OPENACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::fillInArrayBack( const int i, const int j, const int index )
 {
-/*
-    double *tm[2];
-
-    tm[0] = tmpMGReal;
-    tm[1] = tmpMGImag;
-*/
-//    int dir = 3;
-// int index=0;
-
-    //     cout<<"after"<<endl;
-#pragma acc loop gang 
+//     cout<<"after"<<endl;
+#pragma acc loop gang
     for ( int id = 0; id < nChunk; id++ )
     {
-#pragma acc loop vector 
+#pragma acc loop vector
         for ( int k = 0; k < nzChunk; k++ )
         {
-            P( id, 3, i, j, k, index ) = tmpMGReal[id * nzChunk + k + OFFS]; //      cout<<k<<"   "<<tmpMG[i]<<endl;
-        //    P( id, 3, i, j, k, index ) =5.*scale; //      cout<<k<<"   "<<tmpMG[i]<<endl;
+            if ( index == 0 )
+            {
+                P( id, 3, i, j, k, index ) = tmpMGReal[id * nzChunk + k + OFFS]; //      cout<<k<<"   "<<tmpMG[i]<<endl;
+            }
+            else
+            {
+                P( id, 3, i, j, k, index ) = tmpMGImag[id * nzChunk + k + OFFS]; //      cout<<k<<"   "<<tmpMG[i]<<endl;
+            }
+            //    P( id, 3, i, j, k, index ) =5.*scale; //      cout<<k<<"   "<<tmpMG[i]<<endl;
             //        P(id, dir, i, j, k, 1 )  = 0; //      cout<<k<<"   "<<tmpMGReal[i]<<endl;
             //      cout<<tmpMGReal[k]<<endl;
         }
@@ -3312,34 +3498,54 @@ void PencilDcmp::fillInArrayBack( const int i, const int j, const int index )
 #if ( OPENACC )
 #pragma acc routine gang
 #endif
-void PencilDcmp::copyAnsFromMG(  )
+void PencilDcmp::copyAnsFromMG( int index )
 {
 
-#pragma acc loop gang 
-    for ( int i = 0; i < nz; i++ )
+    if ( index == 0 )
     {
-        tmpMGReal[i] = MG.u[i];
-        //    cout<< " answer "<< out[i]<<"delx[0] "<<delx[0]<<endl;
+#pragma acc loop gang
+        for ( int i = 0; i < nz; i++ )
+        {
+            tmpMGReal[i] = MG.u[i];
+            //    cout<< " answer "<< out[i]<<"delx[0] "<<delx[0]<<endl;
+        }
     }
-
+    else
+    {
+#pragma acc loop gang
+        for ( int i = 0; i < nz; i++ )
+        {
+            tmpMGImag[i] = MGC.u[i];
+            //    cout<< " answer "<< out[i]<<"delx[0] "<<delx[0]<<endl;
+        }
+    }
 }
 // do not forget the negative sign
 #if ( OPENACC )
 #pragma acc routine gang
 #endif
-void PencilDcmp::copySourceToMG(  )
+void PencilDcmp::copySourceToMG( int index )
 {
 
-#pragma acc loop gang 
-    for ( int i = 0; i < nz; i++ )
+    if ( index == 0 )
     {
-        //MG.rhs[i] = -tmpMGReal[i];
-        MG.u[i] = -tmpMGReal[i];
-        //    cout<< " answer "<< out[i]<<"delx[0] "<<delx[0]<<endl;
+#pragma acc loop gang
+        for ( int i = 0; i < nz; i++ )
+        {
+            // MG.rhs[i] = -tmpMGReal[i];
+            MG.u[i] = -tmpMGReal[i];
+            //    cout<< " answer "<< out[i]<<"delx[0] "<<delx[0]<<endl;
+        }
     }
-
+    else
+    {
+#pragma acc loop gang
+        for ( int i = 0; i < nz; i++ )
+        {
+            MGC.u[i] = -tmpMGImag[i];
+        }
+    }
 }
-
 
 #if ( OPENACC )
 #pragma acc routine gang
@@ -3369,8 +3575,8 @@ int PencilDcmp::solveThm( const int index )
 #pragma acc loop seq
         for ( int i = 0; i < nyChunk; i++ )
         {
-#if(1)      
-        eig = getEigenVal( i, j );
+#if ( 1 )
+            eig = getEigenVal( i, j );
             /*
             #pragma acc loop vector
                  for(int k=0;k<3;k++)
@@ -3381,7 +3587,7 @@ int PencilDcmp::solveThm( const int index )
 
                 MG.setDiag(diag);
             */
-            fillInArrayContigMG( i, j, index );
+            fillInArrayContig( i, j, index );
 
             MG.assign( tm[index] );
 
@@ -3407,8 +3613,8 @@ void PencilDcmp::eigenVal( ofstream &myfile )
 {
     // note that we perform solve when the data is aligned in y direction
 
-    int    ioffset;
-    int    joffset;
+    int ioffset;
+    int joffset;
     double onDiag;
     myfile << endl;
     myfile << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << endl;
@@ -3434,8 +3640,8 @@ real PencilDcmp::getEigenVal( int i, int j )
     // note that we perform solve when the data is aligned in y direction
     // i and j are goind to be swapped in the thomas call
 
-    int    ioffset;
-    int    joffset;
+    int ioffset;
+    int joffset;
     double onDiag;
 
     ioffset = myRank % p0 * nyChunk;
@@ -3455,17 +3661,28 @@ real PencilDcmp::getEigenVal( int i, int j )
     return ( onDiag );
 }
 
+#if(0)
 // This is not used look for independent init function
 PittPackResult PoissonGPU::initializeAndBind()
 {
     PittPackResult result = SUCCESS;
 #if ( OPENACC )
 
+int nodalComSize;
+
     acc_init( acc_device_nvidia ); // OpenACC call
 
     const int numDev = acc_get_num_devices( acc_device_nvidia ); // #GPUs
 
-    if ( comSize == numDev )
+    if ( numDev == 0 )
+    {
+        cout << "NO GPUs to run "
+             << "\n";
+    }
+
+   nodalComSize= createNodalCommunicator();
+  
+    if ( nodalComSize == numDev )
     {
         const int devId = myRank % numDev;
         //  const int devId = 0;
@@ -3483,21 +3700,23 @@ PittPackResult PoissonGPU::initializeAndBind()
 
     return ( result );
 }
+#endif
+
 //#pragma acc routine worker
-#pragma acc routine gang 
-void                PencilDcmp::preprocessSignalAccordingly( const int direction, const int counter )
+#pragma acc routine gang
+void PencilDcmp::preprocessSignalAccordingly( const int direction, const int counter )
 {
     int size;
     int limit0;
     if ( direction == 0 )
     {
         limit0 = nyChunk;
-        size   = nxChunk * nChunk;
+        size = nxChunk * nChunk;
     }
     else if ( direction == 1 )
     {
         limit0 = nxChunk;
-        size   = nyChunk * nChunk;
+        size = nyChunk * nChunk;
     }
 
     if ( tags[counter] == 0 )
@@ -3511,32 +3730,36 @@ void                PencilDcmp::preprocessSignalAccordingly( const int direction
     else if ( tags[counter] == 1 )
     {
 //#pragma acc loop worker
-#pragma acc loop gang 
+#pragma acc loop gang
         for ( int k = 0; k < nzChunk * limit0; k++ )
         {
             Sig.preprocessSignalDCT10( P, size, k, direction );
         }
     }
 }
-#pragma acc routine gang 
-void                PencilDcmp::postprocessSignalAccordingly( const int direction, const int counter )
+#if ( OPENACC )
+#pragma acc routine gang
+#endif
+void PencilDcmp::postprocessSignalAccordingly( const int direction, const int counter )
 {
     int limit0;
     int size;
     if ( direction == 0 )
     {
         limit0 = nyChunk;
-        size   = nChunk * nxChunk;
+        size = nChunk * nxChunk;
     }
     else if ( direction == 1 )
     {
         limit0 = nxChunk;
-        size   = nChunk * nyChunk;
+        size = nChunk * nyChunk;
     }
 
     if ( tags[counter] == 0 )
     {
+#if ( OPENACC )
 #pragma acc loop gang
+#endif
         for ( int k = 0; k < limit0 * nzChunk; k++ )
         {
             Sig.postprocessSignalDST10( P, size, k, direction );
@@ -3544,7 +3767,9 @@ void                PencilDcmp::postprocessSignalAccordingly( const int directio
     }
     else if ( tags[counter] == 1 )
     {
+#if ( OPENACC )
 #pragma acc loop gang
+#endif
         for ( int k = 0; k < nzChunk * limit0; k++ )
         {
             Sig.postprocessSignalDCT10( P, size, k, direction );
@@ -3561,12 +3786,12 @@ void PencilDcmp::postprocessSignalAccordinglyReverse( const int direction, const
     if ( direction == 0 )
     {
         limit0 = nyChunk;
-        size   = nChunk * nxChunk;
+        size = nChunk * nxChunk;
     }
     else if ( direction == 1 )
     {
         limit0 = nxChunk;
-        size   = nChunk * nyChunk;
+        size = nChunk * nyChunk;
     }
 
     if ( tags[counter] == 0 )
@@ -3607,7 +3832,7 @@ void PencilDcmp::preprocessSignalAccordinglyReverse( const int direction, const 
     else if ( direction == 1 )
     {
         limit0 = nxChunk;
-        size   = nChunk * nyChunk;
+        size = nChunk * nyChunk;
     }
     if ( tags[counter] == 0 )
     {
@@ -3671,7 +3896,7 @@ void PencilDcmp::modifyRhsDirichlet()
 #if ( DEBUG )
     cout << " rank " << myRank << " c1  " << c1 << " " << c2 << " " << c3 << endl;
     cout << " rank " << myRank << " N:  " << Nx << " " << Ny << " " << Nz << endl;
-    cout << "xmin = " << Xa + 0 * c1 + shift * c1 * .5 << " xmax " << Xa + ( Nx - 1 ) * c1 + shift * c1 * .5 << endl;
+    cout << "xmin = " << Xa + 0 * c1 + shift *c1 * .5 << " xmax " << Xa + ( Nx - 1 ) * c1 + shift * c1 * .5 << endl;
     ;
 #endif
     double omega[3] = {pi, pi, pi};
@@ -3695,9 +3920,8 @@ void PencilDcmp::modifyRhsDirichlet()
             {
                 y = Ya + j * c2 + shift * c2 * 0.5;
 
-                P( i, j, k )
-                = P( i, j, k )
-                  + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                P( i, j, k ) = P( i, j, k ) + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                                              * exactValue( omega[2] * z, tags[2] );
             }
         }
     }
@@ -3722,16 +3946,15 @@ void PencilDcmp::modifyRhsDirichlet()
             {
                 y = Ya + j * c2 + shift * c2 * 0.5;
 
-                P( i, j, k )
-                = P( i, j, k )
-                  + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                P( i, j, k ) = P( i, j, k ) + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                                              * exactValue( omega[2] * z, tags[2] );
             }
         }
     }
 
     if ( faceTag[0] == 1 )
     {
-        x     = Xa;
+        x = Xa;
         int i = 0;
 //        cout << YELLOW << " Xmin " << x << RESET << endl;
 #if ( OPENACC )
@@ -3747,9 +3970,8 @@ void PencilDcmp::modifyRhsDirichlet()
             {
                 y = Ya + j * c2 + shift * c2 * 0.5;
 
-                P( i, j, k )
-                = P( i, j, k )
-                  + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                P( i, j, k ) = P( i, j, k ) + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                                              * exactValue( omega[2] * z, tags[2] );
             }
         }
     }
@@ -3757,8 +3979,8 @@ void PencilDcmp::modifyRhsDirichlet()
     if ( faceTag[1] == 1 )
     {
         int i = nxChunk - 1;
-        x     = Xa + ( i + 1 ) * c1;
-        //  cout << YELLOW << " Xmax " << x << RESET << endl;
+        x = Xa + ( i + 1 ) * c1;
+//  cout << YELLOW << " Xmax " << x << RESET << endl;
 
 #if ( OPENACC )
 #pragma acc loop worker private( z, y )
@@ -3772,16 +3994,15 @@ void PencilDcmp::modifyRhsDirichlet()
             for ( int j = 0; j < nyChunk; j++ )
             {
                 y = Ya + j * c2 + shift * c2 * 0.5;
-                P( i, j, k )
-                = P( i, j, k )
-                  + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                P( i, j, k ) = P( i, j, k ) + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                                              * exactValue( omega[2] * z, tags[2] );
             }
         }
     }
 
     if ( faceTag[2] == 1 )
     {
-        y     = Ya;
+        y = Ya;
         int j = 0;
 
 //    cout << YELLOW << " Ymin " << y << RESET << endl;
@@ -3797,9 +4018,8 @@ void PencilDcmp::modifyRhsDirichlet()
             for ( int i = 0; i < nxChunk; i++ )
             {
                 x = Xa + i * c1 + shift * c1 * 0.5;
-                P( i, j, k )
-                = P( i, j, k )
-                  + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                P( i, j, k ) = P( i, j, k ) + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                                              * exactValue( omega[2] * z, tags[2] );
             }
         }
     }
@@ -3807,7 +4027,7 @@ void PencilDcmp::modifyRhsDirichlet()
     if ( faceTag[3] == 1 )
     {
         int j = nyChunk - 1;
-        y     = Ya + ( j + 1 ) * c2;
+        y = Ya + ( j + 1 ) * c2;
 // cout << YELLOW << " Ymax " << y << RESET << endl;
 #if ( OPENACC )
 #pragma acc loop worker private( z, x )
@@ -3821,25 +4041,28 @@ void PencilDcmp::modifyRhsDirichlet()
             for ( int i = 0; i < nxChunk; i++ )
             {
                 x = Xa + i * c1 + shift * c1 * 0.5;
-                P( i, j, k )
-                = P( i, j, k )
-                  + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                P( i, j, k ) = P( i, j, k ) + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                                              * exactValue( omega[2] * z, tags[2] );
             }
         }
     }
 }
 
+static int createNodalCommunicator();
 PittPackResult OPENACC_Init( int &my_rank, int &com_size ) /*!relates initializes and carries out CPU-GPU binding for PoissonGPU class*/
 {
     PittPackResult result = SUCCESS;
 
 #if ( OPENACC )
+     int nodalComSize;
 
     acc_init( acc_device_nvidia ); // OpenACC call
 
     const int num_dev = acc_get_num_devices( acc_device_nvidia ); // #GPUs
 
-    //    if ( com_size <= num_dev && num_dev != 0 )
+   nodalComSize= createNodalCommunicator();
+
+        if ( nodalComSize <= num_dev && num_dev != 0 )
     {
         const int dev_id = my_rank % num_dev;
         acc_set_device_num( dev_id, acc_device_nvidia ); // assign GPU to one MPI process
@@ -3847,9 +4070,10 @@ PittPackResult OPENACC_Init( int &my_rank, int &com_size ) /*!relates initialize
         cout << "MPI process " << my_rank << "  is assigned to GPU " << dev_id << "\n";
         //#endif
     }
-    //  else
+      else
     {
-        //      result = GPU_INIT_FAILURE;
+            cout<<" number of GPU "<<num_dev<<" come_size "<<com_size<<endl;
+            result = GPU_INIT_FAILURE;
     }
 
 #endif
@@ -3864,7 +4088,7 @@ const char *PittPackGetErrorEnum( PittPackResult error )
             return "SUCCESS";
         case GPU_INIT_FAILURE:
             return (
-            "\t GPU_INIT_FAILURE: \n Number of GPUs is not equal to number of CPUs,\n algorithm is designed for a one-on-one binding" );
+            "\t GPU_INIT_FAILURE: \n Number of GPUs is not equal to number of CPUs on every node,\n algorithm is designed for a one-on-one binding" );
         case SOLVER_ARRAY_INCONSISTENT:
             return ( "\n Error in input, ZSIZE is not big enough to accomodate Thomas algorithm\n" );
         case MPI_INIT_FAIL:
@@ -3896,7 +4120,7 @@ const char *PittPackGetErrorEnum( PittPackResult error )
 
 void PencilDcmp::currentDateTime()
 {
-    time_t    now = time( 0 );
+    time_t now = time( 0 );
     struct tm tstruct;
     // char       nameAppendix[80];
     tstruct = *localtime( &now );
@@ -3907,11 +4131,19 @@ void PencilDcmp::currentDateTime()
 void PencilDcmp::runInfo()
 {
     currentDateTime();
-    double meshSize = nChunk * nChunk * nChunk * nxChunk * nyChunk * nzChunk;
+
+    long long int tmp0 = nxChunk;
+    long long int tmp1 = nyChunk;
+    long long int tmp2 = nzChunk;
+    long long int tmp = tmp0 * tmp1 * tmp2;
+
+    long long int meshSize = nChunk * nChunk * nChunk * tmp;
+
+    //    double meshSize = nChunk * nChunk * nChunk * nxChunk * nyChunk * nzChunk;
 
     if ( myRank == 0 )
     {
-        ofstream    PittOut;
+        ofstream PittOut;
         std::string filename = "Pitt_";
         filename.append( nameAppendix );
         filename.append( "_out" );
@@ -3933,18 +4165,33 @@ void PencilDcmp::runInfo()
         PittOut << "# nyChunk = " << nyChunk << endl;
         PittOut << "# nzChunk = " << nzChunk << endl;
         PittOut << "# number of Chunks = " << nChunk << endl;
-        PittOut << "# total number of cells  = " <<FormatWithCommas(meshSize)<<" ~ " << setprecision(2)<<std::fixed <<meshSize / ( 1e6 ) << " (M) " << endl;
+        PittOut << "# total number of cells  = " << FormatWithCommas( meshSize ) << " ~ " << setprecision( 2 ) << std::fixed
+                << meshSize / ( 1e6 ) << " (M) " << endl;
         PittOut << "# number of cells per processor  = " << meshSize / p0 / p0 / ( 1.e6 ) << " (M) " << endl;
         PittOut << "# theoretical memory size  = " << meshSize * 16 / ( 1.e9 ) << " GB " << endl;
         PittOut << "# memory size per processor  = " << meshSize * 16 / ( 1.e9 * p0 * p0 ) << " (GB) " << endl;
         PittOut << "# memory size per processor plus extra container = " << ( meshSize + meshSize / p0 ) * 16 / ( 1.e9 * p0 * p0 )
                 << " (GB) " << endl;
+
+        if ( SOLUTIONMETHOD == 0 )
+        {
+             PittOut << "# Direct Solution Method in Z-direction  = " << " Thomas " << endl;
+        }
+        else if( SOLUTIONMETHOD == 1)
+        {
+            PittOut << "# Direct Solution Method in Z-direction  = " << " PCR  " << endl;
+        }
+        else if( SOLUTIONMETHOD == 2 )
+        {
+                PittOut << "# Solution Method in Z-direction  = " << " CR-P " << endl;
+        }
+
 #if ( OPENACC )
         PittOut << "# number of GPUs = " << comSize << endl;
 #else
         PittOut << "# number of processors = " << comSize << endl;
 #endif
-        PittOut << "# Multigrid  Solving = " << MULTIGRID << endl;
+        PittOut << "# Solver Tag = " << SOLUTIONMETHOD << endl;
 
         PittOut << "# ZSIZE = " << ZSIZE << endl;
         PittOut << "# iaxSize = " << iaxSize << endl;
@@ -3956,18 +4203,16 @@ void PencilDcmp::runInfo()
 #else
         PittOut << "# COMM Pattern = Neighborhood Collective " << endl;
 #endif
-        PittOut << "# Code used short/int for CRS matrices =  " << SHORT << endl;
+        PittOut << "# Code used short/int for CRS matrices =  " << SHORT_ << endl;
         if ( I_O == 0 )
         {
             PittOut << "# I/O = OFF"
-                    << "\n"
-                    << endl;
+                    << "\n" << endl;
         }
         else
         {
             PittOut << "# I/O =  ON"
-                    << "\n"
-                    << endl;
+                    << "\n" << endl;
         }
 
         if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
@@ -3977,24 +4222,410 @@ void PencilDcmp::runInfo()
         }
         PittOut << "---------------------------------------------------------\n" << endl;
         PittOut << "                Run-Time  = " << runTime << " (s) "
-                << "\n"
-                << endl;
+                << "\n" << endl;
         PittOut << "---------------------------------------------------------\n" << endl;
-        cout << "Grid siz= [ " << nxChunk * nChunk << " * " << nyChunk * nChunk << " * " << nzChunk << "], error = " << finalErr
+        cout << "Grid siz= [ " << nxChunk *nChunk << " * " << nyChunk *nChunk << " * " << nzChunk << "], error = " << finalErr
              << ", time = " << runTime << " (s) " << endl;
     }
 }
 
-
+#if ( OPENACC )
+#pragma acc routine gang
+#endif
+int PencilDcmp::solveThmBatch( const int index )
+{
+    // not that rhs already scaled for initialization for Thomas so here we need to rescale
+    //  back as MultiGrid has its own scaling
 /*
-            fillInArrayContigMG( i, j, index );
-            copySourceToMG(  );
-    //        eig = getEigenVal( i, j );
-            MG.setDiag( eig );
-        //   MG.solveMono(eig);
-            copyAnsFromMG(  );
-            fillInArrayBack( i, j, index );
-//            MG.reset();
+
+    double S1[ZSIZE];
+    double S2[ZSIZE];
+  */ 
+    double eig;
+
+   // cout<< RED<<"multiGrid" <<RESET<<endl;
+
+    int count = 0;
+    int i, j;
+
+  for ( int j = 0; j < nxChunk; j++ )
+    {
+// calculate i and j 
+#if ( OPENACC )
+#pragma acc loop private(eig)
+#endif
+        for ( int i = 0; i < nyChunk; i++ )
+        {
+          eig = getEigenVal( i, j );
+
+          fillInArrayContig( i, j, index , x1+ i*nz);
+
+          T.thomasLowMem( x2+i*nz, x1+nz*i ,eig,index);
+
+          fillInArrayBack( i, j, index, x1+nz*i );
+       }
+  }
+
+
+#if (0)
+#pragma acc loop 
+    for ( int j = 0; j < nxChunk; j++ )
+    {
+#pragma acc loop 
+        for ( int i = 0; i < nyChunk; i++ )
+        {
+         
+            eig = getEigenVal( i, j );
+
+//            fillInArrayContig( i, j, index );
+/*
+#pragma acc loop 
+       for(int k=0;k<ZSIZE;k++)
+         {   
+             S1[k]=eig; 
+             S2[k]=eig; 
+          }
 */
+/*
+            
+            #pragma acc loop vector
+                 for(int k=0;k<3;k++)
+                  {
+                   diag[k]=eig;
+            //       cout<<" main diagonal "<<diag[k]<<endl;
+                  }
+/
+  
+
+              MG.setDiag(diag);
+            */
+
+            MG.assign( tm[index] );
+
+            // solves Thomas
+            MG.thomasLowMem( tm[index], eig, index );
+            MG.thomasPutBack( tm[index], index );
+
+            fillInArrayBack( i, j, index );
+            MG.reset();
+        }
+    }
+#endif
+// printf("number without MG %d\n",count );
+    // int dir=3;
+    // int index=0;
+    return ( 0 );
+}
+
+
+#if ( OPENACC )
+#pragma acc routine worker
+#endif
+void PencilDcmp::fillInArrayContig( const int i, const int j,int index, double *container )
+{
+
+//    cout<<"before inside fill in"<<endl;
+
+#pragma acc loop worker
+    for ( int id = 0; id < nChunk; id++ )
+    {
+#pragma acc loop vector
+        for ( int k = 0; k < nzChunk; k++ )
+        {
+            if ( index == 0 )
+            {
+                container[id * nzChunk + k + OFFS] = P( id, 3, i, j, k, index );
+            }
+            else
+            {
+                container[id * nzChunk + k + OFFS] = P( id, 3, i, j, k, index );
+            }
+       }
+    }
+
+   container[0] =0.0;
+   container[nz-1] =0.0;
+/*
+for(int i=0;i<nz;i++)
+{
+cout<<container[i]<<endl;
+}
+*/
+}
+
+
+#if ( OPENACC )
+#pragma acc routine worker
+#endif
+void PencilDcmp::fillInArrayBack( const int i, const int j, const int index, double *container )
+{
+//     cout<<"after"<<endl;
+#if ( OPENACC )
+#pragma acc loop worker
+#endif
+    for ( int id = 0; id < nChunk; id++ )
+    {
+#if ( OPENACC )
+#pragma acc loop vector
+#endif
+        for ( int k = 0; k < nzChunk; k++ )
+        {
+            if ( index == 0 )
+            {
+                P( id, 3, i, j, k, index ) = container[id * nzChunk + k ]; //      cout<<k<<"   "<<tmpMG[i]<<endl;
+            }
+            else
+            {
+                P( id, 3, i, j, k, index ) = container[id * nzChunk + k ]; //      cout<<k<<"   "<<tmpMG[i]<<endl;
+            }
+            //    P( id, 3, i, j, k, index ) =5.*scale; //      cout<<k<<"   "<<tmpMG[i]<<endl;
+            //        P(id, dir, i, j, k, 1 )  = 0; //      cout<<k<<"   "<<tmpMGReal[i]<<endl;
+            //      cout<<tmpMGReal[k]<<endl;
+        }
+    }
+    //      cout<<"-------------------"<<endl;
+}
+
+#if ( OPENACC )
+#pragma acc routine gang
+#endif
+void PencilDcmp::solvePCR( const int index )
+{
+    double eig;
+
+    int count = 0;
+    int i, j;
+
+  for ( int j = 0; j < nxChunk; j++ )
+    {
+// calculate i and j 
+#if ( OPENACC )
+#pragma acc loop private(eig)
+#endif
+        for ( int i = 0; i < nyChunk; i++ )
+        {
+          eig = getEigenVal( i, j );
+
+          fillInArrayContigNormalize( i, j, index, crpcr_rhs+nz*i, eig);
+
+          offDiagNormalize( i, j, crpcr_lower+nz*i, crpcr_upper+nz*i, eig );
+
+          T.pcr(nz, crpcr_lower+i*nz, crpcr_upper+nz*i,crpcr_rhs+nz*i);
+
+          fillInArrayBack( i, j, crpcr_rhs+nz*i,index );
+       }
+  }
+}
+
+
+#if ( OPENACC )
+#pragma acc routine gang
+#endif
+void PencilDcmp::solveCRP( const int index )
+{
+    double eig;
+
+    int count = 0;
+    double offdiag; 
+
+// maximum level is set to log2(16384)+1=15
+    double tmpA[15];
+    double tmpC[15];
+    
+   double ThmB[3]={1.0,1.0,1.0};
+   double ThmA[3]={0.0,0.0,0.0};
+   double ThmC[3]={0.0,0.0,0.0};
+   double gam1[3]={0.0,0.0,0.0};
+   double tmpRHS[3]={0.0,0.0,0.0};
+ 
+  for ( int j = 0; j < nxChunk; j++ )
+    {
+// calculate i and j 
+#pragma acc loop private(offdiag,eig)
+        for ( int i = 0; i < nyChunk; i++ )
+        {
+          eig = getEigenVal( i, j );
+
+          offdiag=1./eig;
+
+          fillInArrayContigNormalize( i, j, index, crpcr_rhs + nz * i,eig);
+
+          T.crp(nz,offdiag,tmpA ,tmpC , tmpRHS,ThmA,ThmC,ThmB,gam1,crpcr_rhs+nz*i);
+
+          fillInArrayBack( i, j, crpcr_rhs + nz * i,index );
+       }
+   }
+}
+
+
+
+#if ( OPENACC )
+#pragma acc routine worker
+#endif
+void PencilDcmp::fillInArrayContigNormalize( const int i, const int j,int index, double *container,double eig )
+{
+
+double eigInv=1./eig;
+
+#pragma acc loop worker
+    for ( int id = 0; id < nChunk; id++ )
+    {
+#pragma acc loop vector
+        for ( int k = 0; k < nzChunk; k++ )
+        {
+            if ( index == 0 )
+            {
+                container[id * nzChunk + k + OFFS] = P( id, 3, i, j, k, index )*eigInv;
+            }
+            else
+            {
+                container[id * nzChunk + k + OFFS] = P( id, 3, i, j, k, index )*eigInv;
+            }
+       }
+    }
+
+                container[0] =0.0;
+                container[nz-1] =0.0;
+
+}
+
+#if ( OPENACC )
+#pragma acc routine vector
+#endif
+void PencilDcmp::offDiagNormalize( const int i, const int j, double *lower,double *upper,double eig )
+{
+
+double eigInv=1./eig;
+    
+lower[0]=0.0;
+upper[nz-1]=0.0;
+
+// dirichlet 
+
+#pragma acc loop vector
+        for ( int k = 0; k < nz; k++ )
+        {
+             lower[k]=eigInv;
+   }
+#pragma acc loop vector
+        for ( int k = 0; k < nz; k++ )
+        {
+             upper[k]=eigInv;
+   }
+
+   lower[nz-1]=1./(eig-1.); 
+   upper[0]=1./(eig-1.); 
+
+
+}
+
+#if ( OPENACC )
+#pragma acc routine worker
+#endif
+void PencilDcmp::fillInArrayBack( const int i, const int j,double *container, const int index )
+{
+//     cout<<"after"<<endl;
+#pragma acc loop worker
+    for ( int id = 0; id < nChunk; id++ )
+    {
+#pragma acc loop vector
+        for ( int k = 0; k < nzChunk; k++ )
+        {
+            if ( index == 0 )
+            {
+                P( id, 3, i, j, k, index ) = container[id * nzChunk + k + OFFS]; //      cout<<k<<"   "<<tmpMG[i]<<endl;
+            }
+            else
+            {
+                P( id, 3, i, j, k, index ) = container[id * nzChunk + k + OFFS]; //      cout<<k<<"   "<<tmpMG[i]<<endl;
+            }
+            //    P( id, 3, i, j, k, index ) =5.*scale; //      cout<<k<<"   "<<tmpMG[i]<<endl;
+            //        P(id, dir, i, j, k, 1 )  = 0; //      cout<<k<<"   "<<tmpMGReal[i]<<endl;
+            //      cout<<tmpMGReal[k]<<endl;
+        }
+    }
+    //      cout<<"-------------------"<<endl;
+}
+
+static int extractIntegerWords(string str)
+{
+    std::string temp;
+    int number=0;
+
+    for (unsigned int i=0; i < str.size(); i++)
+    {
+        if (isdigit(str[i]))
+        {
+            for (unsigned int a=i; a<str.size(); a++) 
+            {
+                temp += str[a];
+            }
+          break;
+        }
+    }
+    std::istringstream stream(temp);
+    stream >> number;
+
+return(number);
+}
+
+/*! \brief Helper Function to 
+ *         check one-on-one mapping between CPU-GPU.
+ *
+ *  1. Processor name is obtained using MPI_Get_processor_name()
+ *  2. Node numbers are extracted from the string  
+ *  3. Local nodal communicator is constricted using MPI_Comm_split()
+ *  4. The size of this new communicator is returned to OpenACCINIT
+ *  5. The size of the nodl communicator should be equal to number of GPU's
+ *  6. If not, error code 1 is thrown
+ */
+
+static int createNodalCommunicator()
+{
+
+  MPI_Comm nodalComm;
+
+  int my_rank,np,my_new_rank,new_np;
+  int color,key,len;
+
+  MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
+  MPI_Comm_size(MPI_COMM_WORLD,&np);
+
+  char pname[256];
+
+  MPI_Get_processor_name(pname,&len);
+
+   long int d;
+
+// some strema wizardry to extract node number from the proc name
+   stringstream ss;
+   string s;
+   ss<<pname;
+   ss>>s;
+//   cout<<s<<endl;
+   color= extractIntegerWords(s);
+   key=my_rank;
+
+   //printf("PROCESS %d of %d: Running on %s  color= %d len=%d\n",my_rank+1,np,pname,color, len);
+   printf("PROCESS %d of %d: Running on %s  color= %d len=%d\n",my_rank+1,np,pname,color, len);
+
+   MPI_Comm_split(MPI_COMM_WORLD,color,key,&nodalComm);
+   MPI_Comm_rank(nodalComm,&my_new_rank);
+   MPI_Comm_size(nodalComm,&new_np);
+
+   printf("Process %d (in COMM_WORLD) is process %d (in split communicator)\n",my_rank,my_new_rank );
+   printf("Process %d (in COMM_WORLD): COMM_WORLD has %d processes\n", my_rank,np);
+   printf("Process %d (in COMM_WORLD): split communicator has %d processes\n", my_rank,new_np);
+
+   MPI_Comm_free(&nodalComm);
+
+ return(new_np);
+
+} 
+
+
+
+
+
 
 

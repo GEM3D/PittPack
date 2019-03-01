@@ -2,7 +2,7 @@
 #define _MATHFUNCTION_H_
 
 #if ( OPENACC )
-#include <accelmath.h>
+//#include <accelmath.h>
 #else
 #include <cmath>
 #endif

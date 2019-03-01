@@ -2,7 +2,7 @@
 #define _TRIDIAG_H_
 #include "chunkedArray.h"
 #include "definitions.h"
-
+#include "params.h"
 /*!
  *
  *
@@ -39,6 +39,18 @@ class TriDiag
 
 #pragma acc routine
     void thomasPeriodicReal( ChunkedArray &P, double *onDiag, int i, int j, int dir );
+
+#pragma acc routine vector
+     void pcr(int n, double *a, double *c, double *d);
+
+#pragma acc routine seq
+   void  thomasLowMem( double *tmpMG, double *rh , double diag, int index );
+
+#pragma acc routine vector
+   void crp(const int n, double offdiag,double *tmpA,double *tmpC,double *tmpRHS,double *ThmA,double *ThmC,double *ThmB,double *gam1, double *rhs);
+
+#pragma acc routine seq
+   void thomasLowMem(int N, double *a, double *b, double *c, double *r, double *gam);
 
     ~TriDiag(); /*!< destructor of the class*/
 };

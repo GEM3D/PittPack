@@ -45,6 +45,11 @@ class MultiGrid
     double *__restrict__ subDiag0 = NULL; /*!< subDiagonal Values of the coefficient matrix */
     double *__restrict__ supDiag0 = NULL; /*!< superDiagonal Matrices of the coefficient matrix  */
     double *__restrict__ onDiag0  = NULL; /*!<  Diagonal Matrices of the coefficient matrix  */
+//    double *__restrict__ dl = NULL; /*!< subDiagonal Values of the coefficient matrix */
+//    double *__restrict__ d = NULL; /*!< superDiagonal Matrices of the coefficient matrix  */
+//    double *__restrict__ du  = NULL; /*!<  Diagonal Matrices of the coefficient matrix  */
+
+
     int *indices
     = NULL; /*!< Save the indices to an array instead of calculating them  each time since there is a recursive sequential loop in the
 function*/
@@ -53,6 +58,7 @@ function*/
     int iterDescend;    /*!< Number of Iterations at smoothing for the coarsening phase of the full V-cycle */
     int iterClimb;      /*!< Number of iterations in smoothing for moving to the denser grid  */
     int iterOuter;      /*!< Number of outer iterations */
+    int gridSizePowerTwoPlusOne;        /*!< If the grid size is not divisible, then an MultiGrid is one, it reverts back to Mono Grid */
 
     public:
     MultiGrid( int n, double delx, char *sm, int iter1, int iter2, int iter3 ); /*!< Class constructor */
@@ -77,7 +83,7 @@ function*/
     void solveMono(double onDiag ); /*!< solves using one grid */
 #pragma acc routine vector
     double l1Norm(); /*!< Calculates the l1-norm */
-#pragma acc routine gang
+#pragma acc routine vector
     double l2Norm(); /*!< Calculates the l2-norm*/
     void   print( double *u, double delx, int level );
     void   print( double delx, int level );
@@ -125,6 +131,7 @@ function*/
 #pragma acc routine vector
     void thomasPutBack( double *tmpMG, int index );
 
+//    void thomasCusparse(double *rhs);
 
 #pragma acc routine gang
 void fillInArrayContig( ChunkedArray &P,int nChunk,  int nzChunk  , int i,  int j, int index );
@@ -133,6 +140,8 @@ void fillInArrayContig( ChunkedArray &P,int nChunk,  int nzChunk  , int i,  int 
 void fillInArrayBack(ChunkedArray &P, int nChunk,  int nzChunk ,  int i,  int j,  int index );
 
     friend class PencilDcmp;
+    void suggestSize(int a);
+
 
     ~MultiGrid();
 };

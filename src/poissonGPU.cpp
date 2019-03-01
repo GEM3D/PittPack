@@ -4,7 +4,7 @@
 void PoissonGPU::performTransformXdir() /*!< Called on Host and Ran on GPU*/
 {
     cufftHandle plan;
-    double *    ptr = P.P;
+    double *ptr = P.P;
 #pragma acc host_data use_device( ptr )
     {
         cufftPlan1d( &plan, nx, CUFFT_Z2Z, nyChunk * nzChunk );
@@ -16,7 +16,7 @@ void PoissonGPU::performTransformXdir() /*!< Called on Host and Ran on GPU*/
 void PoissonGPU::performInverseTransformXdir() /*!< Called on Host and Ran on GPU*/
 {
     cufftHandle plan;
-    double *    ptr = P.P;
+    double *ptr = P.P;
 #pragma acc host_data use_device( ptr )
     {
         cufftPlan1d( &plan, nx, CUFFT_Z2Z, nyChunk * nzChunk );
@@ -27,7 +27,7 @@ void PoissonGPU::performInverseTransformXdir() /*!< Called on Host and Ran on GP
 void PoissonGPU::performTransformYdir() /*!< Called on Host and Ran on GPU*/
 {
     cufftHandle plan;
-    double *    ptr = P.P;
+    double *ptr = P.P;
 #pragma acc host_data use_device( ptr )
     {
         cufftPlan1d( &plan, ny, CUFFT_Z2Z, nxChunk * nzChunk );
@@ -39,7 +39,7 @@ void PoissonGPU::performTransformYdir() /*!< Called on Host and Ran on GPU*/
 void PoissonGPU::performInverseTransformYdir() /*!< Called on Host and Ran on GPU*/
 {
     cufftHandle plan;
-    double *    ptr = P.P;
+    double *ptr = P.P;
 #pragma acc host_data use_device( ptr )
     {
         cufftPlan1d( &plan, ny, CUFFT_Z2Z, nxChunk * nzChunk );
@@ -47,6 +47,28 @@ void PoissonGPU::performInverseTransformYdir() /*!< Called on Host and Ran on GP
         cufftDestroy( plan );
     }
 }
+
+void PoissonGPU::triDiagCusparse( double *dl, double *ds, double *du, double *rhs )
+{
+    // cout<< " size of nz" <<nz<<endl;
+
+    cusparseHandle_t handle = NULL;
+#pragma acc host_data use_device( rhs, du, dl, ds )
+    {
+        cusparseCreate( &handle );
+if(PIVOT==0)
+{
+        cusparseDgtsv_nopivot( handle, nz, 1, dl, ds, du, rhs, nz );
+}
+else
+{
+        cusparseDgtsv(handle, nz,1, dl, ds, du, rhs, nz);
+}
+    }
+
+    cusparseDestroy( handle );
+}
+
 // const std::string currentDateTime() ;
 
 void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
@@ -75,23 +97,29 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
     //   initializeAndBind();
 
     double err = 0.0;
-    finalErr   = 0.0;
-
+    finalErr = 0.0;
+    double eig;
 //    P.moveHostToDevice();
 #if ( 1 )
+
+    int trsps_gang0=MIN(50,iaxSize);
+    int trsps_gang1=MIN(50, iaySize);
+
+   int nSig0=MIN(50,nxChunk); 
+   int nSig1=MIN(50,nyChunk); 
 
     int result = SUCCESS;
 
     for ( int num = 0; num < 1; num++ )
     {
-#pragma acc data present( P [0:2 * nxChunk * nyChunk * nzChunk * nChunk], this ) copy( result, err )
+#pragma acc data present( P[0 : 2 * nxChunk *nyChunk *nzChunk *nChunk], this, tmpMGReal, tmpMGImag ) copy( result, err )
         {
-#pragma acc parallel
+#pragma acc parallel  vector_length(VECLENGTH)
             initializeTrigonometric();
 
             if ( bc[0] != 'P' && bc[2] != 'P' )
             {
-#pragma acc parallel
+#pragma acc parallel  vector_length(VECLENGTH)
                 modifyRhsDirichlet();
             }
 
@@ -102,24 +130,25 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             {
                 P.moveHostToDevice();
             }
-                // perform FFT in x direction
-                // remember, need to rearrange and restore each time
+// perform FFT in x direction
+// remember, need to rearrange and restore each time
 
 #if ( FFTX )
 // step 2) change location of the array such that FFT can be performed on a contegeous array
-#pragma acc parallel
+#pragma acc parallel num_gangs(trsps_gang0)  vector_length(VECLENGTH)
             changeLocationX();
-            // step 3) perform  FFT
+// step 3) perform  FFT
 
-#pragma acc parallel
+#pragma acc parallel num_gangs(nSig0)  vector_length(VECLENGTH)
             preprocessSignalAccordingly( 0, 0 );
 
             performTransformXdir();
 
-#pragma acc parallel
+#pragma acc parallel  num_gangs(nSig0)  vector_length(VECLENGTH)
             postprocessSignalAccordingly( 0, 0 );
 // step 4) restore the array to original status before FFT
-#pragma acc parallel
+//#pragma acc parallel
+#pragma acc parallel num_gangs(trsps_gang0)  vector_length(VECLENGTH)
             restoreLocationX();
 
 #endif
@@ -135,28 +164,31 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             {
                 P.moveHostToDevice();
             }
-                // step 6) swaps X and Y coordinates, now X is Y and nx is ny
+// step 6) swaps X and Y coordinates, now X is Y and nx is ny
 
-#pragma acc parallel
+#pragma acc parallel  vector_length(VECLENGTH)
             rearrangeX2Y();
 
-            // step 7) change location of the array such that FFT can be performed on a contegeous array in the transverse direction
+// step 7) change location of the array such that FFT can be performed on a contegeous array in the transverse direction
 
-#pragma acc parallel
+//#pragma acc parallel
+
+#pragma acc parallel num_gangs(trsps_gang1)  vector_length(VECLENGTH)
             changeLocationY();
 
-#pragma acc parallel
+#pragma acc parallel  num_gangs(nSig1)  vector_length(VECLENGTH)
             preprocessSignalAccordingly( 1, 1 );
 
             // step 8) perform  FFT transform can be performed
             performTransformYdir();
-#pragma acc parallel
+#pragma acc parallel  num_gangs(nSig1)  vector_length(VECLENGTH)
             postprocessSignalAccordingly( 1, 1 );
-            // M.printX( myfile );
+// M.printX( myfile );
 
-            // step 9) restore the array to original status before FFT
+// step 9) restore the array to original status before FFT
+//#pragma acc parallel 
 
-#pragma acc parallel
+#pragma acc parallel num_gangs(trsps_gang1)  vector_length(VECLENGTH)
             restoreLocationY();
 
 #endif
@@ -180,26 +212,117 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             //#pragma acc parallel firstprivate( result ) reduction( + : result )
             //            result = solve();
 
+            // generating two streams to handle the task parallel section of the code
 
-            if ( MULTIGRID == 1 )
+            if ( SOLUTIONMETHOD == 0 )
             {
-#pragma acc parallel num_gangs(1)
-                solveMG( 0 );
 
-// #pragma acc parallel num_gangs(1)
-//              solveMG(1);
+#pragma acc parallel
+                solveThmBatch( 0 );
+
+#pragma acc parallel
+                solveThmBatch( 1 );
+
+/*
+#pragma acc parallel num_gangs( 1 ) async( 2 )
+                solveMG();
+
+#pragma acc parallel num_gangs( 1 ) async( 3 )
+                solveMGC();
+
+//#pragma acc wait(2,3)
+#pragma acc wait( 2 )
+#pragma acc wait( 3 )
+*/
             }
-            else
+
+            else if ( SOLUTIONMETHOD == 1 )
             {
 /*
 //#pragma acc parallel async(123)
 #pragma acc parallel
                 solveThm( 0 );
+
 #pragma acc parallel
                 solveThm( 1 );
 */
+
+/*
+#pragma acc parallel num_gangs(nxChunk)
+            solveThmBatch( 0 );
+*/
+
+#pragma acc parallel num_gangs(nxChunk) vector_length(VECLENGTH)
+            solvePCR( 0 );
+
+            }
+            else if(SOLUTIONMETHOD == 2 )
+            {
+
+#pragma acc parallel num_gangs(nxChunk) vector_length(VECLENGTH) 
+//#pragma acc parallel num_gangs(1) vector_length(1) 
+            solveCRP( 0 );
+
             }
 
+            else
+            {
+                // adding CUSPARSE
+
+#if(0)             
+                for ( int j = 0; j < nxChunk; j++ )
+                {
+                    for ( int i = 0; i < nyChunk; i++ )
+                    {
+
+//#pragma acc parallel
+//                        eig = getEigenVal( i, j );
+
+#pragma acc parallel async( 4 )
+                        setDiag( i,j );
+
+#pragma acc parallel async( 5 )
+                        fillInArrayContig( i, j, 0 );
+
+#pragma acc wait( 4 )
+#pragma acc wait( 5 )
+
+                        triDiagCusparse( dl, ds, du, tmpMGReal );
+
+#pragma acc parallel
+                        fillInArrayBack( i, j, 0 );
+                    }
+                }
+/*
+                   for ( int j = 0; j < nxChunk; j++ )
+                  {
+                        for ( int i = 0; i < nyChunk; i++ )
+                        {
+
+
+                #pragma acc parallel
+                         eig = getEigenVal( i, j );
+
+
+                #pragma acc parallel async(4)
+                         setDiag(i,j);
+
+                #pragma acc parallel async(5)
+                         fillInArrayContig( i, j, 1 );
+
+                #pragma acc wait(4)
+                #pragma acc wait(5)
+
+                         triDiagCusparse(dl,ds,du,tmpMGImag);
+
+                #pragma acc parallel
+                         fillInArrayBack( i, j, 1 );
+
+                 }
+                 }
+*/                
+#endif
+            }
             //#pragma acc wait(123)
             //            #pragma acc parallel
             //                        solveThm(1);
@@ -232,26 +355,26 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
 #if ( IFFTY )
 // step 13) prepre for contigeuous FFT
-#pragma acc parallel
+#pragma acc parallel num_gangs(trsps_gang1)  vector_length(VECLENGTH)
             changeLocationY();
 
-            // step 14) perform IFFT
+// step 14) perform IFFT
 
-#pragma acc parallel
+#pragma acc parallel  num_gangs(nSig1)  vector_length(VECLENGTH)
             preprocessSignalAccordinglyReverse( 1, 1 );
 
             performInverseTransformYdir();
-#pragma acc parallel
+#pragma acc parallel  num_gangs(nSig1)  vector_length(VECLENGTH)
             postprocessSignalAccordinglyReverse( 1, 1 );
-            // step 15) restore the array to original status before IFFT
+// step 15) restore the array to original status before IFFT
 
-#pragma acc parallel
+#pragma acc parallel num_gangs(trsps_gang1)  vector_length(VECLENGTH)
             restoreLocationY();
 
 // step 16) swaps X and Y coordinates, now X is Y and nx is ny
 // need to redefine the function ??????????????????????????????????????????????????????????????????????????
 // now again switching to x-direction arrangement so printX is fine
-#pragma acc parallel
+#pragma acc parallel  vector_length(VECLENGTH)
             rearrangeX2YInverse();
 
             // step 17) pencils with n(0,1,0) is converted to pencil with n(1,0,0)
@@ -269,39 +392,39 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 #endif
 
 #if ( IFFTX )
-                // step 18) change location of the array such that IFFT can be performed on a contegeous array
+// step 18) change location of the array such that IFFT can be performed on a contegeous array
 
-#pragma acc parallel
+#pragma acc parallel num_gangs(trsps_gang0)  vector_length(VECLENGTH)
             changeLocationX();
 
-            // step 19) perform  IFFT
+// step 19) perform  IFFT
 
-#pragma acc parallel
+#pragma acc parallel  num_gangs(nSig0)  vector_length(VECLENGTH)
             preprocessSignalAccordinglyReverse( 0, 0 );
 
             performInverseTransformXdir();
 
-#pragma acc parallel
+#pragma acc parallel  num_gangs(nSig0)  vector_length(VECLENGTH)
             postprocessSignalAccordinglyReverse( 0, 0 );
 
 // step 20) restore the array to original status before FFT
-#pragma acc parallel
+#pragma acc parallel num_gangs(trsps_gang0) vector_length(VECLENGTH)
             restoreLocationX();
 
-#pragma acc parallel
+#pragma acc parallel num_gangs(nxChunk)  vector_length(VECLENGTH)
             rescale();
 
             // return back to the original set-up
             changeOwnershipPairwiseExchangeZX();
 
-            //        setCoords( Xbox, 2 );
-            //#pragma acc update device()
+//        setCoords( Xbox, 2 );
+//#pragma acc update device()
 
 #endif
 
             if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
             {
-#pragma acc parallel // reduction(max:err)
+#pragma acc parallel vector_length(32) reduction(max:err)
                 err = getError();
 
                 // cout<<" ****** "<<err<<endl;
@@ -331,9 +454,9 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
     if ( myRank == 0 )
     {
         runTime = t2 - t1;
+        runInfo();
     }
 
-    runInfo();
     if ( JIC )
     {
 #if ( OPENACC )
@@ -373,3 +496,5 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 }
 
 #endif
+
+

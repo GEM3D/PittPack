@@ -8,22 +8,22 @@
 
 void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
 {
-    hid_t   file_id, dset_id;    /* file and dataset identifiers */
-    hid_t   filespace, memspace; /* file and memory dataspace identifiers */
-    hsize_t dimsf[4];            /* dataset dimensions */
-    hsize_t chunk_dims[4];       /* chunk dimensions */
-    hsize_t count[4];            /* hyperslab selection parameters */
+    hid_t file_id, dset_id;    /* file and dataset identifiers */
+    hid_t filespace, memspace; /* file and memory dataspace identifiers */
+    hsize_t dimsf[4];          /* dataset dimensions */
+    hsize_t chunk_dims[4];     /* chunk dimensions */
+    hsize_t count[4];          /* hyperslab selection parameters */
     hsize_t block[4];
     hsize_t offset[4];
-    hid_t   plist_id; /* property list identifier */
-    uint    i, j, k, l;
-    herr_t  status;
+    hid_t plist_id; /* property list identifier */
+    uint i, j, k, l;
+    herr_t status;
     // int         *data=NULL;
 
     /*
      * MPI variables
      */
-    int   mpi_size, mpi_rank;
+    int mpi_size, mpi_rank;
     real *xtemp = NULL;
     real *ytemp = NULL;
     real *ztemp = NULL;
@@ -55,7 +55,7 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
     uint partialforestsize = F.nChunk; /*!<the forest size for each processor */
 
     CommPoint2Point<uint> com( &partialforestsize, 1 );
-    uint                  offset1 = 0, totalvalue = 0;
+    uint offset1 = 0, totalvalue = 0;
     com.getOffset( partialforestsize, &offset1 );
 
     CommCollective<uint> comc( nullptr, 1 );
@@ -131,7 +131,7 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
     // the first argument is the dimension which is 4
 
     filespace = H5Screate_simple( 4, dimsf, NULL );
-    memspace  = H5Screate_simple( 4, chunk_dims, NULL );
+    memspace = H5Screate_simple( 4, chunk_dims, NULL );
 
     sprintf( str0, "/X" );
     plist_id = H5Pcreate( H5P_DATASET_CREATE );
@@ -153,7 +153,7 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
 
     real Xh, Yh, Zh;
     real hx, hy, hz;
-    int  index;
+    int index;
     /*
         cout << YELLOW << "Xa " << F.Xa << " Xb " << F.Xb << RESET << endl;
         cout << YELLOW << "Ya " << F.Ya << " Yb " << F.Yb << RESET << endl;
@@ -467,13 +467,13 @@ static void integer_string( char *strin, int i )
 
 void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, uint offset, uint appx )
 {
-    MPI_File     fp;
-    int          buf[1000], np = comsize;
-    MPI_Request  request;
+    MPI_File fp;
+    int buf[1000], np = comsize;
+    MPI_Request request;
     unsigned int i;
-    int          j;
+    int j;
 
-    MPI_Status  status;
+    MPI_Status status;
     const char *names[] = {"X", "Y", "Z"};
 
     uint L1 = F.nx;
@@ -503,7 +503,7 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
     char strN[100];
     char strNcube[1000];
     char stroff[1000];
-    int  index;
+    int index;
 
     if ( L1 < 10 )
     {
@@ -599,9 +599,8 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
                 sprintf( str, "   <Grid Name=\"mesh0\" GridType=\"Uniform\">\n" );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 b = b + strlen( str );
-                sprintf( str,
-                         "        <Topology TopologyType=\"3DSMesh\" "
-                         "NumberOfElements=\"%s %s %s\"/>\n",
+                sprintf( str, "        <Topology TopologyType=\"3DSMesh\" "
+                              "NumberOfElements=\"%s %s %s\"/>\n",
                          strL, strM, strN );
                 // printf("hyperslab =%d\n",strlen(str));
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
@@ -612,16 +611,15 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
 
                 for ( j = 0; j < 3; j++ )
                 {
-                    sprintf( str,
-                             "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s "
-                             "%s %s %d\" NumberType=\"Float\" Precision=\"4\"  "
-                             "Type=\"HyperSlab\"> \n",
+                    sprintf( str, "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s "
+                                  "%s %s %d\" NumberType=\"Float\" Precision=\"4\"  "
+                                  "Type=\"HyperSlab\"> \n",
                              strL, strM, strN, 1 );
                     MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                     b = b + strlen( str );
                     sprintf( str, "         <DataItem Dimensions=\"3 4\" Format=\"XML\" > \n" );
                     MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
-                    b     = b + strlen( str );
+                    b = b + strlen( str );
                     index = offset + co;
                     integer_string( stroff, index );
                     sprintf( str, "         %d %d %d %s  \n", 0, 0, 0, stroff );
@@ -636,10 +634,9 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
                     sprintf( str, "         </DataItem>\n" );
                     MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                     b = b + strlen( str );
-                    sprintf( str,
-                             "          <DataItem Name=\"%s\" Dimensions=\"%s %s %s "
-                             "%s\" NumberType=\"Float\" Precision=\"4\" "
-                             "Format=\"HDF\">\n",
+                    sprintf( str, "          <DataItem Name=\"%s\" Dimensions=\"%s %s %s "
+                                  "%s\" NumberType=\"Float\" Precision=\"4\" "
+                                  "Format=\"HDF\">\n",
                              names[j], strL, strM, strN, strNcube );
                     MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                     b = b + strlen( str );
@@ -661,16 +658,15 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
                               "Center=\"Node\"> \n" );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 b = b + strlen( str );
-                sprintf( str,
-                         "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s "
-                         "%s %s %d\" NumberType=\"Float\" Precision=\"4\"  "
-                         "Type=\"HyperSlab\"> \n",
+                sprintf( str, "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s "
+                              "%s %s %d\" NumberType=\"Float\" Precision=\"4\"  "
+                              "Type=\"HyperSlab\"> \n",
                          strL, strM, strN, 1 );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 b = b + strlen( str );
                 sprintf( str, "         <DataItem Dimensions=\"3 4\" Format=\"XML\" > \n" );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
-                b     = b + strlen( str );
+                b = b + strlen( str );
                 index = offset + co;
                 integer_string( stroff, index );
                 sprintf( str, "         %d %d %d %s  \n", 0, 0, 0, stroff );
@@ -685,10 +681,9 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
                 sprintf( str, "         </DataItem>\n" );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 b = b + strlen( str );
-                sprintf( str,
-                         "          <DataItem Name=\"Q\" Dimensions=\"%s %s %s "
-                         "%s\" NumberType=\"Float\" Precision=\"4\" "
-                         "Format=\"HDF\">\n",
+                sprintf( str, "          <DataItem Name=\"Q\" Dimensions=\"%s %s %s "
+                              "%s\" NumberType=\"Float\" Precision=\"4\" "
+                              "Format=\"HDF\">\n",
                          strL, strM, strN, strNcube );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 b = b + strlen( str );
@@ -710,9 +705,9 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
                 b = b + strlen( str );
 #if ( 1 )
                 co++;
-// procesor zero should broadcast this value to others
-// since this is inside an if loop we can not use collective
-// rather we simply send via send and recieves
+                // procesor zero should broadcast this value to others
+                // since this is inside an if loop we can not use collective
+                // rather we simply send via send and recieves
                 // put error here
                 if ( a != offset0 || b != offset1 )
                 {
@@ -723,9 +718,6 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
                     printf( "??????????????????????????????????????????\n" );
                     exit( 0 );
                 }
-                
-  
-                       
 
 //              printf("Go fix your offset for Xdmf meta data file a=%d
 // offset0=%d b=%d offset1=%d\n",a,offset0,b,offset1);
@@ -737,12 +729,12 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
     else
     {
 
-//recieve the offset value form proc 0 and set your file offse taccordingly
+        // recieve the offset value form proc 0 and set your file offse taccordingly
         // other ranks do something else
         // 5 is added because of the header of the file written by  processor 0
 
         int mpi_offset = 0;
-        co             = 0;
+        co = 0;
 
         for ( int it = 0; it < F.nChunk; it++ )
         {
@@ -756,9 +748,8 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
             // MPI_INFO_NULL );
             sprintf( str, "   <Grid Name=\"mesh0\" GridType=\"Uniform\">\n" );
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
-            sprintf( str,
-                     "        <Topology TopologyType=\"3DSMesh\" "
-                     "NumberOfElements=\"%s %s %s\"/>\n",
+            sprintf( str, "        <Topology TopologyType=\"3DSMesh\" "
+                          "NumberOfElements=\"%s %s %s\"/>\n",
                      strL, strM, strN );
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
             sprintf( str, "          <Geometry GeometryType=\"X_Y_Z\">  \n" );
@@ -767,10 +758,9 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
 #if ( 1 )
             for ( j = 0; j < 3; j++ )
             {
-                sprintf( str,
-                         "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s "
-                         "%s %s %d\" NumberType=\"Float\" Precision=\"4\"  "
-                         "Type=\"HyperSlab\"> \n",
+                sprintf( str, "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s "
+                              "%s %s %d\" NumberType=\"Float\" Precision=\"4\"  "
+                              "Type=\"HyperSlab\"> \n",
                          strL, strM, strN, 1 );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 sprintf( str, "         <DataItem Dimensions=\"3 4\" Format=\"XML\" > \n" );
@@ -785,10 +775,9 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 sprintf( str, "         </DataItem>\n" );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
-                sprintf( str,
-                         "          <DataItem Name=\"%s\" Dimensions=\"%s %s %s "
-                         "%s\" NumberType=\"Float\" Precision=\"4\" "
-                         "Format=\"HDF\">\n",
+                sprintf( str, "          <DataItem Name=\"%s\" Dimensions=\"%s %s %s "
+                              "%s\" NumberType=\"Float\" Precision=\"4\" "
+                              "Format=\"HDF\">\n",
                          names[j], strL, strM, strN, strNcube );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 sprintf( str, "          %s:/%s\n", fname, names[j] );
@@ -807,10 +796,9 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
             sprintf( str, "         <Attribute Name=\"Q\" AttributeType=\"Scalar\" "
                           "Center=\"Node\"> \n" );
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
-            sprintf( str,
-                     "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s %s "
-                     "%s %d\" NumberType=\"Float\" Precision=\"4\"  "
-                     "Type=\"HyperSlab\"> \n",
+            sprintf( str, "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s %s "
+                          "%s %d\" NumberType=\"Float\" Precision=\"4\"  "
+                          "Type=\"HyperSlab\"> \n",
                      strL, strM, strN, 1 );
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
             sprintf( str, "         <DataItem Dimensions=\"3 4\" Format=\"XML\" > \n" );
@@ -825,9 +813,8 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
             sprintf( str, "         </DataItem>\n" );
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
-            sprintf( str,
-                     "          <DataItem Name=\"Q\" Dimensions=\"%s %s %s %s\" "
-                     "NumberType=\"Float\" Precision=\"4\" Format=\"HDF\">\n",
+            sprintf( str, "          <DataItem Name=\"Q\" Dimensions=\"%s %s %s %s\" "
+                          "NumberType=\"Float\" Precision=\"4\" Format=\"HDF\">\n",
                      strL, strM, strN, strNcube );
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
             sprintf( str, "          %s:/Q\n", fname );
@@ -863,22 +850,22 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
 #if ( DEBUG )
 void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
 {
-    hid_t   file_id, dset_id;    /* file and dataset identifiers */
-    hid_t   filespace, memspace; /* file and memory dataspace identifiers */
-    hsize_t dimsf[4];            /* dataset dimensions */
-    hsize_t chunk_dims[4];       /* chunk dimensions */
-    hsize_t count[4];            /* hyperslab selection parameters */
+    hid_t file_id, dset_id;    /* file and dataset identifiers */
+    hid_t filespace, memspace; /* file and memory dataspace identifiers */
+    hsize_t dimsf[4];          /* dataset dimensions */
+    hsize_t chunk_dims[4];     /* chunk dimensions */
+    hsize_t count[4];          /* hyperslab selection parameters */
     hsize_t block[4];
     hsize_t offset[4];
-    hid_t   plist_id; /* property list identifier */
-    uint    i, j, k, l;
-    herr_t  status;
+    hid_t plist_id; /* property list identifier */
+    uint i, j, k, l;
+    herr_t status;
     // int         *data=NULL;
 
     /*
      * MPI variables
      */
-    int   mpi_size, mpi_rank;
+    int mpi_size, mpi_rank;
     real *xtemp = NULL;
     real *ytemp = NULL;
     real *ztemp = NULL;
@@ -910,7 +897,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
     uint partialforestsize = F.nChunk; /*!<the forest size for each processor */
 
     CommPoint2Point<uint> com( &partialforestsize, 1 );
-    uint                  offset1 = 0, totalvalue = 0;
+    uint offset1 = 0, totalvalue = 0;
     com.getOffset( partialforestsize, &offset1 );
 
     CommCollective<uint> comc( nullptr, 1 );
@@ -984,7 +971,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
     // the first argument is the dimension which is 4
 
     filespace = H5Screate_simple( 4, dimsf, NULL );
-    memspace  = H5Screate_simple( 4, chunk_dims, NULL );
+    memspace = H5Screate_simple( 4, chunk_dims, NULL );
 
     sprintf( str0, "/X" );
     plist_id = H5Pcreate( H5P_DATASET_CREATE );
@@ -1006,7 +993,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
 
     real Xh, Yh, Zh;
     real hx, hy, hz;
-    int  index;
+    int index;
     /*
         cout << YELLOW << "Xa " << F.Xa << " Xb " << F.Xb << RESET << endl;
         cout << YELLOW << "Ya " << F.Ya << " Yb " << F.Yb << RESET << endl;
@@ -1226,7 +1213,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
     block[3] = chunk_dims[3];
 
     filespace = H5Screate_simple( 4, dimsf, NULL );
-    memspace  = H5Screate_simple( 4, chunk_dims, NULL );
+    memspace = H5Screate_simple( 4, chunk_dims, NULL );
 
     sprintf( str0, "/Q" );
     plist_id = H5Pcreate( H5P_DATASET_CREATE );
@@ -1302,22 +1289,22 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
 
 void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int aligndir )
 {
-    hid_t   file_id, dset_id;    /* file and dataset identifiers */
-    hid_t   filespace, memspace; /* file and memory dataspace identifiers */
-    hsize_t dimsf[4];            /* dataset dimensions */
-    hsize_t chunk_dims[4];       /* chunk dimensions */
-    hsize_t count[4];            /* hyperslab selection parameters */
+    hid_t file_id, dset_id;    /* file and dataset identifiers */
+    hid_t filespace, memspace; /* file and memory dataspace identifiers */
+    hsize_t dimsf[4];          /* dataset dimensions */
+    hsize_t chunk_dims[4];     /* chunk dimensions */
+    hsize_t count[4];          /* hyperslab selection parameters */
     hsize_t block[4];
     hsize_t offset[4];
-    hid_t   plist_id; /* property list identifier */
-    uint    i, j, k, l;
-    herr_t  status;
+    hid_t plist_id; /* property list identifier */
+    uint i, j, k, l;
+    herr_t status;
     // int         *data=NULL;
 
     /*
      * MPI variables
      */
-    int   mpi_size, mpi_rank;
+    int mpi_size, mpi_rank;
     real *xtemp = NULL;
     real *ytemp = NULL;
     real *ztemp = NULL;
@@ -1349,7 +1336,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
     uint partialforestsize = F.nChunk; /*!<the forest size for each processor */
 
     CommPoint2Point<uint> com( &partialforestsize, 1 );
-    uint                  offset1 = 0, totalvalue = 0;
+    uint offset1 = 0, totalvalue = 0;
     com.getOffset( partialforestsize, &offset1 );
 
     CommCollective<uint> comc( nullptr, 1 );
@@ -1434,7 +1421,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
     // the first argument is the dimension which is 4
 
     filespace = H5Screate_simple( 4, dimsf, NULL );
-    memspace  = H5Screate_simple( 4, chunk_dims, NULL );
+    memspace = H5Screate_simple( 4, chunk_dims, NULL );
 
     sprintf( str0, "/X" );
     plist_id = H5Pcreate( H5P_DATASET_CREATE );
@@ -1456,7 +1443,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
 
     real Xh, Yh, Zh;
     real hx, hy, hz;
-    int  index;
+    int index;
 
     real Dx = ( F.Xb - F.Xa ) / F.nChunk;
 
@@ -1731,7 +1718,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
     block[3] = chunk_dims[3];
 
     filespace = H5Screate_simple( 4, dimsf, NULL );
-    memspace  = H5Screate_simple( 4, chunk_dims, NULL );
+    memspace = H5Screate_simple( 4, chunk_dims, NULL );
 
     sprintf( str0, "/Q" );
     plist_id = H5Pcreate( H5P_DATASET_CREATE );
@@ -1812,13 +1799,13 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
 
 void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer my_rank, uint offset, uint appx )
 {
-    MPI_File     fp;
-    int          buf[1000], np = comsize;
-    MPI_Request  request;
+    MPI_File fp;
+    int buf[1000], np = comsize;
+    MPI_Request request;
     unsigned int i;
-    int          j;
+    int j;
 
-    MPI_Status  status;
+    MPI_Status status;
     const char *names[] = {"X", "Y", "Z"};
 
     // chunks in hdf5 work in reverse order my x corresponds to hdf5 z, and vice verse
@@ -1831,8 +1818,8 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
     sprintf( strname, XDMF_NAME, appx );
     char str[1000];
 
-   int offset0 = 156;
-   int offset1 = 2005;
+    int offset0 = 156;
+    int offset1 = 2005;
     //  const int offset1 = 1992;
 
     cout << "size str" << strlen( strname ) << endl;
@@ -1853,7 +1840,7 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
     char strN[100];
     char strNcube[1000];
     char stroff[1000];
-    int  index;
+    int index;
 
     if ( L1 < 10 )
     {
@@ -1922,15 +1909,15 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
         exit( 0 );
     }
 
-   int ab[2];
+    int ab[2];
     uint co = 0;
-   //MPI_Status status;
-   //MPI_Request request;
+    // MPI_Status status;
+    // MPI_Request request;
 
-   if(my_rank!=0)
-   {
-    MPI_Irecv(ab,2,MPI_INT,0,0,MPI_COMM_WORLD,&request);
-   }
+    if ( my_rank != 0 )
+    {
+        MPI_Irecv( ab, 2, MPI_INT, 0, 0, MPI_COMM_WORLD, &request );
+    }
 
     // a counts the offset for header whic is only written by process rank 0 and
     // and b the hyperslab part for each cube
@@ -1969,9 +1956,8 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
                 sprintf( str, "   <Grid Name=\"mesh0\" GridType=\"Uniform\">\n" );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 b = b + strlen( str );
-                sprintf( str,
-                         "        <Topology TopologyType=\"3DSMesh\" "
-                         "NumberOfElements=\"%s %s %s\"/>\n",
+                sprintf( str, "        <Topology TopologyType=\"3DSMesh\" "
+                              "NumberOfElements=\"%s %s %s\"/>\n",
                          strL, strM, strN );
                 // printf("hyperslab =%d\n",strlen(str));
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
@@ -1982,16 +1968,15 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
 
                 for ( j = 0; j < 3; j++ )
                 {
-                    sprintf( str,
-                             "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s "
-                             "%s %s %d\" NumberType=\"Float\" Precision=\"4\"  "
-                             "Type=\"HyperSlab\"> \n",
+                    sprintf( str, "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s "
+                                  "%s %s %d\" NumberType=\"Float\" Precision=\"4\"  "
+                                  "Type=\"HyperSlab\"> \n",
                              strL, strM, strN, 1 );
                     MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                     b = b + strlen( str );
                     sprintf( str, "         <DataItem Dimensions=\"3 4\" Format=\"XML\" > \n" );
                     MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
-                    b     = b + strlen( str );
+                    b = b + strlen( str );
                     index = offset + co;
                     integer_string( stroff, index );
                     sprintf( str, "         %d %d %d %s  \n", 0, 0, 0, stroff );
@@ -2006,10 +1991,9 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
                     sprintf( str, "         </DataItem>\n" );
                     MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                     b = b + strlen( str );
-                    sprintf( str,
-                             "          <DataItem Name=\"%s\" Dimensions=\"%s %s %s "
-                             "%s\" NumberType=\"Float\" Precision=\"4\" "
-                             "Format=\"HDF\">\n",
+                    sprintf( str, "          <DataItem Name=\"%s\" Dimensions=\"%s %s %s "
+                                  "%s\" NumberType=\"Float\" Precision=\"4\" "
+                                  "Format=\"HDF\">\n",
                              names[j], strL, strM, strN, strNcube );
                     MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                     b = b + strlen( str );
@@ -2031,16 +2015,15 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
                               "Center=\"Cell\"> \n" );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 b = b + strlen( str );
-                sprintf( str,
-                         "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s "
-                         "%s %s %d\" NumberType=\"Float\" Precision=\"4\"  "
-                         "Type=\"HyperSlab\"> \n",
+                sprintf( str, "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s "
+                              "%s %s %d\" NumberType=\"Float\" Precision=\"4\"  "
+                              "Type=\"HyperSlab\"> \n",
                          strLCell, strMCell, strNCell, 1 );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 b = b + strlen( str );
                 sprintf( str, "         <DataItem Dimensions=\"3 4\" Format=\"XML\" > \n" );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
-                b     = b + strlen( str );
+                b = b + strlen( str );
                 index = offset + co;
                 integer_string( stroff, index );
                 sprintf( str, "         %d %d %d %s  \n", 0, 0, 0, stroff );
@@ -2055,10 +2038,9 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
                 sprintf( str, "         </DataItem>\n" );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 b = b + strlen( str );
-                sprintf( str,
-                         "          <DataItem Name=\"Q\" Dimensions=\"%s %s %s "
-                         "%s\" NumberType=\"Float\" Precision=\"4\" "
-                         "Format=\"HDF\">\n",
+                sprintf( str, "          <DataItem Name=\"Q\" Dimensions=\"%s %s %s "
+                              "%s\" NumberType=\"Float\" Precision=\"4\" "
+                              "Format=\"HDF\">\n",
                          strLCell, strMCell, strNCell, strNcube );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 b = b + strlen( str );
@@ -2098,29 +2080,27 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
             }
         }
 
-    ab[0]=a;
-    ab[1]=b;
-// send the values of a and b to other procs
-    for(int i=1;i<np;i++)
-     {
-      MPI_Send(ab,2,MPI_INT,i,0,MPI_COMM_WORLD);
-     }
-          
-
+        ab[0] = a;
+        ab[1] = b;
+        // send the values of a and b to other procs
+        for ( int i = 1; i < np; i++ )
+        {
+            MPI_Send( ab, 2, MPI_INT, i, 0, MPI_COMM_WORLD );
+        }
     }
 #if ( 1 )
     else
     {
-     //   calcOff(&offset0,offset1);  
+        //   calcOff(&offset0,offset1);
         // other ranks do something else
         // 5 is added because of the header of the file written by  processor 0
-        MPI_Wait(&request,&status);
-        offset0=ab[0];
-        offset1=ab[1];
+        MPI_Wait( &request, &status );
+        offset0 = ab[0];
+        offset1 = ab[1];
 
-        //printf("offset0(%d) = %d  offset1(%d) = %d\n",my_rank,offset0,my_rank,offset1);
+        // printf("offset0(%d) = %d  offset1(%d) = %d\n",my_rank,offset0,my_rank,offset1);
         int mpi_offset = 0;
-        co             = 0;
+        co = 0;
 
         for ( int it = 0; it < F.nChunk; it++ )
         {
@@ -2134,9 +2114,8 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
             // MPI_INFO_NULL );
             sprintf( str, "   <Grid Name=\"mesh0\" GridType=\"Uniform\">\n" );
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
-            sprintf( str,
-                     "        <Topology TopologyType=\"3DSMesh\" "
-                     "NumberOfElements=\"%s %s %s\"/>\n",
+            sprintf( str, "        <Topology TopologyType=\"3DSMesh\" "
+                          "NumberOfElements=\"%s %s %s\"/>\n",
                      strL, strM, strN );
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
             sprintf( str, "          <Geometry GeometryType=\"X_Y_Z\">  \n" );
@@ -2145,10 +2124,9 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
 #if ( 1 )
             for ( j = 0; j < 3; j++ )
             {
-                sprintf( str,
-                         "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s "
-                         "%s %s %d\" NumberType=\"Float\" Precision=\"4\"  "
-                         "Type=\"HyperSlab\"> \n",
+                sprintf( str, "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s "
+                              "%s %s %d\" NumberType=\"Float\" Precision=\"4\"  "
+                              "Type=\"HyperSlab\"> \n",
                          strL, strM, strN, 1 );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 sprintf( str, "         <DataItem Dimensions=\"3 4\" Format=\"XML\" > \n" );
@@ -2163,10 +2141,9 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 sprintf( str, "         </DataItem>\n" );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
-                sprintf( str,
-                         "          <DataItem Name=\"%s\" Dimensions=\"%s %s %s "
-                         "%s\" NumberType=\"Float\" Precision=\"4\" "
-                         "Format=\"HDF\">\n",
+                sprintf( str, "          <DataItem Name=\"%s\" Dimensions=\"%s %s %s "
+                              "%s\" NumberType=\"Float\" Precision=\"4\" "
+                              "Format=\"HDF\">\n",
                          names[j], strL, strM, strN, strNcube );
                 MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
                 sprintf( str, "          %s:/%s\n", fname, names[j] );
@@ -2185,10 +2162,9 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
             sprintf( str, "         <Attribute Name=\"Q\" AttributeType=\"Scalar\" "
                           "Center=\"Cell\"> \n" );
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
-            sprintf( str,
-                     "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s %s "
-                     "%s %d\" NumberType=\"Float\" Precision=\"4\"  "
-                     "Type=\"HyperSlab\"> \n",
+            sprintf( str, "      <DataItem ItemType=\"HyperSlab\" Dimensions=\"%s %s "
+                          "%s %d\" NumberType=\"Float\" Precision=\"4\"  "
+                          "Type=\"HyperSlab\"> \n",
                      strLCell, strMCell, strNCell, 1 );
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
             sprintf( str, "         <DataItem Dimensions=\"3 4\" Format=\"XML\" > \n" );
@@ -2203,9 +2179,8 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
             sprintf( str, "         </DataItem>\n" );
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
-            sprintf( str,
-                     "          <DataItem Name=\"Q\" Dimensions=\"%s %s %s %s\" "
-                     "NumberType=\"Float\" Precision=\"4\" Format=\"HDF\">\n",
+            sprintf( str, "          <DataItem Name=\"Q\" Dimensions=\"%s %s %s %s\" "
+                          "NumberType=\"Float\" Precision=\"4\" Format=\"HDF\">\n",
                      strLCell, strMCell, strNCell, strNcube );
             MPI_File_write( fp, str, strlen( str ), MPI_CHAR, &status );
             sprintf( str, "          %s:/Q\n", fname );
@@ -2244,9 +2219,9 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
 void Phdf5::getXcoord( int *L, const double Xa, const double Xh, const int aligndir, double *xtemp )
 {
     int index = 0;
-    int L1    = L[0];
-    int M1    = L[1];
-    int N1    = L[2];
+    int L1 = L[0];
+    int M1 = L[1];
+    int N1 = L[2];
     // this is consistent with the major directions specfied in rearrange
     // n0(0,0,1) slices are in xy-plane
     // major direction=1 is planar rotation in y irection but still slices are in xy plane
@@ -2310,9 +2285,9 @@ void Phdf5::getXcoord( int *L, const double Xa, const double Xh, const int align
 void Phdf5::getYcoord( int *L, const double Ya, const double Yh, const int aligndir, double *ytemp )
 {
     int index = 0;
-    int L1    = L[0];
-    int M1    = L[1];
-    int N1    = L[2];
+    int L1 = L[0];
+    int M1 = L[1];
+    int N1 = L[2];
 
     if ( aligndir == 0 )
     {
@@ -2370,9 +2345,9 @@ void Phdf5::getYcoord( int *L, const double Ya, const double Yh, const int align
 void Phdf5::getZcoord( int *L, const double Za, const double Zh, const int aligndir, double *ztemp )
 {
     int index = 0;
-    int L1    = L[0];
-    int M1    = L[1];
-    int N1    = L[2];
+    int L1 = L[0];
+    int M1 = L[1];
+    int N1 = L[2];
 
     // z is the same for two directions 0 and 1 since rottion in on n(0,0,0) plane
 
@@ -2433,9 +2408,9 @@ void Phdf5::getZcoord( int *L, const double Za, const double Zh, const int align
 void Phdf5::getQ( ChunkedArray &F, const int chunkId, int *L, const int aligndir, double *qtemp )
 {
     int index = 0;
-    int L1    = L[0] - 1;
-    int M1    = L[1] - 1;
-    int N1    = L[2] - 1;
+    int L1 = L[0] - 1;
+    int M1 = L[1] - 1;
+    int N1 = L[2] - 1;
     // this is consistent with the major directions specfied in rearrange
     // n0(0,0,1) slices are in xy-plane
     // major direction=1 is planar rotation in y irection but still slices are in xy plane
@@ -2498,4 +2473,3 @@ void Phdf5::getQ( ChunkedArray &F, const int chunkId, int *L, const int aligndir
 
     // cout << " ============================= " << endl;
 }
-

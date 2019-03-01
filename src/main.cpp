@@ -23,7 +23,7 @@
  *
  *
  *             Usage:
- *             mpirun -np NP  nx ny nz 
+ *             mpirun -np NP  nx ny nz
  *
  * @authors     Jaber J. Hasbestan and Inanc Senocak (PI) <br>
  * @date        Jan 2019
@@ -86,8 +86,7 @@ int main( int argcs, char *pArgs[] )
     cout << " ====================================== " << endl;
     cout << " ====================================== " << endl;
     cout << " OPENACC is defined "
-            "============"
-         << endl;
+            "============" << endl;
     cout << " ====================================== " << endl;
     cout << " ====================================== " << endl;
 
@@ -106,9 +105,8 @@ int main( int argcs, char *pArgs[] )
 
     int p0 = sqrt( com_size );
     int p1 = p0;
-    int d  = nElem;
 
-    cout << " p0 " << p0 << endl;
+    cout << " p0 " << p0 <<" "<<p1<< endl;
 
     int Nx = NXCHUNK * p0;
     int Ny = NYCHUNK * p0;
@@ -139,9 +137,9 @@ int main( int argcs, char *pArgs[] )
 
 #endif
 
-    //       char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
+   //        char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
     //    char mybc[6] = {'D', 'D', 'D', 'D', 'D', 'D'};
-    char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
+        char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
     std::cout << mybc[0] << " " << mybc[1] << " " << mybc[2] << " " << mybc[3] << " " << mybc[4] << " " << mybc[5] << std::endl;
     M.assignBoundary( mybc );
     // testMpiClass(MPI_COMM_WORLD);
@@ -173,9 +171,9 @@ int main( int argcs, char *pArgs[] )
     */
     // int tags[3]={1,1,1};
 
-    int    tags[3] = {0, 0, 0};
-    double t1, t2;
-    int    this_rank = 3;
+   // int tags[3] = {0, 0, 0};
+   // double t1, t2;
+   // int this_rank = 3;
 #if ( DEBUG1 )
     ofstream myfile;
 
@@ -213,8 +211,8 @@ int main( int argcs, char *pArgs[] )
     cout << "xxxxxxxxxxxxInitilize done xxxxxxxxxxxxxxxxxxxxx" << endl;
     //     M.IO( 0, dir, 0 );
 
-    MPI_Barrier( MPI_COMM_WORLD );
-    t1 = MPI_Wtime();
+   // MPI_Barrier( MPI_COMM_WORLD );
+   // t1 = MPI_Wtime();
 
 #if ( DEBUG1 )
     myfile << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << endl;
@@ -225,7 +223,7 @@ int main( int argcs, char *pArgs[] )
         M.printX( myfile );
     }
 #endif
-        // step 1) pencils with n(0,0,1) is converted to pencil with n(1,0,0)
+// step 1) pencils with n(0,0,1) is converted to pencil with n(1,0,0)
 
 #if ( 1 )
 #if ( !EXACT )
@@ -274,36 +272,39 @@ int main( int argcs, char *pArgs[] )
     M.runInfo();
 #endif
 
-    // M.testDST10();
-    //   M.testDST10();
-    //  M.testDST01();
+//#pragma acc parallel
+//    M.solveThmSmallMesh(0 ); 
+ //  cout<<BLUE<<"thomas solving "<<RESET<<endl;
+// M.testDST10();
+//   M.testDST10();
+//  M.testDST01();
 
-    /* not working for collectives yet
-    int  a[1]={my_rank+100};
-    int b[1]={0};
-    #pragma acc enter data copyin(a[0:1],b[0:1])
+/* not working for collectives yet
+int  a[1]={my_rank+100};
+int b[1]={0};
+#pragma acc enter data copyin(a[0:1],b[0:1])
+{
+
+#pragma acc host_data use_device(a,b)
+MPI_Allreduce(a, b,1,MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+
+}
+cout<<"b = "<<b[0]<<endl;
+*/
+/*
+    if(my_rank==0)
     {
-
-    #pragma acc host_data use_device(a,b)
-    MPI_Allreduce(a, b,1,MPI_INT, MPI_MAX, MPI_COMM_WORLD);
-
+      cout<<"Grid Size"<<NXCHUNK<< " "<<  <<endl;
     }
-    cout<<"b = "<<b[0]<<endl;
-    */
-    /*
-        if(my_rank==0)
-        {
-          cout<<"Grid Size"<<NXCHUNK<< " "<<  <<endl;
-        }
-    */
-    // ported to the class destructor
-    //    MPI_Finalize();
+*/
+// ported to the class destructor
+//    MPI_Finalize();
 
 #endif
-if(INCLUDE_ERROE_CAL_IN_TIMING==1)
-{
-    cout<<RED<<"Warning : output file show the error not the solution  "<<RESET<<endl; 
-}
+    if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
+    {
+        cout << RED << "Warning : output file show the error not the solution  " << RESET << endl;
+    }
     return ( 0 );
 };
 

@@ -6,9 +6,6 @@
 ## enter 0 for CPU 
 ## enter 1 for GPU
 
-# run ./start.sh
-## enter 0 for CPU 
-## enter 1 for GPU
 
 for complete documentation visit www.pittpack.com
 

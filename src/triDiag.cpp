@@ -1260,7 +1260,7 @@ void TriDiag::thomasPeriodicReal( ChunkedArray &P, double *onDiag, int i, int j,
 void TriDiag::crp(const int n, double offdiag,double *tmpA,double *tmpC,double *tmpRHS,double *thmA,double *thmC,double *thmB,double *gam1, double *rhs)
 {
 
-  int level = log2(n);
+  int level = mylog2(n);
   int d0; 
   int d1; 
   int m = n;
@@ -1420,7 +1420,7 @@ for(int i=0;i<1;i++)
 void TriDiag::pcr(int n, double *a, double *c, double *d)
 {
 
-  int level = log2(n)+1;
+  int level = mylog2(n)+1;
   int s;
 
   double r;

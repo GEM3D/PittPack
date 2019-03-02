@@ -1652,7 +1652,7 @@ double PencilDcmp::getError()
         err = err + P( 2 * i );
     }
     err = err / ( unitSize );
-    err = sqrt( err );
+    err = squareRoot( err );
 
     /*
         MPI_Allreduce( &err, &finalErr, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );

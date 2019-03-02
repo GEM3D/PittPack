@@ -32,9 +32,9 @@ double absolute( double x )
 #if ( OPENACC )
 #pragma acc routine seq
 #endif
-double arctan( double x )
+int mylog2( int x )
 {
-    return ( atan( x ) );
+    return ( log2( x ) );
 }
 
 #if ( OPENACC )
@@ -43,4 +43,11 @@ double arctan( double x )
 double squareRoot( double x )
 {
     return ( sqrt( x ) );
+}
+#if ( OPENACC )
+#pragma acc routine seq
+#endif
+double arctan( double x )
+{
+    return ( atan( x ) );
 }

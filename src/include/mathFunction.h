@@ -32,4 +32,9 @@ double arctan( double x );
 #endif
 double squareRoot(double x);
 
+#if ( OPENACC )
+#pragma acc routine seq
+#endif
+int mylog2(int x);
+
 #endif

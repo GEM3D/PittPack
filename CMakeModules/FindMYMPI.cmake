@@ -42,8 +42,10 @@ if(NOT MPI_ROOT)
 # stampede
 set(MPI_ROOT $ENV{I_MPI_ROOT})
 endif()
-
-
+if(NOT MPI_ROOT)
+# titan
+set(MPI_ROOT $ENV{MPICH_DIR})
+endif()
 
 
 message("MPI" ${MPI_ROOT})
@@ -63,7 +65,7 @@ message("Suffixes"  ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
  find_library(
     MPI_LIB
-    NAMES "libmpi.so"
+    NAMES "libmpi.so" "libmpich.so"
     PATHS ${MPI_ROOT}
     PATH_SUFFIXES "lib" "lib64"
     NO_DEFAULT_PATH

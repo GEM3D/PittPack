@@ -219,10 +219,10 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
 #pragma acc parallel
                 solveThmBatch( 0 );
-
+/*
 #pragma acc parallel
                 solveThmBatch( 1 );
-
+*/
 /*
 #pragma acc parallel num_gangs( 1 ) async( 2 )
                 solveMG();

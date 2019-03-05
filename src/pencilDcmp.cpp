@@ -61,13 +61,22 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
     tmpMGReal = new double[nz];
     tmpMGImag = new double[nz];
 #endif
+   
+      
+    gangTri=MIN(nyChunk,TRI_NUM_GANG);
 
-    x1=new double[nxChunk*nz];
-    x2=new double[nxChunk*nz];
+if( SOLUTIONMETHOD ==0)
+{   
+    gangTri=2*gangTri;
+}
+    x1=new double[gangTri*nz];
+    x2=new double[gangTri*nz];
 
-    crpcr_lower=new double[nxChunk*nz];
-    crpcr_upper=new double[nxChunk*nz];
-
+   if(SOLUTIONMETHOD!=0)
+   {
+//    crpcr_lower=new double[gangTri*nz];
+    crpcr_upper=new double[gangTri*nz];
+}
 
     subDiag = new double[3];
     supDiag = new double[3];
@@ -132,10 +141,13 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
 #pragma acc enter data create( du[0 : nz] )
 #pragma acc update device( dl[0 : nz] )
 #pragma acc update device( du[0 : nz] )
-#pragma acc enter data create( x1[0 : nz*nxChunk] )
-#pragma acc enter data create( x2[0 : nz*nxChunk] )
-#pragma acc enter data create( crpcr_lower[0 : nz*nxChunk] )
-#pragma acc enter data create( crpcr_upper[0 : nz*nxChunk] )
+#pragma acc enter data create( x1[0 : nz*gangTri] )
+#pragma acc enter data create( x2[0 : nz*gangTri] )
+if(SOLUTIONMETHOD!=0)
+{
+//#pragma acc enter data create( crpcr_lower[0 : nz*gangTri] )
+#pragma acc enter data create( crpcr_upper[0 : nz*gangTri] )
+}
 #endif
     /* impoartant note about nested classes is that we need to go from top to bottom, first have the highest level
          class copyin 'this' for that class and then once the address are set on the GPU, then copyin the lower level class
@@ -219,13 +231,22 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
     tmpMGReal = new double[nz + SIZEMG];
     tmpMGImag = new double[nz + SIZEMG];
 #endif
+   
+    gangTri=MIN(nyChunk,TRI_NUM_GANG);
 
-    x1=new double[nxChunk*nz];
-    x2=new double[nxChunk*nz];
+    if(SOLUTIONMETHOD==0)
+    {
+      gangTri=2*gangTri;
+    }
 
-    crpcr_lower=new double[nxChunk*nz];
-    crpcr_upper=new double[nxChunk*nz];
+    x1=new double[gangTri*nz];
+    x2=new double[gangTri*nz];
 
+if(SOLUTIONMETHOD!=0)
+{
+//    crpcr_lower=new double[gangTri*nz];
+    crpcr_upper=new double[gangTri*nz];
+}
     subDiag = new double[3];
     supDiag = new double[3];
     length = new int[3];
@@ -289,10 +310,13 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
 #pragma acc enter data create( du[0 : nz] )
 #pragma acc update device( du[0 : nz] )
 #pragma acc update device( dl[0 : nz] )
-#pragma acc enter data create( x1[0 : nz*nxChunk] )
-#pragma acc enter data create( x2[0 : nz*nxChunk] )
-#pragma acc enter data create( crpcr_lower[0 : nz*nxChunk] )
-#pragma acc enter data create( crpcr_upper[0 : nz*nxChunk] )
+#pragma acc enter data create( x1[0 : nz*gangTri] )
+#pragma acc enter data create( x2[0 : nz*gangTri] )
+if(SOLUTIONMETHOD!=0)
+{
+//#pragma acc enter data create( crpcr_lower[0 : nz*gangTri] )
+#pragma acc enter data create( crpcr_upper[0 : nz*gangTri] )
+}
 #endif
     /* impoartant note about nested classes is that we need to go from top to bottom, first have the highest level
          class copyin 'this' for that class and then once the address are set on the GPU, then copyin the lower level class
@@ -448,6 +472,11 @@ PencilDcmp::~PencilDcmp()
 #pragma acc exit data delete ( du )
 #pragma acc exit data delete ( dl )
 #pragma acc exit data delete ( ds )
+if(SOLUTIONMETHOD!=0)
+{
+//#pragma acc exit data delete ( crpcr_lower )
+#pragma acc exit data delete ( crpcr_upper )
+}
 #pragma acc exit data delete ( x1 )
 #pragma acc exit data delete ( x2 )
 #pragma acc exit data delete ( this )
@@ -480,6 +509,11 @@ PencilDcmp::~PencilDcmp()
     delete[] x1;
     delete[] x2;
 
+if(SOLUTIONMETHOD!=0)
+{
+//   delete [] crpcr_lower;
+   delete [] crpcr_upper;
+}
     // free the duplicated communicator
 
     MPI_Comm_free( &Comm );
@@ -4214,7 +4248,7 @@ void PencilDcmp::runInfo()
         if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
         {
             PittOut << "---------------------------------------------------------\n" << endl;
-            PittOut << "               Global Error  = " << finalErr << "\n" << endl;
+            PittOut << "               Global Error  = "<<setprecision(12) << finalErr << "\n" << endl;
         }
         PittOut << "---------------------------------------------------------\n" << endl;
         PittOut << "                Run-Time  = " << runTime << " (s) "
@@ -4408,9 +4442,9 @@ void PencilDcmp::solvePCR( const int index )
 
           fillInArrayContigNormalize( i, j, index, x1+nz*i, eig);
 
-          offDiagNormalize( i, j, crpcr_lower+nz*i, crpcr_upper+nz*i, eig );
+          offDiagNormalize( i, j, x2+nz*i, crpcr_upper+nz*i, eig );
 
-          T.pcr(nz, crpcr_lower+i*nz, crpcr_upper+nz*i,x1+nz*i);
+          T.pcr(nz, x2+i*nz, crpcr_upper+nz*i,x1+nz*i);
 
           fillInArrayBack( i, j, x1+nz*i,index );
        }

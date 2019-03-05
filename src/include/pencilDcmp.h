@@ -52,6 +52,7 @@ class PencilDcmp
     int      nChunk;          /*!< number of chunks for each processor  */
     int      fullSize;
     int      returnVal;
+    int gangTri;
     MPI_Comm Comm;
     MPI_Comm nbrComm[2]; /*!< stores MPI communicators to be used for neighborhood collectives in x- and y-directions */
     MPI_Comm nbrComm0;   /*!< MPI communicator to use for neighborhood collectives in x-dir */

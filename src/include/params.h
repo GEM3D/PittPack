@@ -48,8 +48,8 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     PIVOT = 1,                        /*!< This is only used for cuSPARSE, for diagonally dominant matrix pivoting is not required */
     INNERITER= 10,
     OUTERITER =20, 
-    THOMAS_NUM_GANG=64,               /*!< Overrides the default number of gpu blocks (gangs) */
-    VECLENGTH=256,                    /*!< sets the number of gpu-threads */
+    TRI_NUM_GANG=1000000,               /*!< Overrides the default number of gpu blocks (gangs), setting this to a large value will replace this with nyChunk */
+    VECLENGTH=512,                    /*!< sets the number of gpu-threads */
     MAXLEVEL=20,
 };
 

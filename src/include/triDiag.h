@@ -3,6 +3,7 @@
 #include "chunkedArray.h"
 #include "definitions.h"
 #include "params.h"
+#include "mathFunction.h"
 /*!
  *
  *

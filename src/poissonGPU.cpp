@@ -114,7 +114,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
     {
 #pragma acc data present( P[0 : 2 * nxChunk *nyChunk *nzChunk *nChunk], this, tmpMGReal, tmpMGImag ) copy( result, err )
         {
-#pragma acc parallel  vector_length(VECLENGTH)
+#pragma acc parallel num_gangs(50)  vector_length(VECLENGTH)
             initializeTrigonometric();
 
             if ( bc[0] != 'P' && bc[2] != 'P' )
@@ -217,7 +217,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             if ( SOLUTIONMETHOD == 0 )
             {
 
-#pragma acc parallel
+#pragma acc parallel num_gangs(gangTri) vector_length(1) 
                 solveThmBatch( 0 );
 /*
 #pragma acc parallel
@@ -252,15 +252,14 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             solveThmBatch( 0 );
 */
 
-#pragma acc parallel num_gangs(nxChunk) vector_length(VECLENGTH)
+#pragma acc parallel num_gangs(gangTri) vector_length(VECLENGTH)
             solvePCR( 0 );
 
             }
             else if(SOLUTIONMETHOD == 2 )
             {
 
-#pragma acc parallel num_gangs(nxChunk) vector_length(VECLENGTH) 
-//#pragma acc parallel num_gangs(1) vector_length(1) 
+#pragma acc parallel num_gangs(gangTri) vector_length(VECLENGTH) 
             solveCRP( 0 );
 
             }
@@ -411,7 +410,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 #pragma acc parallel num_gangs(trsps_gang0) vector_length(VECLENGTH)
             restoreLocationX();
 
-#pragma acc parallel num_gangs(nxChunk)  vector_length(VECLENGTH)
+#pragma acc parallel num_gangs(nSig0)  vector_length(VECLENGTH)
             rescale();
 
             // return back to the original set-up

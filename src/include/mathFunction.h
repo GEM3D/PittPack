@@ -35,6 +35,7 @@ double squareRoot(double x);
 #if ( OPENACC )
 #pragma acc routine seq
 #endif
-int mylog2(int x);
+int myLog2(int x);
+
 
 #endif

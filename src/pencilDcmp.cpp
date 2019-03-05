@@ -67,7 +67,6 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
 
     crpcr_lower=new double[nxChunk*nz];
     crpcr_upper=new double[nxChunk*nz];
-    crpcr_rhs=new double[nxChunk*nz];
 
 
     subDiag = new double[3];
@@ -137,7 +136,6 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
 #pragma acc enter data create( x2[0 : nz*nxChunk] )
 #pragma acc enter data create( crpcr_lower[0 : nz*nxChunk] )
 #pragma acc enter data create( crpcr_upper[0 : nz*nxChunk] )
-#pragma acc enter data create( crpcr_rhs[0 : nz*nxChunk] )
 #endif
     /* impoartant note about nested classes is that we need to go from top to bottom, first have the highest level
          class copyin 'this' for that class and then once the address are set on the GPU, then copyin the lower level class
@@ -227,7 +225,6 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
 
     crpcr_lower=new double[nxChunk*nz];
     crpcr_upper=new double[nxChunk*nz];
-    crpcr_rhs=new double[nxChunk*nz];
 
     subDiag = new double[3];
     supDiag = new double[3];
@@ -296,7 +293,6 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
 #pragma acc enter data create( x2[0 : nz*nxChunk] )
 #pragma acc enter data create( crpcr_lower[0 : nz*nxChunk] )
 #pragma acc enter data create( crpcr_upper[0 : nz*nxChunk] )
-#pragma acc enter data create( crpcr_rhs[0 : nz*nxChunk] )
 #endif
     /* impoartant note about nested classes is that we need to go from top to bottom, first have the highest level
          class copyin 'this' for that class and then once the address are set on the GPU, then copyin the lower level class
@@ -1652,7 +1648,7 @@ double PencilDcmp::getError()
         err = err + P( 2 * i );
     }
     err = err / ( unitSize );
-    err = squareRoot( err );
+    err = sqrt( err );
 
     /*
         MPI_Allreduce( &err, &finalErr, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
@@ -4318,6 +4314,7 @@ int PencilDcmp::solveThmBatch( const int index )
 }
 
 
+
 #if ( OPENACC )
 #pragma acc routine worker
 #endif
@@ -4345,6 +4342,10 @@ void PencilDcmp::fillInArrayContig( const int i, const int j,int index, double *
 
    container[0] =0.0;
    container[nz-1] =0.0;
+
+
+
+
 /*
 for(int i=0;i<nz;i++)
 {
@@ -4392,10 +4393,9 @@ void PencilDcmp::fillInArrayBack( const int i, const int j, const int index, dou
 void PencilDcmp::solvePCR( const int index )
 {
     double eig;
-
     int count = 0;
     int i, j;
-
+#pragma acc loop seq
   for ( int j = 0; j < nxChunk; j++ )
     {
 // calculate i and j 
@@ -4406,13 +4406,13 @@ void PencilDcmp::solvePCR( const int index )
         {
           eig = getEigenVal( i, j );
 
-          fillInArrayContigNormalize( i, j, index, crpcr_rhs+nz*i, eig);
+          fillInArrayContigNormalize( i, j, index, x1+nz*i, eig);
 
           offDiagNormalize( i, j, crpcr_lower+nz*i, crpcr_upper+nz*i, eig );
 
-          T.pcr(nz, crpcr_lower+i*nz, crpcr_upper+nz*i,crpcr_rhs+nz*i);
+          T.pcr(nz, crpcr_lower+i*nz, crpcr_upper+nz*i,x1+nz*i);
 
-          fillInArrayBack( i, j, crpcr_rhs+nz*i,index );
+          fillInArrayBack( i, j, x1+nz*i,index );
        }
   }
 }
@@ -4438,6 +4438,7 @@ void PencilDcmp::solveCRP( const int index )
    double gam1[3]={0.0,0.0,0.0};
    double tmpRHS[3]={0.0,0.0,0.0};
  
+#pragma acc loop seq
   for ( int j = 0; j < nxChunk; j++ )
     {
 // calculate i and j 
@@ -4448,11 +4449,11 @@ void PencilDcmp::solveCRP( const int index )
 
           offdiag=1./eig;
 
-          fillInArrayContigNormalize( i, j, index, crpcr_rhs + nz * i,eig);
+          fillInArrayContigNormalize( i, j, index, x1 + nz * i,eig);
 
-          T.crp(nz,offdiag,tmpA ,tmpC , tmpRHS,ThmA,ThmC,ThmB,gam1,crpcr_rhs+nz*i);
+          T.crp(nz,offdiag,tmpA ,tmpC , tmpRHS,ThmA,ThmC,ThmB,gam1,x1+nz*i);
 
-          fillInArrayBack( i, j, crpcr_rhs + nz * i,index );
+          fillInArrayBack( i, j, x1 + nz * i,index );
        }
    }
 }
@@ -4496,22 +4497,21 @@ void PencilDcmp::offDiagNormalize( const int i, const int j, double *lower,doubl
 {
 
 double eigInv=1./eig;
-    
-lower[0]=0.0;
-upper[nz-1]=0.0;
-
 // dirichlet 
 
 #pragma acc loop vector
-        for ( int k = 0; k < nz; k++ )
+        for ( int k = 1; k < nz; k++ )
         {
              lower[k]=eigInv;
    }
 #pragma acc loop vector
-        for ( int k = 0; k < nz; k++ )
+        for ( int k = 0; k < nz-1; k++ )
         {
              upper[k]=eigInv;
    }
+    
+    lower[0]=0.0;
+    upper[nz-1]=0.0;
 
    lower[nz-1]=1./(eig-1.); 
    upper[0]=1./(eig-1.); 

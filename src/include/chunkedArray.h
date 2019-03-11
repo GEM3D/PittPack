@@ -3,7 +3,6 @@
 #include "definitions.h"
 #include <assert.h>
 #include <iostream>
-
 /*!
  *
  * \class ChunkedArray
@@ -25,10 +24,11 @@ class ChunkedArray
     int    nz;                     /*!< nz for each chunk, depending on the direction of chunking this might be nz or nz/nChunk  */
     int    arraySize;              /*!<Total size of array */
     double Xa, Xb, Ya, Yb, Za, Zb; /*!< Block coordinates to be passed on to Class Phdf5 for visualization*/
-    double *__restrict__ P = NULL; /*!< Restricted main pointer tohold data*/
+    double *__restrict__ P = NULL; /*!< Restricted main pointer to hold data*/
     int    chunkSize       = 0;
     int    orientation;
     double dx, dy, dz;
+    complex<double> *__restrict__ Pc=NULL;
 
     public:
     ChunkedArray(){};                  /*!< Constructor  */
@@ -40,27 +40,27 @@ class ChunkedArray
     void           setDirection( int dir );
     void           setCoords( double *X );
 //    void print();
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
-    double &operator()( int i, int j, int k, int index );
+     double &operator()( int i, int j, int k, int index );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
     double &operator()( int i, int j, int k );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
     double &operator()( int chunkId, int dir, int i, int j, int k, int index );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
     double &operator()( int i, int j, int k, int dir, int index );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
     double &operator()( int i );

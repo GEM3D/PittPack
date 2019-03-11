@@ -1,38 +1,40 @@
 #ifndef _MATHFUNCTION_H_
 #define _MATHFUNCTION_H_
 
-#if ( OPENACC )
-//#include <accelmath.h>
+#include "params.h"
+
+#if ( PITTPACKACC )
+#include <accel.h>
 #else
 #include <cmath>
 #endif
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 double sine( double x );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 double cosine( double x );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 double absolute( double x );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 double arctan( double x );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 double squareRoot(double x);
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 int myLog2(int x);

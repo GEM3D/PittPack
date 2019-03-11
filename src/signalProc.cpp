@@ -5,7 +5,7 @@
 
 void SignalProc::copyin()
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc enter data create( this[0 : 1] )
 #pragma acc update device( this )
 #endif
@@ -21,12 +21,12 @@ SignalProc::SignalProc()
 
 SignalProc::~SignalProc()
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc exit data delete ( this )
 #endif
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void SignalProc::postprocessSignalDCT10( ChunkedArray &P, const int size, const int i, const int direction )
@@ -45,7 +45,7 @@ void SignalProc::postprocessSignalDCT10( ChunkedArray &P, const int size, const 
 
     //    if ( direction == 0 )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
         for ( int j = 0; j < size / 2 - idx; j++ )
@@ -57,7 +57,7 @@ void SignalProc::postprocessSignalDCT10( ChunkedArray &P, const int size, const 
     double theta;
 
 // notice the multiplication by two here
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int j = 0; j < size; j++ )
@@ -69,7 +69,7 @@ void SignalProc::postprocessSignalDCT10( ChunkedArray &P, const int size, const 
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void SignalProc::postprocessSignalDCT01( ChunkedArray &P, const int size, const int j, const int direction )
@@ -79,7 +79,7 @@ void SignalProc::postprocessSignalDCT01( ChunkedArray &P, const int size, const 
     int upperBound = ( size - 1 ) / 2 + 1;
     int istart = upperBound;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int i = 0; i < upperBound; i++ )
@@ -89,14 +89,14 @@ void SignalProc::postprocessSignalDCT01( ChunkedArray &P, const int size, const 
 
     int idx = size % 2;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int i = 0; i < size / 2; i++ )
     {
         P( 2 *( j *size + 2 *i + 1 ) + 1 ) = P( 2 * ( j * size + size - i - 1 ) );
     }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int i = 0; i < size; i++ )
@@ -105,7 +105,7 @@ void SignalProc::postprocessSignalDCT01( ChunkedArray &P, const int size, const 
         P( 2 *( i + j *size ) + 1 ) = 0.0;
     }
 }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void SignalProc::preprocessSignalDCT01( ChunkedArray &P, const int size, const int i, const int direction )
@@ -117,7 +117,7 @@ void SignalProc::preprocessSignalDCT01( ChunkedArray &P, const int size, const i
     P( 2 *i *size + 0 ) = 0.5 * cosine( theta ) * P( 2 * i * size );
     P( 2 *i *size + 1 ) = 0.0;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int j = 1; j < size / 2 + 1; j++ )
@@ -132,7 +132,7 @@ void SignalProc::preprocessSignalDCT01( ChunkedArray &P, const int size, const i
         P( 2 *( i *size + j ) ) = 0.5 * ( cosine( theta ) * P( 2 * ( i * size + j ) ) + sine( theta ) * P( 2 * ( i * size + size - j ) ) );
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int j = size / 2 + 1; j < size; j++ )
@@ -141,7 +141,7 @@ void SignalProc::preprocessSignalDCT01( ChunkedArray &P, const int size, const i
         P( 2 *( i *size + j ) + 1 ) = -P( 2 * ( i * size + size - j ) + 1 );
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int j = size / 2 + 1; j < size; j++ )
@@ -151,7 +151,7 @@ void SignalProc::preprocessSignalDCT01( ChunkedArray &P, const int size, const i
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 //#pragma acc routine vector
 #pragma acc routine vector
 #endif
@@ -162,7 +162,7 @@ void SignalProc::preprocessSignalDCT10( ChunkedArray &P, const int size, const i
     int upperBound = ( size - 1 ) / 2 + 1;
     int istart = upperBound;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int j = 0; j < upperBound; j++ )
@@ -172,7 +172,7 @@ void SignalProc::preprocessSignalDCT10( ChunkedArray &P, const int size, const i
 
     int idx = size % 2;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int j = istart; j < size; j++ )
@@ -181,7 +181,7 @@ void SignalProc::preprocessSignalDCT10( ChunkedArray &P, const int size, const i
     }
 
     double tmp;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector private( tmp )
 #endif
     for ( int j = 0; j < size; j++ )
@@ -194,7 +194,7 @@ void SignalProc::preprocessSignalDCT10( ChunkedArray &P, const int size, const i
 
 // make sure the assignment from given real pointer P to copmex carray is consistent with the boundary  conditions
 // this routine assumes that the signal is saved contigeously disregarding suxh that the signal fits in the first N/2 elements
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void SignalProc::preprocessSignalDST10( ChunkedArray &P, const int size, const int i, const int direction )
@@ -203,7 +203,7 @@ void SignalProc::preprocessSignalDST10( ChunkedArray &P, const int size, const i
     preprocessSignalDCT10( P, size, i, direction );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void SignalProc::postprocessSignalDST10( ChunkedArray &P, const int size, const int i, const int direction )
@@ -212,7 +212,7 @@ void SignalProc::postprocessSignalDST10( ChunkedArray &P, const int size, const 
     swap( P, size, i, direction );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void SignalProc::preprocessSignalDST01( ChunkedArray &P, const int size, const int i, const int direction )
@@ -221,7 +221,7 @@ void SignalProc::preprocessSignalDST01( ChunkedArray &P, const int size, const i
     preprocessSignalDCT01( P, size, i, direction );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void SignalProc::postprocessSignalDST01( ChunkedArray &P, const int size, const int i, const int direction )
@@ -234,12 +234,12 @@ void SignalProc::postprocessSignalDST01( ChunkedArray &P, const int size, const 
 // respectively, by reversing the order of the inputs and flipping the sign of every other output,
 // and vice versa for DST-II from DCT-II, ref : https://en.wikipedia.org/wiki/Discrete_sine_transform
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void SignalProc::swap( ChunkedArray &P, const int size, const int i, const int direction )
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int j = 0; j < size; j++ )
@@ -252,7 +252,7 @@ void SignalProc::swap( ChunkedArray &P, const int size, const int i, const int d
         }
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int j = 0; j < size; j++ )

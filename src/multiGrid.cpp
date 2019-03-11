@@ -56,7 +56,7 @@ MultiGrid::MultiGrid( int n, double Delx, char *sm, int iter1, int iter2, int it
         tmpArraySize = 1;
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc enter data create( this[0 : 1] )
 #pragma acc update device( this[0 : 1] )
 #pragma acc enter data create( rhs[0 : arraySize] )
@@ -120,7 +120,7 @@ void MultiGrid::construct( int n, int iter1, int iter2, int iter3, double *sub, 
 
     suggestSize( n );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc enter data create( this[0 : 1] )
 #pragma acc update device( this[0 : 1] )
 #pragma acc enter data create( rhs[0 : arraySize] )
@@ -140,7 +140,7 @@ void MultiGrid::construct( int n, int iter1, int iter2, int iter3, double *sub, 
 #endif
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
 void MultiGrid::setDiag( double diag )
@@ -189,7 +189,7 @@ MultiGrid::MultiGrid( int n, double Delx, int iter1, int iter2, int iter3 )
         tmpArraySize = 1;
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc enter data create( this[0 : 1] )
 #pragma acc update device( this[0 : 1] )
 #pragma acc enter data create( rhs[0 : arraySize] )
@@ -216,7 +216,7 @@ MultiGrid::~MultiGrid()
 {
 // allocate on the device
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc exit data delete ( rhs[0 : arraySize] )
 #pragma acc exit data delete ( rhsImag[0 : arraySize] )
 #pragma acc exit data delete ( u[0 : arraySize] )
@@ -282,7 +282,7 @@ void MultiGrid::initialize( double *uIn )
         rhs[i] = uIn[i];
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( rhs[0 : arraySize] )
 #pragma acc update device( u[0 : arraySize] )
 #pragma acc update device( res[0 : N] )
@@ -395,7 +395,7 @@ int MultiGrid::detectMaxLevel( int n )
 // on the first element
 // our awesome binary tree reduction algorithm to calculate the l2norm of the residual
 #if ( 0 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 double MultiGrid::l2Norm()
@@ -403,7 +403,7 @@ double MultiGrid::l2Norm()
     // double val=0.0;
     double val;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int j = 0; j < N; j++ )
@@ -414,14 +414,14 @@ double MultiGrid::l2Norm()
     int size = ( N - 1 );
 
 // printf("%d \n", maxLevel);
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop seq
 #endif
     for ( int k = 0; k < maxLevel; k++ )
     {
         // int k=0;
         c = ( 1 << k );
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
         for ( int j = 0; j < ( size >> ( k + 1 ) ); j++ )
@@ -437,13 +437,13 @@ double MultiGrid::l2Norm()
 
 #else
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 double MultiGrid::l2Norm()
 {
     double val = 0.0;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int j = 0; j < N; j++ )
@@ -457,7 +457,7 @@ double MultiGrid::l2Norm()
 #endif
 
 #if ( CELL == 1 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 int MultiGrid::getIndex( int level )
@@ -492,7 +492,7 @@ int MultiGrid::getIndex( int level )
 #endif
 
 #if ( CELL == 1 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::multiGridProlong( int level )
@@ -520,7 +520,7 @@ void MultiGrid::multiGridProlong( int level )
     u[index] = u[index0];
     u[index + upperLimit0] = u[index0 + upperLimit];
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit; i++ )
@@ -531,7 +531,7 @@ void MultiGrid::multiGridProlong( int level )
         //    printf("i  =%d  ii= %d, %lf \n", i * d0+index,i+index0, u[i * d0]);
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i <= upperLimit; i++ )
@@ -543,7 +543,7 @@ void MultiGrid::multiGridProlong( int level )
 }
 #else
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::multiGridProlong( int level )
@@ -575,7 +575,7 @@ void MultiGrid::multiGridProlong( int level )
 */
 // injection part
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 0; i <= upperLimit; i++ )
@@ -584,7 +584,7 @@ void MultiGrid::multiGridProlong( int level )
         // printf("FIRST LOOP %d u[%d]  u[%d]=  \n",i, i * 2+ index+1,i+index0);
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i <= upperLimit; i++ )
@@ -602,7 +602,7 @@ void MultiGrid::multiGridProlong( int level )
 
 #if ( CELL == 1 )
 // restircting
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
 void MultiGrid::multiGridRestrict( int level )
@@ -642,7 +642,7 @@ void MultiGrid::multiGridRestrict( int level )
 
 // index0 already takes into account the difference in level
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit; i++ )
@@ -663,7 +663,7 @@ void MultiGrid::multiGridRestrict( int level )
 }
 #else
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::multiGridRestrict( int level )
@@ -677,7 +677,7 @@ void MultiGrid::multiGridRestrict( int level )
 
     int index = indices[levelOut];
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit + 1; i++ )
@@ -706,7 +706,7 @@ void MultiGrid::multiGridRestrict( int level )
 #endif
 
 #if ( CELL == 1 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::residual( int level )
@@ -750,7 +750,7 @@ void MultiGrid::residual( int level )
     res[upperLimit] = ( rhs[index0+upperLimit] * dx0*dx0 + ( subDiag0[1]*u[index0+ upperLimit - 1] +(onDiag0R ) * u[index0+upperLimit] )  );
 */
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit; i++ )
@@ -769,7 +769,7 @@ void MultiGrid::residual( int level )
 
 #else
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::residual( int level )
@@ -795,7 +795,7 @@ void MultiGrid::residual( int level )
     res[start] = ( rhs[index0] * dx0 + ( u[index0 + 1] + onDiag0[1] * u[index0] ) / dx0 );
     res[end] = ( rhs[index0 + upperLimit] * dx0 + ( onDiag0[1] * u[upperLimit + index0] + u[index0 + upperLimit - 1] ) / dx0 );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit; i++ )
@@ -815,7 +815,7 @@ void MultiGrid::residual( int level )
 #endif
 
 #if ( CELL == 1 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::smooth( int level, int iter )
@@ -846,7 +846,7 @@ void MultiGrid::smooth( int level, int iter )
 
 #else
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::smooth( int level, int iter )
@@ -877,12 +877,12 @@ void MultiGrid::smooth( int level, int iter )
 #endif
 
 #if ( CELL == 1 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::weightedJacobiSmoother( int index0, int upperLimit, double d )
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 0; i < upperLimit + 1; i++ )
@@ -890,7 +890,7 @@ void MultiGrid::weightedJacobiSmoother( int index0, int upperLimit, double d )
         utmp[i] = u[i + index0];
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit; i = i + 1 )
@@ -902,7 +902,7 @@ void MultiGrid::weightedJacobiSmoother( int index0, int upperLimit, double d )
 
 #else
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::weightedJacobiSmoother( int index0, int upperLimit, double d )
@@ -911,7 +911,7 @@ void MultiGrid::weightedJacobiSmoother( int index0, int upperLimit, double d )
     int farRight = index0 + upperLimit;
 
 // printf(" smoother %d tmpArraySize= %d farRight = %d d=%lf \n",selectSmoother,tmpArraySize,farRight,d);
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     /* for ( int i = 0; i < arraySize; i++ )
@@ -930,7 +930,7 @@ void MultiGrid::weightedJacobiSmoother( int index0, int upperLimit, double d )
     }
 // printf("!!!!!!!!!!!!!!!! index0 = %d  upper =%d  d=%lf  u[%d]=%lf \n",index0, index0+upperLimit, d,farRight,utmp[farRight]);
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit; i = i + 1 )
@@ -948,7 +948,7 @@ void MultiGrid::weightedJacobiSmoother( int index0, int upperLimit, double d )
 
 #if ( CELL == 1 )
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::redBlackSmoother( int index0, int upperLimit, double d, int level )
@@ -979,7 +979,7 @@ void MultiGrid::redBlackSmoother( int index0, int upperLimit, double d, int leve
     u[index0 + upperLimit] = ( rhs[index0 + upperLimit] * d * d * delx[0] * delx[0] + ( subDiag0[1] * u[index0 + upperLimit - 1] ) )
                              * ( -1. / onDiag0R );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit / 2; i++ )
@@ -988,7 +988,7 @@ void MultiGrid::redBlackSmoother( int index0, int upperLimit, double d, int leve
                               + ( supDiag0[1] * u[2 * i + index0 + 1] + subDiag0[1] * u[2 * i + index0 - 1] ) ) * ( -1. / onDiag0[1] );
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit; i = i + 2 )
@@ -999,7 +999,7 @@ void MultiGrid::redBlackSmoother( int index0, int upperLimit, double d, int leve
 }
 #else
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::redBlackSmoother( int index0, int upperLimit, double d )
@@ -1009,7 +1009,7 @@ void MultiGrid::redBlackSmoother( int index0, int upperLimit, double d )
 
     double coeff = -1. / onDiag0[1];
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit; i = i + 2 )
@@ -1022,7 +1022,7 @@ void MultiGrid::redBlackSmoother( int index0, int upperLimit, double d )
     {
         u[index0] = ( rhs[index0] * delx[0] * delx[0] * d * d + u[index0 + 1] ) * coeff;
     }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit / 2; i++ )
@@ -1074,7 +1074,7 @@ void MultiGrid::print( double delx, int level )
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::reFill( double *out )
@@ -1088,7 +1088,7 @@ void MultiGrid::reFill( double *out )
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::solveMono( double onDiag )
@@ -1178,7 +1178,7 @@ void MultiGrid::solveMono( double onDiag )
 }
 
 #if ( CELL == 1 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::redBlackMono( double onDiag )
@@ -1209,7 +1209,7 @@ void MultiGrid::redBlackMono( double onDiag )
 #endif
 
 // Starting from red, this loop handles red cells first
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit / 2; i++ )
@@ -1220,7 +1220,7 @@ void MultiGrid::redBlackMono( double onDiag )
 // revisisted this loop sice PGI had a hard time understanding that we jump one at a time
 
 // Starting from red, this loop handles black cells first
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < ( upperLimit + rem ); i = i + 2 )
@@ -1231,7 +1231,7 @@ void MultiGrid::redBlackMono( double onDiag )
 #endif
 
     /*
-    #if ( OPENACC )
+    #if ( PITTPACKACC )
     #pragma acc loop gang
     #endif
         for ( int i = 0; i < N ; i++ )
@@ -1242,7 +1242,7 @@ void MultiGrid::redBlackMono( double onDiag )
 
     /*
      // PGI rejects parallelization of the following although there is no data dependency
-     #if ( OPENACC )
+     #if ( PITTPACKACC )
      #pragma acc loop
      #endif
          for ( int i = 1; i < upperLimit; i = i + 2 )
@@ -1255,7 +1255,7 @@ void MultiGrid::redBlackMono( double onDiag )
 
 #else
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::redBlackMono( double onDiag )
@@ -1267,14 +1267,14 @@ void MultiGrid::redBlackMono( double onDiag )
 
     u[N - 1] = ( rhs[N - 1] * delx[0] * delx[0] + u[N - 2] ) * coeff;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit / 2; i++ )
     {
         u[2 * i] = ( rhs[2 * i] * delx[0] * delx[0] + ( u[2 * i + 1] + u[2 * i - 1] ) ) * coeff;
     }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < upperLimit; i = i + 2 )
@@ -1292,12 +1292,12 @@ void MultiGrid::redBlackMono( double onDiag )
 
 #endif
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::weightedJacobiMono()
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 0; i < N; i++ )
@@ -1305,7 +1305,7 @@ void MultiGrid::weightedJacobiMono()
         utmp[i] = u[i];
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 1; i < N - 1; i = i + 1 )
@@ -1340,7 +1340,7 @@ void getErr( double *u, int n, double delx[0], double pi )
 */
 
 #if ( CELL == 1 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 void MultiGrid::exact()
@@ -1386,7 +1386,7 @@ void MultiGrid::exact()
 }
 #else
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::exact()
@@ -1398,7 +1398,7 @@ void MultiGrid::exact()
 
 #endif
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::solveMulti( double *out )
@@ -1496,7 +1496,7 @@ void MultiGrid::solveMulti( double *out )
     }
     */
     /*
-    #if ( OPENACC )
+    #if ( PITTPACKACC )
     #pragma acc update self( u [0:arraySize] )
     #endif
     */
@@ -1504,12 +1504,12 @@ void MultiGrid::solveMulti( double *out )
     //    printf( "Error =%e\n", resTot  );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::reInit()
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = N; i < arraySize; i++ )
@@ -1518,12 +1518,12 @@ void MultiGrid::reInit()
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::reset()
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 0; i < arraySize; i++ )
@@ -1532,7 +1532,7 @@ void MultiGrid::reset()
         u[i] = 0.0;
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 0; i < N; i++ )
@@ -1721,18 +1721,18 @@ void MultiGrid::thomasPutBack( double *tmpMG, int index )
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::fillInArrayContig( ChunkedArray &P, int nChunk, int nzChunk, int i, int j, int index )
 {
 //    cout<<"before inside fill in"<<endl;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
     for ( int id = 0; id < nChunk; id++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
         for ( int k = 0; k < nzChunk; k++ )
@@ -1746,18 +1746,18 @@ void MultiGrid::fillInArrayContig( ChunkedArray &P, int nChunk, int nzChunk, int
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void MultiGrid::fillInArrayBack( ChunkedArray &P, int nChunk, int nzChunk, int i, int j, int index )
 {
 //     cout<<"after"<<endl;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
     for ( int id = 0; id < nChunk; id++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
         for ( int k = 0; k < nzChunk; k++ )

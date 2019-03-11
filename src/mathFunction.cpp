@@ -1,11 +1,11 @@
 #include "mathFunction.h"
 #include <math.h>
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #include "openacc.h"
 #endif
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 double sine( double x )
@@ -13,7 +13,7 @@ double sine( double x )
     return ( sin( x ) );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 double cosine( double x )
@@ -21,7 +21,7 @@ double cosine( double x )
     return ( cos( x ) );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 double absolute( double x )
@@ -29,7 +29,7 @@ double absolute( double x )
     return ( fabs( x ) );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 double arctan( double x )
@@ -37,7 +37,7 @@ double arctan( double x )
     return ( atan( x ) );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 double squareRoot( double x )
@@ -46,7 +46,7 @@ double squareRoot( double x )
 }
 
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 int myLog2( int x ) 

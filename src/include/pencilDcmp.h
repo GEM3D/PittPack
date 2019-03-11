@@ -8,7 +8,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <stdlib.h>
-#if _OPENACC
+#if (PITTPACKACC)
 #include "cufft.h"
 #endif
 #include "multiGrid.h"
@@ -140,8 +140,8 @@ class PencilDcmp
     void changeOwnershipPairwiseExchangeXY(); /*!< Redistributes data by rotating from X to Y direction using pairwise exchange*/
 
     static int getPeriodicRankYZ( int rank );
-#if ( OPENACC )
-#pragma acc routine worker
+#if ( PITTPACKACC )
+#pragma acc routine gang
 #endif
     void modifyRhsDirichlet();
 
@@ -255,7 +255,7 @@ class PencilDcmp
     void eigenVal( ofstream &myfile ); /*!< prints the eigenvcalues to a file for debugging*/
 
 #pragma acc routine
-    real getEigenVal( int i, int j ); /*!< Calculates the eigen vale based on the offset, note that, at the tridiagonal solve, j- direction
+    PittPackReal getEigenVal( int i, int j ); /*!< Calculates the eigen vale based on the offset, note that, at the tridiagonal solve, j- direction
                                         is the dominant direction
                                         if nxChunk==nyChunk && dx=dy, the eigenvalues are symmetric  */
 #pragma acc routine

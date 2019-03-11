@@ -1,7 +1,7 @@
 #ifndef _PARAMS_H_
 #define _PARAMS_H_
 
-#define OPENACC _OPENACC
+#define PITTPACKACC _OPENACC
 #define EXACT 0
 #define DEBUG2 0 /*!< turns on debug for poissonGPU */
 #define DEBUG_COMM 0
@@ -12,6 +12,7 @@
 #define SHORT_  0 /*!< controls the type for \f$iax, iay, jax, jay\f$ arrays, setting to 1 selects \f$short int\f$  where settingt it to zero will set \
 the type as \f$int\f$ */
 #define ZSIZE 64 /*! shoud be nzChubk*nChunk, not required if the first 4 letters specifying the boundary are not 'P', also not required in new version of solve  */
+#define MULTIGRIDON 0
 
 #define COMM_ON 1
 
@@ -22,7 +23,6 @@ the type as \f$int\f$ */
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-#define MULTIGRIDON 0
 
 // const int CHUNK=5;
 // Please note that if your ny*nz*sqrt(COM_SIZE) < 65535
@@ -40,7 +40,7 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     GPUAW2                      = 1,        /*! chunkwise send/recieve for XY rotation */
     MPI_ERROR_DISABLE           = 0,        /*! if set to 1 it will reset MPI_ERROR_FATAl to MPI_ERROR_RETURN */
     PITT_ABORT                  = 0,
-    INCLUDE_ERROE_CAL_IN_TIMING = 0, /*! uses an expensive allreduce function misleading to be included in profiling, takes 8 % of 512M
+    INCLUDE_ERROE_CAL_IN_TIMING =0 , /*! uses an expensive allreduce function misleading to be included in profiling, takes 8 % of 512M
                                         mesh, suggest truning it off for profiling*/
     SOLUTIONMETHOD = 0,                   /*!< (0) solves with Thomas (1) Uses PCR (2) CR-P (4) Multigrid and (5) cuSPARCE (CR and PCR ) 
                                                 the last two are disabled disabled to avoid unnecesary memory usage, 
@@ -48,9 +48,14 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     PIVOT = 1,                        /*!< This is only used for cuSPARSE, for diagonally dominant matrix pivoting is not required */
     INNERITER= 10,
     OUTERITER =20, 
-    TRI_NUM_GANG=1000000,               /*!< Overrides the default number of gpu blocks (gangs), setting this to a large value will replace this with nyChunk */
-    VECLENGTH=512,                    /*!< sets the number of gpu-threads */
+    TRI_NUM_GANG=10000,               /*!< Overrides the default number of gpu blocks (gangs), setting this to a large value will replace this with nyChunk */
+    VECLENGTH=256,                    /*!< sets the number of gpu-threads */
     MAXLEVEL=20,
+    COEFF0=1,                         /*!< (COEFF0*pi) is the frequency of the exact solution in the x-direction  */
+    COEFF1=2,                         /*!< (COEFF0*pi) is the frequency of the exact solution in the y-direction  */
+    COEFF2=3,                         /*!< (COEFF0*pi) is the frequency of the exact solution in the z-direction  */
+    CUFFT_STREAMS=0,                  /*!<  uses different stream for fft transform  */
+
 };
 
 typedef enum PittPackErrorCodes {
@@ -75,13 +80,18 @@ typedef enum PittPackErrorCodes {
     CONNECTIVITY_CONSTRUCTION_FAIL = 17,
     THOMAS_FAIL                    = 18, /*!< Thomas algorithm failed */
     INPUT_ARGS                     = 19,
+    CUFFT_FAIL_X                   = 20, /*!< CUFFT Failure in X-direction transoformation */  
+    CUFFT_FAIL_INV_X               = 21,  /*!< CUFFT Failure in inverse transform in X-direction */  
+    CUFFT_FAIL_Y                   = 22,   /*!< CUFFT Failure in Y-direction transoformation */  
+    CUFFT_FAIL_INV_Y               = 23,   /*!< CUFFT Failure in inverse transformation in Y-direction */  
+
 } PittPackResult;
 
 const double pi = 3.1415926535897932384;
 
 // These are for debugging and turning on and off several stages of the Poisson solve
 
-#define POSS 1 
+#define POSS 1  
 #define SOLVE 1 
 #define IFFTX 1
 #define IFFTY 1

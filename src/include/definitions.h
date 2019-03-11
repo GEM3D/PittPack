@@ -3,28 +3,20 @@
 #include "fftw3.h"
 #include "hdf5.h"
 #include "params.h"
-#include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <cstddef>
-#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
-#include <functional>
 #include <iostream>
-#include <list>
-#include <memory>
 #include <mpi.h>
 #include <sstream>
-#include <stack>
 #include <stdexcept>
 #include <string>
 #include <sys/time.h>
 #include <time.h>
-#include <unistd.h>
 #include <vector>
-#ifdef _OPENACC
+#include <complex>
+
+#if(PITTPACKACC)
 #include "math.h"
 #include "openacc.h"
 #include "cusparse.h"
@@ -36,7 +28,7 @@ typedef int integer;
 
 typedef unsigned int unit;
 // typedef float real;
-typedef double real;
+typedef double PittPackReal;
 
 using namespace std;
 
@@ -56,14 +48,6 @@ std::string FormatWithCommas(T value)
     ss << std::fixed << value;
     return ss.str();
 }
-
-
-
-/*
-using real = double;
-using uint = unsigned int;
-using integer = int;
-*/
 
 #define RED "\033[01;31m"
 #define GREEN "\033[22;32m"

@@ -1,49 +1,80 @@
 #include "definitions.h"
 #include "pencilDcmp.h"
-#if ( OPENACC )
-void PoissonGPU::performTransformXdir() /*!< Called on Host and Ran on GPU*/
+
+#if ( PITTPACKACC )
+void PoissonGPU::performTransformXdir() /*!< Is called on Host and Runs on GPU*/
 {
-    cufftHandle plan;
+    cufftHandle plan=NULL;
     double *ptr = P.P;
+
 #pragma acc host_data use_device( ptr )
     {
         cufftPlan1d( &plan, nx, CUFFT_Z2Z, nyChunk * nzChunk );
-        cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_FORWARD );
+       if(CUFFT_STREAMS){
+        void *stream = acc_get_cuda_stream(acc_async_sync);
+        cufftSetStream(plan, (cudaStream_t)stream);}
+       if(CUFFT_SUCCESS!= cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_FORWARD ))
+       {
+        cout << " Exit Code : " << PittPackGetErrorEnum( CUFFT_FAIL_X ) << endl; 
+       }
         cufftDestroy( plan );
     }
+
 }
 
 void PoissonGPU::performInverseTransformXdir() /*!< Called on Host and Ran on GPU*/
 {
-    cufftHandle plan;
+    cufftHandle plan=NULL;
     double *ptr = P.P;
 #pragma acc host_data use_device( ptr )
     {
         cufftPlan1d( &plan, nx, CUFFT_Z2Z, nyChunk * nzChunk );
-        cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_INVERSE );
+       if(CUFFT_STREAMS){
+        void *stream = acc_get_cuda_stream(acc_async_sync);
+        cufftSetStream(plan, (cudaStream_t)stream);}
+        if(CUFFT_SUCCESS!=cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_INVERSE ))
+        {
+        cout << " Exit Code : " << PittPackGetErrorEnum( CUFFT_FAIL_INV_X ) << endl; 
+        }
         cufftDestroy( plan );
     }
 }
 void PoissonGPU::performTransformYdir() /*!< Called on Host and Ran on GPU*/
 {
-    cufftHandle plan;
+    cufftHandle plan=NULL;
     double *ptr = P.P;
 #pragma acc host_data use_device( ptr )
     {
         cufftPlan1d( &plan, ny, CUFFT_Z2Z, nxChunk * nzChunk );
-        cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_FORWARD );
+       if(CUFFT_STREAMS)
+       {
+        void *stream = acc_get_cuda_stream(acc_async_sync);
+        cufftSetStream(plan, (cudaStream_t)stream);
+        }
+       if(CUFFT_SUCCESS!= cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_FORWARD ))
+        {       
+        cout << " Exit Code : " << PittPackGetErrorEnum( CUFFT_FAIL_Y ) << endl; 
+        }
         cufftDestroy( plan );
     }
 }
 
 void PoissonGPU::performInverseTransformYdir() /*!< Called on Host and Ran on GPU*/
 {
-    cufftHandle plan;
+    cufftHandle plan=NULL;
     double *ptr = P.P;
 #pragma acc host_data use_device( ptr )
     {
         cufftPlan1d( &plan, ny, CUFFT_Z2Z, nxChunk * nzChunk );
-        cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_INVERSE );
+       if(CUFFT_STREAMS)
+       {
+        void *stream = acc_get_cuda_stream(acc_async_sync);
+        cufftSetStream(plan, (cudaStream_t)stream);
+        }
+        if(CUFFT_SUCCESS!=cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_INVERSE ))
+        {
+        cout << " Exit Code : " << PittPackGetErrorEnum( CUFFT_FAIL_INV_Y ) << endl; 
+         }
         cufftDestroy( plan );
     }
 }
@@ -95,6 +126,10 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 #endif
 
     //   initializeAndBind();
+   
+   long int initMem=acc_get_memory()/1e9; 
+  
+   cout<<"amount of available memory "<<initMem<<endl;
 
     double err = 0.0;
     finalErr = 0.0;
@@ -107,29 +142,40 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
    int nSig0=MIN(50,nxChunk); 
    int nSig1=MIN(50,nyChunk); 
+   initMem=acc_get_free_memory()/1e9;
+    
+    cout<<"amount of free memory before data region "<<acc_get_free_memory()/1e9<<endl;
 
     int result = SUCCESS;
 
-    for ( int num = 0; num < 1; num++ )
+    for ( int num = 0; num <1 ; num++ )
     {
-#pragma acc data present( P[0 : 2 * nxChunk *nyChunk *nzChunk *nChunk], this, tmpMGReal, tmpMGImag ) copy( result, err )
+#pragma acc data present( P.P[0 : 2 * nxChunk *nyChunk *nzChunk *nChunk], this) copy( result, err )
+//#pragma acc data  copy( result, err )
         {
-#pragma acc parallel num_gangs(50)  vector_length(VECLENGTH)
+
+            cout<<"amount of free memory (0) = "<<(acc_get_free_memory()/1e9)<<endl;
+
+#pragma acc parallel num_gangs(50)  vector_length(32)
             initializeTrigonometric();
 
+#if ( POSS )
+            cout<<"amount of free memory after init = "<<acc_get_free_memory()/1e9<<endl;
             if ( bc[0] != 'P' && bc[2] != 'P' )
             {
-#pragma acc parallel  vector_length(VECLENGTH)
+#pragma acc parallel num_gangs(50)  vector_length(VECLENGTH)
                 modifyRhsDirichlet();
             }
 
-#if ( POSS )
+            cout<<"amount of free memory 1 "<<acc_get_free_memory()/1e9<<endl;
+
             changeOwnershipPairwiseExchangeZX();
 
             if ( GPUAW == 0 )
             {
                 P.moveHostToDevice();
             }
+            cout<<"amount of free memory 2 "<<acc_get_free_memory()/1e9<<endl;
 // perform FFT in x direction
 // remember, need to rearrange and restore each time
 
@@ -137,15 +183,23 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 // step 2) change location of the array such that FFT can be performed on a contegeous array
 #pragma acc parallel num_gangs(trsps_gang0)  vector_length(VECLENGTH)
             changeLocationX();
+
+            cout<<"amount of free memory 3 "<<acc_get_free_memory()/1e9<<endl;
 // step 3) perform  FFT
 
 #pragma acc parallel num_gangs(nSig0)  vector_length(VECLENGTH)
             preprocessSignalAccordingly( 0, 0 );
 
+            cout<<"amount of free memory 4 "<<acc_get_free_memory()/1e9<<endl;
+
             performTransformXdir();
 
-#pragma acc parallel  num_gangs(nSig0)  vector_length(VECLENGTH)
+            cout<<"amount of free memory 5 "<<acc_get_free_memory()/1e9<<endl;
+
+#pragma acc parallel num_gangs(nSig0)  vector_length(VECLENGTH)
             postprocessSignalAccordingly( 0, 0 );
+            
+            cout<<"amount of free memory 6 "<<acc_get_free_memory()/1e9<<endl;
 // step 4) restore the array to original status before FFT
 //#pragma acc parallel
 #pragma acc parallel num_gangs(trsps_gang0)  vector_length(VECLENGTH)
@@ -153,6 +207,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
 #endif
 
+            cout<<"amount of free memory 7 "<<acc_get_free_memory()/1e9<<endl;
 #if ( FFTY )
             // step 5) pencils with n(1,0,0) is converted to pencil with n(0,1,0)
             if ( GPUAW2 == 0 )
@@ -166,7 +221,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             }
 // step 6) swaps X and Y coordinates, now X is Y and nx is ny
 
-#pragma acc parallel  vector_length(VECLENGTH)
+#pragma acc parallel  num_gangs(trsps_gang0)  vector_length(VECLENGTH)
             rearrangeX2Y();
 
 // step 7) change location of the array such that FFT can be performed on a contegeous array in the transverse direction
@@ -181,6 +236,8 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
             // step 8) perform  FFT transform can be performed
             performTransformYdir();
+            cout<<"amount of free memory 8 "<<acc_get_free_memory()/1e9<<endl;
+           // acc_clear_freelists();
 #pragma acc parallel  num_gangs(nSig1)  vector_length(VECLENGTH)
             postprocessSignalAccordingly( 1, 1 );
 // M.printX( myfile );
@@ -193,6 +250,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
 #endif
 
+            cout<<"amount of free memory 9 "<<acc_get_free_memory()/1e9<<endl;
 #if ( SOLVE )
             // step 10) pencils with n(0,1,0) is converted to pencil with n(0,0,1)
 
@@ -331,6 +389,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
                      // M.printX( myfile );
             */
 
+            cout<<"amount of free memory 10 "<<acc_get_free_memory()/1e9<<endl;
             if ( result != SUCCESS )
             {
                 cout << "Exit Code: " << THOMAS_FAIL << endl;
@@ -352,6 +411,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             }
 #endif
 
+            cout<<"amount of free memory 11 "<<acc_get_free_memory()/1e9<<endl;
 #if ( IFFTY )
 // step 13) prepre for contigeuous FFT
 #pragma acc parallel num_gangs(trsps_gang1)  vector_length(VECLENGTH)
@@ -373,7 +433,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 // step 16) swaps X and Y coordinates, now X is Y and nx is ny
 // need to redefine the function ??????????????????????????????????????????????????????????????????????????
 // now again switching to x-direction arrangement so printX is fine
-#pragma acc parallel  vector_length(VECLENGTH)
+#pragma acc parallel num_gangs(trsps_gang0)  vector_length(VECLENGTH)
             rearrangeX2YInverse();
 
             // step 17) pencils with n(0,1,0) is converted to pencil with n(1,0,0)
@@ -390,6 +450,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             }
 #endif
 
+            cout<<"amount of free memory 12 "<<acc_get_free_memory()/1e9<<" GB "<<endl;
 #if ( IFFTX )
 // step 18) change location of the array such that IFFT can be performed on a contegeous array
 
@@ -413,6 +474,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 #pragma acc parallel num_gangs(nSig0)  vector_length(VECLENGTH)
             rescale();
 
+            cout<<"amount of free memory 13 "<<acc_get_free_memory()/1e9<<" GB  "<<endl;
             // return back to the original set-up
             changeOwnershipPairwiseExchangeZX();
 
@@ -423,12 +485,13 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
             if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
             {
-#pragma acc parallel vector_length(32) reduction(max:err)
+#pragma acc parallel vector_length(50) reduction(max:err)
                 err = getError();
 
                 // cout<<" ****** "<<err<<endl;
             }
 
+            cout<<"amount of free memeory 14 "<<acc_get_free_memory()/1e9<<endl;
 #endif
         }
     }
@@ -458,11 +521,11 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
     if ( JIC )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc data present( P, R )
 #endif
         {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc parallel
 #endif
             debug();

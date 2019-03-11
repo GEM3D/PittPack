@@ -24,27 +24,27 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
      * MPI variables
      */
     int mpi_size, mpi_rank;
-    real *xtemp = NULL;
-    real *ytemp = NULL;
-    real *ztemp = NULL;
-    real *qtemp = NULL;
+    PittPackReal *xtemp = NULL;
+    PittPackReal *ytemp = NULL;
+    PittPackReal *ztemp = NULL;
+    PittPackReal *qtemp = NULL;
 
     uint L1 = F.nx;
     uint M1 = F.ny;
     uint N1 = F.nz;
 
-    xtemp = new real[L1 * M1 * N1];
-    ytemp = new real[L1 * M1 * N1];
-    ztemp = new real[L1 * M1 * N1];
-    qtemp = new real[L1 * M1 * N1];
+    xtemp = new PittPackReal[L1 * M1 * N1];
+    ytemp = new PittPackReal[L1 * M1 * N1];
+    ztemp = new PittPackReal[L1 * M1 * N1];
+    qtemp = new PittPackReal[L1 * M1 * N1];
     // cout<<L1<<"\t"<<M1<<"\t"<<N1<<endl;
 
-    real Xa;
-    real Xb;
-    real Ya;
-    real Yb;
-    real Za;
-    real Zb;
+    PittPackReal Xa;
+    PittPackReal Xb;
+    PittPackReal Ya;
+    PittPackReal Yb;
+    PittPackReal Za;
+    PittPackReal Zb;
 
     char str[50];
 
@@ -145,14 +145,14 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
 
     unsigned int level, coord_index;
 
-    real dx, dy, dz;
-    real denum;
-    real XYZ[6];
+    PittPackReal dx, dy, dz;
+    PittPackReal denum;
+    PittPackReal XYZ[6];
     //  morton<N> key;
     hsize_t co = 0;
 
-    real Xh, Yh, Zh;
-    real hx, hy, hz;
+    PittPackReal Xh, Yh, Zh;
+    PittPackReal hx, hy, hz;
     int index;
     /*
         cout << YELLOW << "Xa " << F.Xa << " Xb " << F.Xb << RESET << endl;
@@ -195,11 +195,11 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
         // status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE,
         // memspace,filespace,plist_id, xtemp);
 
-        if ( sizeof( real ) == sizeof( double ) )
+        if ( sizeof( PittPackReal ) == sizeof( double ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, xtemp );
         }
-        else if ( sizeof( real ) == sizeof( float ) )
+        else if ( sizeof( PittPackReal ) == sizeof( float ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_FLOAT, memspace, filespace, plist_id, xtemp );
         }
@@ -268,11 +268,11 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
         // H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
         // status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE,
         // memspace,filespace,plist_id, xtemp);
-        if ( sizeof( real ) == sizeof( double ) )
+        if ( sizeof( PittPackReal ) == sizeof( double ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, ytemp );
         }
-        else if ( sizeof( real ) == sizeof( float ) )
+        else if ( sizeof( PittPackReal ) == sizeof( float ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_FLOAT, memspace, filespace, plist_id, ytemp );
         }
@@ -302,7 +302,7 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
 
     co = 0;
 
-    real Dz = ( F.Zb - F.Za ) / F.nChunk;
+    PittPackReal Dz = ( F.Zb - F.Za ) / F.nChunk;
 
     for ( auto it = 0; it < F.nChunk; it++ )
     {
@@ -339,11 +339,11 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
         H5Pset_dxpl_mpio( plist_id, H5FD_MPIO_INDEPENDENT );
         // status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE,
         // memspace,filespace,plist_id, xtemp);
-        if ( sizeof( real ) == sizeof( double ) )
+        if ( sizeof( PittPackReal ) == sizeof( double ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, ztemp );
         }
-        else if ( sizeof( real ) == sizeof( float ) )
+        else if ( sizeof( PittPackReal ) == sizeof( float ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_FLOAT, memspace, filespace, plist_id, ztemp );
         }
@@ -405,12 +405,12 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
         // status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE,
         // memspace,filespace,plist_id, xtemp);
 
-        if ( sizeof( real ) == sizeof( double ) )
+        if ( sizeof( PittPackReal ) == sizeof( double ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, qtemp );
             //   cout<<BLUE "using double " RESET<<endl;
         }
-        else if ( sizeof( real ) == sizeof( float ) )
+        else if ( sizeof( PittPackReal ) == sizeof( float ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_FLOAT, memspace, filespace, plist_id, qtemp );
         }
@@ -866,27 +866,27 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
      * MPI variables
      */
     int mpi_size, mpi_rank;
-    real *xtemp = NULL;
-    real *ytemp = NULL;
-    real *ztemp = NULL;
-    real *qtemp = NULL;
+    PittPackReal *xtemp = NULL;
+    PittPackReal *ytemp = NULL;
+    PittPackReal *ztemp = NULL;
+    PittPackReal *qtemp = NULL;
 
     uint L1 = F.nx + 1;
     uint M1 = F.ny + 1;
     uint N1 = F.nz + 1;
 
-    xtemp = new real[L1 * M1 * N1];
-    ytemp = new real[L1 * M1 * N1];
-    ztemp = new real[L1 * M1 * N1];
-    qtemp = new real[( L1 - 1 ) * ( M1 - 1 ) * ( N1 - 1 )];
+    xtemp = new PittPackReal[L1 * M1 * N1];
+    ytemp = new PittPackReal[L1 * M1 * N1];
+    ztemp = new PittPackReal[L1 * M1 * N1];
+    qtemp = new PittPackReal[( L1 - 1 ) * ( M1 - 1 ) * ( N1 - 1 )];
     // cout<<L1<<"\t"<<M1<<"\t"<<N1<<endl;
 
-    real Xa;
-    real Xb;
-    real Ya;
-    real Yb;
-    real Za;
-    real Zb;
+    PittPackReal Xa;
+    PittPackReal Xb;
+    PittPackReal Ya;
+    PittPackReal Yb;
+    PittPackReal Za;
+    PittPackReal Zb;
 
     char str[50];
 
@@ -985,14 +985,14 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
 
     unsigned int level, coord_index;
 
-    real dx, dy, dz;
-    real denum;
-    real XYZ[6];
+    PittPackReal dx, dy, dz;
+    PittPackReal denum;
+    PittPackReal XYZ[6];
     //  morton<N> key;
     hsize_t co = 0;
 
-    real Xh, Yh, Zh;
-    real hx, hy, hz;
+    PittPackReal Xh, Yh, Zh;
+    PittPackReal hx, hy, hz;
     int index;
     /*
         cout << YELLOW << "Xa " << F.Xa << " Xb " << F.Xb << RESET << endl;
@@ -1035,11 +1035,11 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
         // status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE,
         // memspace,filespace,plist_id, xtemp);
 
-        if ( sizeof( real ) == sizeof( double ) )
+        if ( sizeof( PittPackReal ) == sizeof( double ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, xtemp );
         }
-        else if ( sizeof( real ) == sizeof( float ) )
+        else if ( sizeof( PittPackReal ) == sizeof( float ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_FLOAT, memspace, filespace, plist_id, xtemp );
         }
@@ -1108,11 +1108,11 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
         // H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
         // status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE,
         // memspace,filespace,plist_id, xtemp);
-        if ( sizeof( real ) == sizeof( double ) )
+        if ( sizeof( PittPackReal ) == sizeof( double ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, ytemp );
         }
-        else if ( sizeof( real ) == sizeof( float ) )
+        else if ( sizeof( PittPackReal ) == sizeof( float ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_FLOAT, memspace, filespace, plist_id, ytemp );
         }
@@ -1142,7 +1142,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
 
     co = 0;
 
-    real Dz = ( F.Zb - F.Za ) / F.nChunk;
+    PittPackReal Dz = ( F.Zb - F.Za ) / F.nChunk;
 
     for ( auto it = 0; it < F.nChunk; it++ )
     {
@@ -1179,11 +1179,11 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
         H5Pset_dxpl_mpio( plist_id, H5FD_MPIO_INDEPENDENT );
         // status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE,
         // memspace,filespace,plist_id, xtemp);
-        if ( sizeof( real ) == sizeof( double ) )
+        if ( sizeof( PittPackReal ) == sizeof( double ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, ztemp );
         }
-        else if ( sizeof( real ) == sizeof( float ) )
+        else if ( sizeof( PittPackReal ) == sizeof( float ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_FLOAT, memspace, filespace, plist_id, ztemp );
         }
@@ -1261,12 +1261,12 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
         // status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE,
         // memspace,filespace,plist_id, xtemp);
 
-        if ( sizeof( real ) == sizeof( double ) )
+        if ( sizeof( PittPackReal ) == sizeof( double ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, qtemp );
             //   cout<<BLUE "using double " RESET<<endl;
         }
-        else if ( sizeof( real ) == sizeof( float ) )
+        else if ( sizeof( PittPackReal ) == sizeof( float ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_FLOAT, memspace, filespace, plist_id, qtemp );
         }
@@ -1305,27 +1305,27 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
      * MPI variables
      */
     int mpi_size, mpi_rank;
-    real *xtemp = NULL;
-    real *ytemp = NULL;
-    real *ztemp = NULL;
-    real *qtemp = NULL;
+    PittPackReal *xtemp = NULL;
+    PittPackReal *ytemp = NULL;
+    PittPackReal *ztemp = NULL;
+    PittPackReal *qtemp = NULL;
 
     uint L1 = F.nx + 1;
     uint M1 = F.ny + 1;
     uint N1 = F.nz + 1;
 
-    xtemp = new real[L1 * M1 * N1];
-    ytemp = new real[L1 * M1 * N1];
-    ztemp = new real[L1 * M1 * N1];
-    qtemp = new real[( L1 - 1 ) * ( M1 - 1 ) * ( N1 - 1 )];
+    xtemp = new PittPackReal[L1 * M1 * N1];
+    ytemp = new PittPackReal[L1 * M1 * N1];
+    ztemp = new PittPackReal[L1 * M1 * N1];
+    qtemp = new PittPackReal[( L1 - 1 ) * ( M1 - 1 ) * ( N1 - 1 )];
     // cout<<L1<<"\t"<<M1<<"\t"<<N1<<endl;
 
-    real Xa;
-    real Xb;
-    real Ya;
-    real Yb;
-    real Za;
-    real Zb;
+    PittPackReal Xa;
+    PittPackReal Xb;
+    PittPackReal Ya;
+    PittPackReal Yb;
+    PittPackReal Za;
+    PittPackReal Zb;
 
     char str[50];
 
@@ -1435,19 +1435,19 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
 
     unsigned int level, coord_index;
 
-    real dx, dy, dz;
-    real denum;
-    real XYZ[6];
+    PittPackReal dx, dy, dz;
+    PittPackReal denum;
+    PittPackReal XYZ[6];
     //  morton<N> key;
     hsize_t co = 0;
 
-    real Xh, Yh, Zh;
-    real hx, hy, hz;
+    PittPackReal Xh, Yh, Zh;
+    PittPackReal hx, hy, hz;
     int index;
 
-    real Dx = ( F.Xb - F.Xa ) / F.nChunk;
+    PittPackReal Dx = ( F.Xb - F.Xa ) / F.nChunk;
 
-    real Dy = ( F.Yb - F.Ya ) / F.nChunk;
+    PittPackReal Dy = ( F.Yb - F.Ya ) / F.nChunk;
     /*
         cout << YELLOW << "Xa " << F.Xa << " Xb " << F.Xb << RESET << endl;
         cout << YELLOW << "Ya " << F.Ya << " Yb " << F.Yb << RESET << endl;
@@ -1507,11 +1507,11 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
         // status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE,
         // memspace,filespace,plist_id, xtemp);
 
-        if ( sizeof( real ) == sizeof( double ) )
+        if ( sizeof( PittPackReal ) == sizeof( double ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, xtemp );
         }
-        else if ( sizeof( real ) == sizeof( float ) )
+        else if ( sizeof( PittPackReal ) == sizeof( float ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_FLOAT, memspace, filespace, plist_id, xtemp );
         }
@@ -1591,11 +1591,11 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
         // H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
         // status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE,
         // memspace,filespace,plist_id, xtemp);
-        if ( sizeof( real ) == sizeof( double ) )
+        if ( sizeof( PittPackReal ) == sizeof( double ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, ytemp );
         }
-        else if ( sizeof( real ) == sizeof( float ) )
+        else if ( sizeof( PittPackReal ) == sizeof( float ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_FLOAT, memspace, filespace, plist_id, ytemp );
         }
@@ -1625,7 +1625,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
 
     co = 0;
 
-    real Dz = ( F.Zb - F.Za ) / F.nChunk;
+    PittPackReal Dz = ( F.Zb - F.Za ) / F.nChunk;
 
     for ( auto it = 0; it < F.nChunk; it++ )
     {
@@ -1671,11 +1671,11 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
         H5Pset_dxpl_mpio( plist_id, H5FD_MPIO_INDEPENDENT );
         // status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE,
         // memspace,filespace,plist_id, xtemp);
-        if ( sizeof( real ) == sizeof( double ) )
+        if ( sizeof( PittPackReal ) == sizeof( double ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, ztemp );
         }
-        else if ( sizeof( real ) == sizeof( float ) )
+        else if ( sizeof( PittPackReal ) == sizeof( float ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_FLOAT, memspace, filespace, plist_id, ztemp );
         }
@@ -1770,12 +1770,12 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
         // status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE,
         // memspace,filespace,plist_id, xtemp);
 
-        if ( sizeof( real ) == sizeof( double ) )
+        if ( sizeof( PittPackReal ) == sizeof( double ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, qtemp );
             //   cout<<BLUE "using double " RESET<<endl;
         }
-        else if ( sizeof( real ) == sizeof( float ) )
+        else if ( sizeof( PittPackReal ) == sizeof( float ) )
         {
             H5Dwrite( dset_id, H5T_NATIVE_FLOAT, memspace, filespace, plist_id, qtemp );
         }

@@ -404,18 +404,20 @@ void PoissonCPU::pittPack()
 
             }
 
-     //    solveThmBatch( 0 );
 */
 
-//           solveThm(0);
+         solveThmBatch( 0 );
+//         solveThm(0);
 
-         solveCRP(0);
+
+//         solveCRP(0);
         }
         else if(SOLUTIONMETHOD==1)
         {
             // "0" solves for the real part and "1" solves for imaginary part
            // solveMG();
             //   solveMGC( );
+ //        solveCRP(0);
         }
 
 // M.printX( myfile );

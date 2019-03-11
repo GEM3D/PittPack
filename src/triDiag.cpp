@@ -16,7 +16,7 @@ void TriDiag::setElems( int nCh, int nzCh, double *sub, double *sup )
         supDiag[i] = sup[i];
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc enter data create( this[0 : 1] )
 #pragma acc update device( this )
 #pragma acc enter data create( subDiag[0 : 3] )
@@ -37,14 +37,14 @@ TriDiag::~TriDiag()
         delete[] supDiag;
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc exit data delete ( subDiag )
 #pragma acc exit data delete ( supDiag )
 #pragma acc exit data delete ( this )
 #endif
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
 void TriDiag::thomas( ChunkedArray &P, double *onDiag, const int i, const int j, const int dir, const int index )
@@ -234,7 +234,7 @@ void TriDiag::thomas( ChunkedArray &P, double *onDiag, const int i, const int j,
     // return(result);
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
 void TriDiag::thomasSingleBlock( ChunkedArray &P, double *onDiag, int i, int j, int dir, int index )
@@ -245,7 +245,7 @@ void TriDiag::thomasSingleBlock( ChunkedArray &P, double *onDiag, int i, int j, 
 // the enterior is always set according to eigenvalues
 // the two ends decided by BC
 /*
-#if(OPENACC)
+#if(PITTPACKACC)
     double Sn[ZSIZE];
 #else
     double Sn[nChunk * nzChunk];
@@ -353,7 +353,7 @@ void TriDiag::thomasSingleBlock( ChunkedArray &P, double *onDiag, int i, int j, 
 }
 
 #if ( 1 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
 void TriDiag::thomasPeriodic( ChunkedArray &P, double *onDiag, int i, int j, int dir, int index )
@@ -727,7 +727,7 @@ void TriDiag::thomasPeriodic( ChunkedArray &P, double *onDiag, int i, int j, int
 }
 #endif
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
 int TriDiag::thomasReal( ChunkedArray &P, double *onDiag, const int i, const int j, const int dir )
@@ -923,7 +923,7 @@ int TriDiag::thomasReal( ChunkedArray &P, double *onDiag, const int i, const int
     return ( result );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
 void TriDiag::thomasPeriodicReal( ChunkedArray &P, double *onDiag, int i, int j, int dir )
@@ -1274,7 +1274,7 @@ void TriDiag::crp(const int n, double offdiag,double *tmpA,double *tmpC,double *
   tmpA[0]=(offdiag);
   tmpC[0]=(offdiag);
 
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc loop seq 
 #endif
   for (int i = 0; i < level-1; i++)
@@ -1329,7 +1329,7 @@ void TriDiag::crp(const int n, double offdiag,double *tmpA,double *tmpC,double *
 //printf("m =%d \n",m);
 
     m=3;
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc loop seq
 #endif
 for(int i=0;i<1;i++)
@@ -1363,7 +1363,7 @@ for(int i=0;i<1;i++)
   int div;
 
   // breaking data dependency so that we can perform the tasks in parallel
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc loop seq
 #endif
   for (int i = level-1; i > 0; i--)
@@ -1376,7 +1376,7 @@ for(int i=0;i<1;i++)
 //  printf("--------------------m= %d div =%d ---------------\n",m,div);
 
 //#pragma acc loop vector 
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc loop vector firstprivate(d0,m)
 #endif
 //#pragma acc loop seq
@@ -1388,7 +1388,7 @@ for(int i=0;i<1;i++)
     }
 
 //#pragma acc loop vector 
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc loop vector firstprivate(d0,m) 
 #endif
 //#pragma acc loop seq
@@ -1414,7 +1414,7 @@ for(int i=0;i<1;i++)
 
 
 
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc routine vector
 #endif
 void TriDiag::pcr(int n, double *a, double *c, double *d)
@@ -1444,14 +1444,14 @@ void TriDiag::pcr(int n, double *a, double *c, double *d)
 
 
 
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc loop seq private(a0,a1,a2,c0,c1,c2,d0,d1,d2)
 #endif
   for (int p = 0; p < level; p++) 
  {
    s = 1 << p;
 
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc loop private(a0,a1,a2,c0,c1,c2,d0,d1,d2,index)
 #endif
   for(int i = 0; i < n ; i++) {
@@ -1505,7 +1505,7 @@ void TriDiag::pcr(int n, double *a, double *c, double *d)
   // both indices are ok to assign
      //
 
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc loop private(a0,a1,a2,c0,c1,c2,d0,d1,d2,r,index)
 #endif
      for(int i=0;i<n;i++)
@@ -1522,19 +1522,20 @@ void TriDiag::pcr(int n, double *a, double *c, double *d)
 
 }
 
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc routine seq
 #endif
 void   TriDiag::thomasLowMem( double *tmpMG, double *rh , double diag, int index )
 {
     double bet; 
 
-    double a[3], b[3], c[3];
+//   double a[3],c[3];
+    double b[3];
 
     int n = nChunk*nzChunk; 
     int N=n; 
-
-#if(OPENACC)
+/*
+#if(PITTPACKACC)
 #pragma acc loop seq
 #endif
     for ( int i = 0; i < 3; i++ )
@@ -1542,7 +1543,7 @@ void   TriDiag::thomasLowMem( double *tmpMG, double *rh , double diag, int index
         a[i] = subDiag[i];
         c[i] = supDiag[i];
     }    
-
+*/
     b[1] = diag;
 
     // for Dirirchlet
@@ -1553,27 +1554,27 @@ void   TriDiag::thomasLowMem( double *tmpMG, double *rh , double diag, int index
     rh[0] = rh[0] / ( bet = b[0] );
 
     int j = 1; 
-    tmpMG[j] = c[j - 1] / bet; 
-    bet = b[1] - a[1] * tmpMG[j];
-    rh[1] = ( rh[1] - a[1] * rh[j - 1] ) / bet; 
-#if(OPENACC)
+    tmpMG[j] = supDiag[j - 1] / bet; 
+    bet = b[1] - subDiag[1] * tmpMG[j];
+    rh[1] = ( rh[1] - subDiag[1] * rh[j - 1] ) / bet; 
+#if(PITTPACKACC)
 #pragma acc loop seq
 #endif
     for ( int j = 2; j < n - 1; j++ )
     {    
         //       DecompositioN and forward substitution.
-        tmpMG[j] = c[1] / bet; 
-        bet = b[1] - a[1] * tmpMG[j];
-        rh[j] = ( rh[j] - a[1] * rh[j - 1] ) / bet; 
+        tmpMG[j] = supDiag[1] / bet; 
+        bet = b[1] - subDiag[1] * tmpMG[j];
+        rh[j] = ( rh[j] - subDiag[1] * rh[j - 1] ) / bet; 
     }    
 
     j = N - 1; 
-    tmpMG[j] = c[1] / bet; 
-    bet = b[2] - a[2] * tmpMG[j];
-    rh[j] = ( rh[j] - a[2] * rh[j - 1] ) / bet; 
+    tmpMG[j] = supDiag[1] / bet; 
+    bet = b[2] - subDiag[2] * tmpMG[j];
+    rh[j] = ( rh[j] - subDiag[2] * rh[j - 1] ) / bet; 
 
     //  cout << a[2] << " " << b[2] << eNdl;
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc loop seq
 #endif
     for ( int j = ( n - 2 ); j >= 0; j-- )
@@ -1583,7 +1584,7 @@ void   TriDiag::thomasLowMem( double *tmpMG, double *rh , double diag, int index
     }    
 }
 
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc routine seq
 #endif
 void TriDiag::thomasLowMem(int N, double *a, double *b, double *c, double *r, double *gam) 
@@ -1611,7 +1612,7 @@ void TriDiag::thomasLowMem(int N, double *a, double *b, double *c, double *r, do
   r[1] = (r[1] - a[1] * r[j - 1]) / bet;
 
 
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc loop seq
 #endif
   for (int j = 2; j < n - 1; j++) {
@@ -1633,7 +1634,7 @@ void TriDiag::thomasLowMem(int N, double *a, double *b, double *c, double *r, do
     cout << "u_low_mem " << r[j] << endl;
   }
 */
-#if(OPENACC)
+#if(PITTPACKACC)
 #pragma acc loop seq
 #endif
   for (int j = (n - 2); j >= 0; j--) {

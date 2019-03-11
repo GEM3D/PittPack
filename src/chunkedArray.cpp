@@ -6,7 +6,7 @@
 //#pragma acc routine
 void ChunkedArray::moveHostToDevice()
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( P[0 : arraySize] )
 #endif
 }
@@ -45,7 +45,7 @@ PittPackResult ChunkedArray::allocate( int *n, int nbl )
     chunkSize = arraySize / nbl; /*! chunk size refers to the size of the chunks, that is the whole
                                     array divided by nchunks, this is to get rid of multiplication by two */
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc enter data create( this[0 : 1] )
 #pragma acc update device( this )
 #pragma acc enter data create( P[0 : arraySize] )
@@ -91,7 +91,7 @@ void ChunkedArray::setDirection( int dir )
     nx = coeff[0] * Nx;
     ny = coeff[1] * Ny;
     nz = coeff[2] * Nz;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( nx, ny, nz )
 #endif
     cout << "each chunk dims=" << nx << " " << ny << " " << nz << endl;
@@ -106,12 +106,12 @@ int ChunkedArray::size()
 //#pragma acc routine
 void ChunkedArray::moveDeviceToHost()
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update self( P[0 : arraySize] )
 #endif
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 // index 0 retrieves real and indez zero retrieves
@@ -121,7 +121,7 @@ double &ChunkedArray::operator()( int i, int j, int k, int index )
     return P[2 * ( i + nx * j + nx * ny * k ) + index];
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 // inline double &ChunkedArray::operator()( int i, int j, int k )
@@ -129,7 +129,7 @@ double &ChunkedArray::operator()( int i, int j, int k )
 {
     return P[2 * ( i + nx * j + nx * ny * k )];
 }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 // inline double &ChunkedArray::operator()( int i, int j, int k, int dir, int index )
@@ -144,7 +144,7 @@ double &ChunkedArray::operator()( int i, int j, int k, int dir, int index )
         return ( P[2 * ( j + ny * i + nx * ny * k ) + index] );
     }
 }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 // inline double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int k, int index )
@@ -178,7 +178,7 @@ double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int k, int
         return ( P[2 * ( chunkId * chunkSize / 2 + k + nz * j + nz * ny * i ) + index] );
     }
 }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 // inline double &ChunkedArray::operator()( int i )
@@ -200,13 +200,13 @@ ChunkedArray::~ChunkedArray()
 {
     if ( P != NULL )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc exit data delete ( P[0 : arraySize] )
 #endif
         delete[] P;
         //        free(P);
     }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc exit data delete ( this )
 #endif
 }

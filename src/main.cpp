@@ -267,9 +267,11 @@ int main( int argcs, char *pArgs[] )
 #if ( DEBUG1 )
     myfile.close();
 #endif
-
+if(INCLUDE_ERROE_CAL_IN_TIMING==0)
+{
     cout << " err = " << M.getError() << endl;
-    M.runInfo();
+}
+//    M.runInfo();
 #endif
 
 //#pragma acc parallel

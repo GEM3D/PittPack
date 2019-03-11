@@ -9,10 +9,18 @@
 
 #define SIZEMG 0
 #define OFFS 0
-//#define INNERITER 2
-//#define OUTERITER 1000
 
 using namespace std;
+
+typedef void (*exitroutinetype)(char *err_msg);
+extern void acc_set_error_routine(exitroutinetype callback_routine);
+
+void handle_gpu_errors(char *err_msg) {
+  printf("GPU Error: %s", err_msg);
+  printf("Exiting...\n\n");
+//  MPI_Abort(MPI_COMM_WORLD, 1);
+  exit(-1);
+}
 
 PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
 {
@@ -32,6 +40,9 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
     nyChunk = ny / p0;
     nzChunk = nz / p0;
 
+ //   acc_set_error_routine(&handle_gpu_errors);
+
+   
     //    cout<<" "<<nxChunk<<" "<<nyChunk<<" "<<" "<<nzChunk<<endl;
 
     MPIStartUp();
@@ -41,6 +52,7 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
     p1 = p0;
 
     nChunk = p0;
+
 
 #if ( !DISABLE_CHECKS )
     PittPackResult result = checkInput();
@@ -114,7 +126,7 @@ if( SOLUTIONMETHOD ==0)
     faceTag = new sint[6];
 
 // allocate some indices for help swap the data in-place rather than allocating a whole matrix
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc enter data create( this[0 : 1] )
 #pragma acc update device( this )
 #pragma acc enter data create( omega[0 : 3] )
@@ -143,11 +155,15 @@ if( SOLUTIONMETHOD ==0)
 #pragma acc update device( du[0 : nz] )
 #pragma acc enter data create( x1[0 : nz*gangTri] )
 #pragma acc enter data create( x2[0 : nz*gangTri] )
+
 if(SOLUTIONMETHOD!=0)
 {
 //#pragma acc enter data create( crpcr_lower[0 : nz*gangTri] )
 #pragma acc enter data create( crpcr_upper[0 : nz*gangTri] )
 }
+
+ cout<<"amount of memory allocated "<<acc_get_free_memory()<<endl;
+
 #endif
     /* impoartant note about nested classes is that we need to go from top to bottom, first have the highest level
          class copyin 'this' for that class and then once the address are set on the GPU, then copyin the lower level class
@@ -281,7 +297,7 @@ if(SOLUTIONMETHOD!=0)
     }
 
 // allocate some indices for help swap the data in-place rather than allocating a whole matrix
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc enter data create( this[0 : 1] )
 #pragma acc update device( this )
 #pragma acc enter data create( omega[0 : 3] )
@@ -317,6 +333,7 @@ if(SOLUTIONMETHOD!=0)
 //#pragma acc enter data create( crpcr_lower[0 : nz*gangTri] )
 #pragma acc enter data create( crpcr_upper[0 : nz*gangTri] )
 }
+ cout<<"amount of free memeory "<<acc_get_free_memory()/1e9<<endl;
 #endif
     /* impoartant note about nested classes is that we need to go from top to bottom, first have the highest level
          class copyin 'this' for that class and then once the address are set on the GPU, then copyin the lower level class
@@ -328,6 +345,8 @@ if(SOLUTIONMETHOD!=0)
     T.setElems( nChunk, nzChunk, subDiag, supDiag );
     MG.construct( ( nz + SIZEMG ), INNERITER, INNERITER, OUTERITER, subDiag, supDiag );
     MGC.construct( ( nz + SIZEMG ), INNERITER, INNERITER, OUTERITER, subDiag, supDiag );
+ 
+//    acc_map_data(P.P,P.P,2*nxChunk*nyChunk*nz*sizeof(double) ); 
 
 #if ( DEBUG )
     cout << "iaxsize " << iaxSize << endl;
@@ -335,7 +354,7 @@ if(SOLUTIONMETHOD!=0)
 #endif
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::setDiag( int i, int j )
@@ -343,7 +362,7 @@ void PencilDcmp::setDiag( int i, int j )
 
 double eig = getEigenVal( i, j ); 
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop
 #endif
     for ( int i = 0; i < nz; i++ )
@@ -360,7 +379,7 @@ void PencilDcmp::setBox( double *X )
         Xbox[i] = X[i];
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( Xbox[0 : 6] )
 #endif
 }
@@ -451,7 +470,7 @@ PencilDcmp::~PencilDcmp()
     }
 
 // freeing the resources should be in reverse order
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc exit data delete ( coords )
 #pragma acc exit data delete ( tags )
 #pragma acc exit data delete ( dxyz )
@@ -617,7 +636,7 @@ void PencilDcmp::getChunkSize()
     fullSize = size;
 
     chunkSize = size / p0;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( chunkSize )
 #pragma acc update device( fullSize )
 #endif
@@ -694,7 +713,7 @@ void PencilDcmp::setCoords( int dir )
     P.setCoords( X );
     setDxyz( Xbox );
 //   P.setDxyz();
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( dxyz[0 : 3] )
 #pragma acc update device( coords[0 : 6] )
 #pragma acc enter data copyin( X[0 : 6] )
@@ -722,7 +741,7 @@ void PencilDcmp::getNoOfChunk()
 {
     // number of chunks that every processor has
     nChunk = p0;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( nChunk )
 #endif
 }
@@ -817,7 +836,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
         start = getPeriodicIndex( i + j ) * P.chunkSize;
         end = P.chunkSize;
         ptr = &P( 0 ) + start;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update self( ptr[0 : end] ) async( 1 )
 #endif
         //   cout<<"start "<<start<<" end "<<end<<" periodic index "<<  getPeriodicIndex( i + j ) <<" chunkSize "<<P.chunkSize<<" ptr "
@@ -825,7 +844,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
 
         MPI_Irecv( &R( 0 ), P.chunkSize, MPI_DOUBLE, getPeriodicRank( i - j ), getPeriodicRank( i - j ), Comm, &request1 );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc wait( 1 )
 #endif
         MPI_Isend( &P( 0 ) + P.chunkSize * getPeriodicIndex( i + j ), P.chunkSize, MPI_DOUBLE, getPeriodicRank( i + j ), myRank, Comm,
@@ -837,7 +856,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
         ptr = &P( 0 ) + getPeriodicIndex( i - j ) * P.chunkSize;
         end = P.chunkSize;
 // P.moveDeviceToHost( getPeriodicIndex( i - j ) );
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update self( ptr[0 : end] ) async( 2 )
 #endif
         /// switch send/recv order
@@ -845,7 +864,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
         MPI_Irecv( &P( 0 ) + P.chunkSize * getPeriodicIndex( i + j ), P.chunkSize, MPI_DOUBLE, getPeriodicRank( i + j ),
                    getPeriodicRank( i + j ), Comm, &request3 );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc wait( 2 )
 #endif
         MPI_Isend( &P( 0 ) + P.chunkSize * getPeriodicIndex( i - j ), P.chunkSize, MPI_DOUBLE, getPeriodicRank( i - j ), myRank, Comm,
@@ -858,7 +877,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
         //      P.moveHostToDevice( getPeriodicIndex( i + j ) );
         ptr = &P( 0 ) + getPeriodicIndex( i + j ) * P.chunkSize;
         end = P.chunkSize;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( ptr[0 : end] ) async( 3 )
 #endif
 
@@ -871,7 +890,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
 #endif
 
         MPI_Wait( &request1, &status );
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc wait( 3 )
 #endif
         for ( int k = 0; k < P.chunkSize; k++ )
@@ -881,7 +900,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
         //        P.moveHostToDevice( getPeriodicIndex( i - j ) );
         ptr = &P( 0 ) + getPeriodicIndex( i - j ) * P.chunkSize;
         end = P.chunkSize;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( ptr[0 : end] )
 #endif
         //        #pragma acc wait
@@ -944,7 +963,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
         start = getPeriodicIndexStride( j ) * P.chunkSize;
         end = P.chunkSize;
         ptr = &P( 0 ) + start;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update self( ptr[0 : end] )
 #endif
         MPI_Irecv( &R( 0 ), P.chunkSize, MPI_DOUBLE, getPeriodicRankStride( -j ), getPeriodicRankStride( -j ), Comm, &request1 );
@@ -969,7 +988,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
         end = P.chunkSize;
 // P.moveDeviceToHost( getPeriodicIndex( i - j ) );
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update self( ptr[0 : end] )
 #endif
         MPI_Irecv( &P( 0 ) + P.chunkSize * getPeriodicIndexStride( j ), P.chunkSize, MPI_DOUBLE, getPeriodicRankStride( j ),
@@ -982,7 +1001,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
 
         ptr = &P( 0 ) + getPeriodicIndexStride( j ) * P.chunkSize;
         end = P.chunkSize;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( ptr[0 : end] )
 #endif
         // transfer from container to the desired location
@@ -996,7 +1015,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
         }
         ptr = &P( 0 ) + getPeriodicIndexStride( -j ) * P.chunkSize;
         end = P.chunkSize;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( ptr[0 : end] )
 #endif
 
@@ -1019,7 +1038,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
 
 #endif
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
 inline int PencilDcmp::getPeriodicRank( int index )
@@ -1344,7 +1363,7 @@ void PencilDcmp::IO( int app, int dir, int aligndir )
 }
 
 /*
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 static double sine( double x )
@@ -1352,7 +1371,7 @@ static double sine( double x )
     return ( sin( x ) );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 static double cosine( double x )
@@ -1361,12 +1380,13 @@ static double cosine( double x )
 }
 */
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 static double exactValue( double x, int tg )
 {
     double ans = 0.0;
+
 
     if ( tg == 0 )
     {
@@ -1389,7 +1409,7 @@ static double exactValue( double x, int tg )
     return ( ans );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::initializeTrigonometric()
@@ -1406,8 +1426,8 @@ void PencilDcmp::initializeTrigonometric()
     double c1, c2, c3;
     double shift = SHIFT;
 
-    int Nx = nx / p0;
-    int Ny = ny / p0;
+    int Nx = nxChunk;
+    int Ny = nyChunk;
     int Nz = nz;
 
     if ( !SHIFT )
@@ -1433,10 +1453,13 @@ void PencilDcmp::initializeTrigonometric()
     cout << "xmin = " << Xa + 0 * c1 + shift *c1 * .5 << " xmax " << Xa + ( Nx - 1 ) * c1 + shift * c1 * .5 << endl;
     ;
 #endif
-    double omega[3] = {pi, 2. * pi, 3. * pi};
+    double omega[3] = {COEFF0*pi, COEFF1 * pi, COEFF2 * pi};
 
-#if ( OPENACC )
-#pragma acc loop gang private( x, y, z )
+#if(1)
+
+#if ( PITTPACKACC )
+#pragma acc loop gang private( x,y,z )
+//#pragma acc loop gang 
 #endif
     for ( int k = 0; k < Nz; k++ )
     {
@@ -1449,8 +1472,8 @@ void PencilDcmp::initializeTrigonometric()
             z = Za + k * c3 + shift * c3 * 0.5;
         }
 
-#if ( OPENACC )
-#pragma acc loop worker
+#if ( PITTPACKACC )
+#pragma acc loop worker private(y) 
 #endif
         for ( int j = 0; j < Ny; j++ )
         {
@@ -1463,8 +1486,9 @@ void PencilDcmp::initializeTrigonometric()
                 y = Ya + j * c2 + shift * c2 * 0.5;
             }
 
-#if ( OPENACC )
-#pragma acc loop vector
+#if ( PITTPACKACC )
+#pragma acc loop vector 
+//#pragma acc loop 
 #endif
             for ( int i = 0; i < Nx; i++ )
             {
@@ -1493,8 +1517,6 @@ void PencilDcmp::initializeTrigonometric()
                    )
                                           * exactValue( omega[2] * z, tags[2] ) ) * c3 * c3;
 
-
-
                                     P( i, j, k, 1 ) = 0.0;
                 */
 
@@ -1509,7 +1531,9 @@ void PencilDcmp::initializeTrigonometric()
                 }
                 else
                 {
-                    P( i, j, k )
+
+//  For big mesh sizes calling class operator calls problems
+                    P( i, j, k,0)
                     = ( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
                         * exactValue( omega[2] * z, tags[2] ) + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] )
                                                                 * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
@@ -1517,6 +1541,19 @@ void PencilDcmp::initializeTrigonometric()
                           * exactValue( omega[2] * z, tags[2] ) ) * c3 * c3;
 
                     P( i, j, k, 1 ) = 0.0;
+/*
+
+
+                  P.P[2*(i+nxChunk*j+nxChunk*nyChunk*k)]
+                    = ( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                        * exactValue( omega[2] * z, tags[2] ) + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] )
+                                                                * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
+                        + ( omega[2] * omega[2] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                          * exactValue( omega[2] * z, tags[2] ) ) * c3 * c3;
+ 
+
+                  P.P[2*(i+nxChunk*j+nxChunk*nyChunk*k)+1]=0.0;
+*/
                 }
 //   P(i,j,k,0)=(x*y*z);
 //   P(i,j,k,1)=(x*y*z);
@@ -1544,6 +1581,7 @@ void PencilDcmp::initializeTrigonometric()
     }
     // P.moveHostToDevice();
 
+#endif
     /*
         if ( bc[0] != 'P' && bc[2] != 'P' )
         {
@@ -1553,7 +1591,7 @@ void PencilDcmp::initializeTrigonometric()
     */
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 // double PencilDcmp::getError(  )
@@ -1600,12 +1638,12 @@ double PencilDcmp::getError()
     cout << " rank " << myRank << " c1  " << c1 << " " << c2 << " " << c3 << endl;
     cout << " rank " << myRank << " N:  " << Nx << " " << Ny << " " << Nz << endl;
 #endif
-    double omega[3] = {pi, 2. * pi, 3. * pi};
+    double omega[3] = {COEFF0*pi, COEFF1 * pi, COEFF2 * pi};
 
     double val = 0.0;
     double val1 = 0.0;
 #if ( 1 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang private( x, y, z, val, val1 )
 #endif
     for ( int k = 0; k < Nz; k++ )
@@ -1619,7 +1657,7 @@ double PencilDcmp::getError()
             z = Za + k * c3 + shift * c3 * 0.5;
         }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
         for ( int j = 0; j < Ny; j++ )
@@ -1633,7 +1671,7 @@ double PencilDcmp::getError()
                 y = Ya + j * c2 + shift * c2 * 0.5;
             }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector // private(val,val1)
 #endif
             for ( int i = 0; i < Nx; i++ )
@@ -1674,7 +1712,7 @@ double PencilDcmp::getError()
     double finalErr = 0.0;
 
 //#pragma acc loop vector reduction(+:err)
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector firstprivate( err ) reduction( + : err )
 #endif
     for ( int i = 0; i < unitSize; i++ )
@@ -1696,12 +1734,12 @@ double PencilDcmp::getError()
 #endif
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::debug()
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
     for ( int i = 0; i < 6; i++ )
@@ -1711,7 +1749,7 @@ void PencilDcmp::debug()
 }
 
 #if ( REV == 0 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::rearrangeX2Y()
@@ -1719,7 +1757,7 @@ void PencilDcmp::rearrangeX2Y()
     double tmp[2 * NXCHUNK1 * NYCHUNK1];
 
 /*
-#if ( OPENACC )
+#if ( PITTPACKACC )
     double tmp[2 * NXCHUNK * NYCHUNK];
 #else
 
@@ -1727,23 +1765,23 @@ void PencilDcmp::rearrangeX2Y()
 #endif
 */
 // rearranges x to y
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang private( tmp[2 * nxChunk *nyChunk] )
 #endif
     for ( int id = 0; id < nChunk; id++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
         for ( int k = 0; k < nzChunk; k++ )
         {
             assignTempX2Y( id, k, tmp );
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
             for ( int j = 0; j < nyChunk; j++ )
             {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
                 for ( int i = 0; i < nxChunk; i++ )
@@ -1761,11 +1799,12 @@ void PencilDcmp::rearrangeX2Y()
 
 #else
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::rearrangeX2Y()
 {
+#pragma acc loop seq
     for ( int id = 0; id < nChunk; id++ )
     {
         assignTempX2Yv1( id );
@@ -1775,17 +1814,17 @@ void PencilDcmp::rearrangeX2Y()
 
 #endif
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine worker
 #endif
 void PencilDcmp::assignTempX2Y( const int chunkId, const int k, double *tmp )
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
     for ( int j = 0; j < nyChunk; j++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
         for ( int i = 0; i < nxChunk; i++ )
@@ -1796,22 +1835,22 @@ void PencilDcmp::assignTempX2Y( const int chunkId, const int k, double *tmp )
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::assignTempX2Yv1( const int chunkId )
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
     for ( int k = 0; k < nzChunk; k++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
         for ( int j = 0; j < nyChunk; j++ )
         {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int i = 0; i < nxChunk; i++ )
@@ -1829,22 +1868,22 @@ void PencilDcmp::assignTempX2Yv1( const int chunkId )
         }
     }
 }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::assignBackTempX2Y( const int chunkId )
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
     for ( int k = 0; k < nzChunk; k++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
         for ( int j = 0; j < nyChunk; j++ )
         {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int i = 0; i < nxChunk; i++ )
@@ -1864,22 +1903,22 @@ void PencilDcmp::assignBackTempX2Y( const int chunkId )
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::assignTempY2X( const int chunkId )
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
     for ( int k = 0; k < nzChunk; k++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
         for ( int i = 0; i < nxChunk; i++ )
         {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int j = 0; j < nyChunk; j++ )
@@ -1898,7 +1937,7 @@ void PencilDcmp::assignTempY2X( const int chunkId )
     }
 
     /*
-    #if ( OPENACC )
+    #if ( PITTPACKACC )
     #pragma acc loop gang
     #endif
         for ( int i = 0; i < 2*nxChunk*nyChunk*nzChunk; i++ )
@@ -1908,22 +1947,22 @@ void PencilDcmp::assignTempY2X( const int chunkId )
     */
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::assignBackTempY2X( const int chunkId )
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
     for ( int k = 0; k < nzChunk; k++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
         for ( int i = 0; i < nxChunk; i++ )
         {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int j = 0; j < nyChunk; j++ )
@@ -1940,30 +1979,30 @@ void PencilDcmp::assignBackTempY2X( const int chunkId )
 }
 
 #if ( REV == 0 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::rearrangeX2YInverse()
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
     double tmp[2 * NXCHUNK1 * NYCHUNK1];
 #endif
     // rearranges x to y
     for ( int id = 0; id < nChunk; id++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
         for ( int k = 0; k < nzChunk; k++ )
         {
             assignTempX2Y( id, k, tmp );
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
 
             for ( int i = 0; i < nxChunk; i++ )
             {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
                 for ( int j = 0; j < nyChunk; j++ )
@@ -1977,12 +2016,13 @@ void PencilDcmp::rearrangeX2YInverse()
 }
 #else
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::rearrangeX2YInverse()
 {
     // rearranges x to y
+#pragma acc loop seq
     for ( int id = 0; id < nChunk; id++ )
     {
         assignTempY2X( id );
@@ -1993,22 +2033,22 @@ void PencilDcmp::rearrangeX2YInverse()
 
 #endif
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::assignTempY2Z( const int chunkId )
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
     for ( int k = 0; k < nzChunk; k++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
         for ( int j = 0; j < nyChunk; j++ )
         {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int i = 0; i < nxChunk; i++ )
@@ -2027,7 +2067,7 @@ void PencilDcmp::assignTempY2Z( const int chunkId )
 
 // basically assigns the array with chunksizeto a tmeporary array which
 // same function of X2Y rotation is used
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::rearrangeY2Z()
@@ -2039,7 +2079,7 @@ void PencilDcmp::rearrangeY2Z()
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::rearrangeY2ZInverse()
@@ -2051,22 +2091,22 @@ void PencilDcmp::rearrangeY2ZInverse()
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::assignBackTempY2Z( const int chunkId )
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
     for ( int k = 0; k < nzChunk; k++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
         for ( int j = 0; j < nyChunk; j++ )
         {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int i = 0; i < nxChunk; i++ )
@@ -2089,22 +2129,22 @@ void PencilDcmp::assignBackTempY2Z( const int chunkId )
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::assignTempZ2Y( const int chunkId )
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
     for ( int k = 0; k < nzChunk; k++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
         for ( int j = 0; j < nyChunk; j++ )
         {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int i = 0; i < nxChunk; i++ )
@@ -2125,22 +2165,22 @@ void PencilDcmp::assignTempZ2Y( const int chunkId )
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::assignBackTempZ2Y( const int chunkId )
 {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
     for ( int k = 0; k < nzChunk; k++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
         for ( int j = 0; j < nyChunk; j++ )
         {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int i = 0; i < nxChunk; i++ )
@@ -2302,7 +2342,7 @@ void PencilDcmp::setUpShuffleArraysX( vector<shuffle0> &a )
 
     cout << " xSize  " << xSize <<" iaxSize  "<< endl;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( iaxSize )
 #pragma acc update device( jaxSize )
 
@@ -2320,14 +2360,14 @@ void PencilDcmp::setUpShuffleArraysX( vector<shuffle0> &a )
 // this is designed for first transform
 //  I will generalize this for any direction
 // trying to convert local to global to get the global one
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 inline sint PencilDcmp::oldIndexX( const sint chunkId, const sint j, const sint k )
 {
     return ( chunkId * nyChunk * nzChunk + nyChunk * k + j );
 }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 inline sint PencilDcmp::getDestinationLocX( const sint id )
@@ -2343,7 +2383,7 @@ inline sint PencilDcmp::getDestinationLocX( const sint id )
     return ( index0 );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 inline void PencilDcmp::decomposeOldIndexX( const sint id, sint &chunkId, sint &j, sint &k )
@@ -2486,7 +2526,7 @@ void PencilDcmp::setUpShuffleArraysY( vector<shuffle0> &a )
     int ySize = 2 * a.size() * nyChunk + 1;
     tmpY = new double[ySize];
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( iaySize )
 #pragma acc update device( jaySize )
 
@@ -2503,14 +2543,14 @@ void PencilDcmp::setUpShuffleArraysY( vector<shuffle0> &a )
 #endif
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 inline sint PencilDcmp::oldIndexY( const sint chunkId, const sint i, const sint k )
 {
     return ( chunkId * nxChunk * nzChunk + nxChunk * k + i );
 }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 inline sint PencilDcmp::getDestinationLocY( const sint id )
@@ -2524,7 +2564,7 @@ inline sint PencilDcmp::getDestinationLocY( const sint id )
     return ( index0 );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 inline void PencilDcmp::decomposeOldIndexY( const sint id, sint &chunkId, sint &i, sint &k )
@@ -2534,7 +2574,7 @@ inline void PencilDcmp::decomposeOldIndexY( const sint id, sint &chunkId, sint &
     i = ( id % ( nxChunk * nzChunk ) ) % nxChunk;
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void PencilDcmp::saveToTmp( const sint id, double *tmp, sint dir )
@@ -2552,7 +2592,7 @@ void PencilDcmp::saveToTmp( const sint id, double *tmp, sint dir )
     {
         N = nzChunk;
     }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int i = 0; i < 2 * N; i++ )
@@ -2561,7 +2601,7 @@ void PencilDcmp::saveToTmp( const sint id, double *tmp, sint dir )
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void PencilDcmp::restoreTmp( const sint id, double *tmp, sint dir )
@@ -2580,7 +2620,7 @@ void PencilDcmp::restoreTmp( const sint id, double *tmp, sint dir )
         N = nzChunk;
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( sint i = 0; i < 2 * N; i++ )
@@ -2589,14 +2629,14 @@ void PencilDcmp::restoreTmp( const sint id, double *tmp, sint dir )
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::changeLocationX()
 {
     double *tm;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 //#pragma acc loop worker private( tm[1] )
 #pragma acc loop private( tm[1] )
 #endif
@@ -2607,7 +2647,7 @@ void PencilDcmp::changeLocationX()
         saveToTmp( jax[iax[i + 1] - 1], tm, 0 );
 
         //       cout<<" iax "<< iax[i]<<" iax+1  "<<iax[i+1]<<endl;
-        //#if(OPENACC)
+        //#if(PITTPACKACC)
         //#pragma acc loop worker
         //#endif
         for ( sint j = iax[i + 1] - 1; j > iax[i]; j-- )
@@ -2620,14 +2660,14 @@ void PencilDcmp::changeLocationX()
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::changeLocationY()
 {
     double *tm;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang private( tm[1] )
 #endif
     for ( sint i = 0; i < iaySize; i++ )
@@ -2642,7 +2682,7 @@ void PencilDcmp::changeLocationY()
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 //#pragma acc routine gang
 #endif
@@ -2650,7 +2690,7 @@ void PencilDcmp::restoreLocationY()
 {
     double *tm;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang private( tm[1] )
 #endif
     for ( sint i = 0; i < iaySize; i++ )
@@ -2667,7 +2707,7 @@ void PencilDcmp::restoreLocationY()
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 //#pragma acc routine vector
 #endif
@@ -2675,7 +2715,7 @@ void PencilDcmp::restoreLocationX()
 {
     double *tm;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang private( tm[1] )
 #endif
     for ( sint i = 0; i < iaxSize; i++ )
@@ -2692,7 +2732,7 @@ void PencilDcmp::restoreLocationX()
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void PencilDcmp::saveToDest( const sint source, const sint dest, sint dir )
@@ -2712,7 +2752,7 @@ void PencilDcmp::saveToDest( const sint source, const sint dest, sint dir )
         N = nzChunk;
     }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( sint i = 0; i < 2 * N; i++ )
@@ -2721,7 +2761,7 @@ void PencilDcmp::saveToDest( const sint source, const sint dest, sint dir )
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void PencilDcmp::saveTmpToDest( const double *tmp, const sint dest, sint dir )
@@ -2739,7 +2779,7 @@ void PencilDcmp::saveTmpToDest( const double *tmp, const sint dest, sint dir )
     {
         N = nzChunk;
     }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( sint i = 0; i < 2 * N; i++ )
@@ -2788,7 +2828,7 @@ void PencilDcmp::printY( ofstream &myfile )
     myfile << endl;
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::rescale()
@@ -2798,17 +2838,17 @@ void PencilDcmp::rescale()
 #endif
     for ( int id = 0; id < nChunk; id++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
         for ( int i = 0; i < nxChunk; i++ )
         {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
             for ( int j = 0; j < nyChunk; j++ )
             {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
                 for ( int k = 0; k < nzChunk; k++ )
@@ -2859,7 +2899,7 @@ void PencilDcmp::setEigenVal()
         denum[1] = 0.0;
         freqs[1] = 2 * freqs[1];
     }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( num[0 : 2] )
 #pragma acc update device( denum[0 : 2] )
 #pragma acc update device( freqs[0 : 2] )
@@ -2908,7 +2948,7 @@ void PencilDcmp::assignBoundary( char *boundary )
     }
 
 //#pragma acc enter data create( bc[0 : 6] )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( bc[0 : 6] )
 #pragma acc update device( faceTag[0 : 6] )
 #endif
@@ -2919,7 +2959,7 @@ void PencilDcmp::assignBoundary( char *boundary )
 
 //  runInfo();
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( tags[0 : 3] )
 #endif
 }
@@ -2968,7 +3008,7 @@ void PencilDcmp::setScale()
     scale = sc[0] * sc[1];
 
     std::cout << "scale " << scale << std::endl;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc update device( scale )
 #endif
 }
@@ -3023,7 +3063,7 @@ void PencilDcmp::detectTransforms()
 
     // detect the number of di
 }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 int PencilDcmp::thomas( int i, int j, int dir, int index )
@@ -3113,7 +3153,7 @@ result=THOMAS_FAIL;
     return ( result );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 void PencilDcmp::thomasSingleBlock( int i, int j, int dir, int index )
@@ -3164,7 +3204,7 @@ void PencilDcmp::thomasSingleBlock( int i, int j, int dir, int index )
     T.thomasSingleBlock( P, onDiag, i, j, dir, index );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
 void PencilDcmp::thomasPeriodic( int i, int j, int dir, int index )
@@ -3195,7 +3235,7 @@ void PencilDcmp::thomasPeriodic( int i, int j, int dir, int index )
 #if ( 0 )
 // this is an in-place solve for thomas in the blocks
 // wastes bandwidth and is not prefered for GPU
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 int PencilDcmp::solve()
@@ -3211,12 +3251,12 @@ int PencilDcmp::solve()
     // PittPackResult result=SUCCESS;
     int result = 0;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
     for ( int j = 0; j < nxChunk; j++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 //#pragma acc loop worker  firstprivate(result) reduction(+:result)
 #pragma acc loop worker
 #endif
@@ -3228,7 +3268,7 @@ int PencilDcmp::solve()
             {
                 if ( bc[4] == 'P' && bc[5] == 'P' )
                 {
-                    //#if ( OPENACC )
+                    //#if ( PITTPACKACC )
                     // this loop is by nature serial, do not try to parallalize it
                     //#endif
                     for ( int k = 0; k < num; k++ )
@@ -3239,7 +3279,7 @@ int PencilDcmp::solve()
                 }
                 else
                 {
-                    //#if ( !OPENACC )
+                    //#if ( !PITTPACKACC )
                     // this loop is by nature serial, do not try to parallalize it
                     //#endif
                     for ( int k = 0; k < num; k++ )
@@ -3284,7 +3324,7 @@ int PencilDcmp::solve()
 // continue form here
 
 #if ( 1 )
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::fillInArrayContig( const int i, const int j, int index )
@@ -3333,7 +3373,7 @@ tm=tmpMGImag;
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::solveMG()
@@ -3424,7 +3464,7 @@ void PencilDcmp::solveMG()
     // printf("number without MG %d\n",count );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::solveMGC()
@@ -3498,7 +3538,7 @@ void PencilDcmp::solveMGC()
     // printf("number without MG %d\n",count );
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::fillInArrayBack( const int i, const int j, const int index )
@@ -3525,7 +3565,7 @@ void PencilDcmp::fillInArrayBack( const int i, const int j, const int index )
     }
     //      cout<<"-------------------"<<endl;
 }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::copyAnsFromMG( int index )
@@ -3551,7 +3591,7 @@ void PencilDcmp::copyAnsFromMG( int index )
     }
 }
 // do not forget the negative sign
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::copySourceToMG( int index )
@@ -3577,7 +3617,7 @@ void PencilDcmp::copySourceToMG( int index )
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 int PencilDcmp::solveThm( const int index )
@@ -3662,10 +3702,10 @@ void PencilDcmp::eigenVal( ofstream &myfile )
     myfile << endl;
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine
 #endif
-real PencilDcmp::getEigenVal( int i, int j )
+PittPackReal PencilDcmp::getEigenVal( int i, int j )
 {
     // note that we perform solve when the data is aligned in y direction
     // i and j are goind to be swapped in the thomas call
@@ -3696,7 +3736,7 @@ real PencilDcmp::getEigenVal( int i, int j )
 PittPackResult PoissonGPU::initializeAndBind()
 {
     PittPackResult result = SUCCESS;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 
 int nodalComSize;
 
@@ -3767,7 +3807,7 @@ void PencilDcmp::preprocessSignalAccordingly( const int direction, const int cou
         }
     }
 }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::postprocessSignalAccordingly( const int direction, const int counter )
@@ -3787,7 +3827,7 @@ void PencilDcmp::postprocessSignalAccordingly( const int direction, const int co
 
     if ( tags[counter] == 0 )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
         for ( int k = 0; k < limit0 * nzChunk; k++ )
@@ -3797,7 +3837,7 @@ void PencilDcmp::postprocessSignalAccordingly( const int direction, const int co
     }
     else if ( tags[counter] == 1 )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
         for ( int k = 0; k < nzChunk * limit0; k++ )
@@ -3806,7 +3846,7 @@ void PencilDcmp::postprocessSignalAccordingly( const int direction, const int co
         }
     }
 }
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::postprocessSignalAccordinglyReverse( const int direction, const int counter )
@@ -3826,7 +3866,7 @@ void PencilDcmp::postprocessSignalAccordinglyReverse( const int direction, const
 
     if ( tags[counter] == 0 )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
         for ( int k = 0; k < nzChunk * limit0; k++ )
@@ -3836,7 +3876,7 @@ void PencilDcmp::postprocessSignalAccordinglyReverse( const int direction, const
     }
     else if ( tags[counter] == 1 )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
         for ( int k = 0; k < nzChunk * limit0; k++ )
@@ -3846,7 +3886,7 @@ void PencilDcmp::postprocessSignalAccordinglyReverse( const int direction, const
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::preprocessSignalAccordinglyReverse( const int direction, const int counter )
@@ -3866,7 +3906,7 @@ void PencilDcmp::preprocessSignalAccordinglyReverse( const int direction, const 
     }
     if ( tags[counter] == 0 )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
         for ( int k = 0; k < nzChunk * limit0; k++ )
@@ -3876,7 +3916,7 @@ void PencilDcmp::preprocessSignalAccordinglyReverse( const int direction, const 
     }
     else if ( tags[counter] == 1 )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
         for ( int k = 0; k < nzChunk * limit0; k++ )
@@ -3886,8 +3926,8 @@ void PencilDcmp::preprocessSignalAccordinglyReverse( const int direction, const 
     }
 }
 
-#if ( OPENACC )
-#pragma acc routine worker
+#if ( PITTPACKACC )
+#pragma acc routine gang
 #endif
 void PencilDcmp::modifyRhsDirichlet()
 {
@@ -3937,13 +3977,13 @@ void PencilDcmp::modifyRhsDirichlet()
         z = Za;
         //      cout << YELLOW << " Zmin " << z << RESET << endl;
         int k = 0;
-#if ( OPENACC )
-#pragma acc loop worker private( x, y )
+#if ( PITTPACKACC )
+#pragma acc loop gang private( x, y )
 #endif
         for ( int i = 0; i < nxChunk; i++ )
         {
             x = Xa + i * c1 + shift * c1 * .5;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int j = 0; j < nyChunk; j++ )
@@ -3963,13 +4003,13 @@ void PencilDcmp::modifyRhsDirichlet()
         //        cout << YELLOW << " Zmax " << z << RESET << endl;
 
         int k = Nz - 1;
-#if ( OPENACC )
-#pragma acc loop worker private( x, y )
+#if ( PITTPACKACC )
+#pragma acc loop gang private( x, y )
 #endif
         for ( int i = 0; i < nxChunk; i++ )
         {
             x = Xa + i * c1 + shift * c1 * .5;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int j = 0; j < nyChunk; j++ )
@@ -3987,13 +4027,13 @@ void PencilDcmp::modifyRhsDirichlet()
         x = Xa;
         int i = 0;
 //        cout << YELLOW << " Xmin " << x << RESET << endl;
-#if ( OPENACC )
-#pragma acc loop worker private( z, y )
+#if ( PITTPACKACC )
+#pragma acc loop gang private( z, y )
 #endif
         for ( int k = 0; k < nzChunk * nChunk; k++ )
         {
             z = Za + k * c3 + shift * c3 * .5;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int j = 0; j < nyChunk; j++ )
@@ -4012,13 +4052,13 @@ void PencilDcmp::modifyRhsDirichlet()
         x = Xa + ( i + 1 ) * c1;
 //  cout << YELLOW << " Xmax " << x << RESET << endl;
 
-#if ( OPENACC )
-#pragma acc loop worker private( z, y )
+#if ( PITTPACKACC )
+#pragma acc loop gang private( z, y )
 #endif
         for ( int k = 0; k < nzChunk * nChunk; k++ )
         {
             z = Za + k * c3 + shift * c3 * .5;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int j = 0; j < nyChunk; j++ )
@@ -4036,13 +4076,13 @@ void PencilDcmp::modifyRhsDirichlet()
         int j = 0;
 
 //    cout << YELLOW << " Ymin " << y << RESET << endl;
-#if ( OPENACC )
-#pragma acc loop worker private( z, x )
+#if ( PITTPACKACC )
+#pragma acc loop gang private( z, x )
 #endif
         for ( int k = 0; k < nzChunk * nChunk; k++ )
         {
             z = Za + k * c3 + shift * c3 * .5;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int i = 0; i < nxChunk; i++ )
@@ -4059,13 +4099,13 @@ void PencilDcmp::modifyRhsDirichlet()
         int j = nyChunk - 1;
         y = Ya + ( j + 1 ) * c2;
 // cout << YELLOW << " Ymax " << y << RESET << endl;
-#if ( OPENACC )
-#pragma acc loop worker private( z, x )
+#if ( PITTPACKACC )
+#pragma acc loop gang private( z, x )
 #endif
         for ( int k = 0; k < nzChunk * nChunk; k++ )
         {
             z = Za + k * c3 + shift * c3 * .5;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
             for ( int i = 0; i < nxChunk; i++ )
@@ -4083,7 +4123,7 @@ PittPackResult OPENACC_Init( int &my_rank, int &com_size ) /*!relates initialize
 {
     PittPackResult result = SUCCESS;
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
      int nodalComSize;
 
     acc_init( acc_device_nvidia ); // OpenACC call
@@ -4143,6 +4183,15 @@ const char *PittPackGetErrorEnum( PittPackResult error )
 
         case INPUT_ARGS:
             return ( "\n   number of input arguments are not correct \n " );
+        case CUFFT_FAIL_X:
+            return ( "\n   CUFFT failed in X-transform  \n " );
+        case CUFFT_FAIL_Y:
+            return ( "\n   CUFFT failed in Y-transform \n " );
+         case CUFFT_FAIL_INV_X:
+            return ( "\n   CUFFT failed in inverse X-transform  \n " );
+        case CUFFT_FAIL_INV_Y:
+            return ( "\n   CUFFT failed in inverse Y-transform \n " );
+ 
     }
 
     return "<unknown>";
@@ -4182,7 +4231,7 @@ void PencilDcmp::runInfo()
         PittOut << "*********************************************************\n" << endl;
         PittOut << "              PittPack: " << nameAppendix << "        \n" << endl;
         PittOut << "*********************************************************\n" << endl;
-#if ( OPENACC )
+#if ( PITTPACKACC )
         PittOut << "                     GPU-Solution                          \n" << endl;
 #else
         PittOut << "                     CPU-Solution                          \n" << endl;
@@ -4216,7 +4265,7 @@ void PencilDcmp::runInfo()
                 PittOut << "# Solution Method in Z-direction  = " << " CR-P " << endl;
         }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
         PittOut << "# number of GPUs = " << comSize << endl;
 #else
         PittOut << "# number of processors = " << comSize << endl;
@@ -4254,12 +4303,12 @@ void PencilDcmp::runInfo()
         PittOut << "                Run-Time  = " << runTime << " (s) "
                 << "\n" << endl;
         PittOut << "---------------------------------------------------------\n" << endl;
-        cout << "Grid siz= [ " << nxChunk *nChunk << " * " << nyChunk *nChunk << " * " << nzChunk << "], error = " << finalErr
+        cout << "Grid siz= [ " << nxChunk *nChunk << " * " << nyChunk *nChunk << " * " << nzChunk* nChunk << "], error = " << finalErr
              << ", time = " << runTime << " (s) " << endl;
     }
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 int PencilDcmp::solveThmBatch( const int index )
@@ -4281,7 +4330,7 @@ int PencilDcmp::solveThmBatch( const int index )
   for ( int j = 0; j < nxChunk; j++ )
     {
 // calculate i and j 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop private(eig)
 #endif
         for ( int i = 0; i < nyChunk; i++ )
@@ -4349,7 +4398,7 @@ int PencilDcmp::solveThmBatch( const int index )
 
 
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine worker
 #endif
 void PencilDcmp::fillInArrayContig( const int i, const int j,int index, double *container )
@@ -4389,18 +4438,18 @@ cout<<container[i]<<endl;
 }
 
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine worker
 #endif
 void PencilDcmp::fillInArrayBack( const int i, const int j, const int index, double *container )
 {
 //     cout<<"after"<<endl;
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop worker
 #endif
     for ( int id = 0; id < nChunk; id++ )
     {
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
         for ( int k = 0; k < nzChunk; k++ )
@@ -4421,7 +4470,7 @@ void PencilDcmp::fillInArrayBack( const int i, const int j, const int index, dou
     //      cout<<"-------------------"<<endl;
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::solvePCR( const int index )
@@ -4433,7 +4482,7 @@ void PencilDcmp::solvePCR( const int index )
   for ( int j = 0; j < nxChunk; j++ )
     {
 // calculate i and j 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc loop private(eig)
 #endif
         for ( int i = 0; i < nyChunk; i++ )
@@ -4452,7 +4501,7 @@ void PencilDcmp::solvePCR( const int index )
 }
 
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
 void PencilDcmp::solveCRP( const int index )
@@ -4494,7 +4543,7 @@ void PencilDcmp::solveCRP( const int index )
 
 
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine worker
 #endif
 void PencilDcmp::fillInArrayContigNormalize( const int i, const int j,int index, double *container,double eig )
@@ -4524,7 +4573,7 @@ double eigInv=1./eig;
 
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
 void PencilDcmp::offDiagNormalize( const int i, const int j, double *lower,double *upper,double eig )
@@ -4553,7 +4602,7 @@ double eigInv=1./eig;
 
 }
 
-#if ( OPENACC )
+#if ( PITTPACKACC )
 #pragma acc routine worker
 #endif
 void PencilDcmp::fillInArrayBack( const int i, const int j,double *container, const int index )

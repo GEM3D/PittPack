@@ -16,6 +16,7 @@ void PoissonGPU::performTransformXdir() /*!< Is called on Host and Runs on GPU*/
        if(CUFFT_SUCCESS!= cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_FORWARD ))
        {
         cout << " Exit Code : " << PittPackGetErrorEnum( CUFFT_FAIL_X ) << endl; 
+        exit(CUFFT_FAIL_X);
        }
         cufftDestroy( plan );
     }
@@ -35,6 +36,7 @@ void PoissonGPU::performInverseTransformXdir() /*!< Called on Host and Ran on GP
         if(CUFFT_SUCCESS!=cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_INVERSE ))
         {
         cout << " Exit Code : " << PittPackGetErrorEnum( CUFFT_FAIL_INV_X ) << endl; 
+        exit(CUFFT_FAIL_INV_X);
         }
         cufftDestroy( plan );
     }
@@ -54,6 +56,7 @@ void PoissonGPU::performTransformYdir() /*!< Called on Host and Ran on GPU*/
        if(CUFFT_SUCCESS!= cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_FORWARD ))
         {       
         cout << " Exit Code : " << PittPackGetErrorEnum( CUFFT_FAIL_Y ) << endl; 
+        exit(CUFFT_FAIL_Y);
         }
         cufftDestroy( plan );
     }
@@ -74,6 +77,7 @@ void PoissonGPU::performInverseTransformYdir() /*!< Called on Host and Ran on GP
         if(CUFFT_SUCCESS!=cufftExecZ2Z( plan, (cufftDoubleComplex *)( ptr ), (cufftDoubleComplex *)( ptr ), CUFFT_INVERSE ))
         {
         cout << " Exit Code : " << PittPackGetErrorEnum( CUFFT_FAIL_INV_Y ) << endl; 
+        exit(CUFFT_FAIL_INV_Y);
          }
         cufftDestroy( plan );
     }

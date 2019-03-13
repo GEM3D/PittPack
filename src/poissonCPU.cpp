@@ -407,6 +407,12 @@ void PoissonCPU::pittPack()
 */
 
          solveThmBatch( 0 );
+
+    if ( bc[0] == 'P' || bc[2] == 'P' )
+{
+         solveThmBatch( 1 );
+}
+
 //         solveThm(0);
 
 

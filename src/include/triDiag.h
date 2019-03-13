@@ -20,10 +20,11 @@ class TriDiag
     double *supDiag = NULL; /*!< upper diagonal values*/
     int     nzChunk;        /*!< number of points at z-direction for every chunk */
     int     nChunk;         /*!< number of chunks*/
+    char    *bc=NULL;
 
     public:
     TriDiag(){};                                                  /*!< class constructor */
-    void setElems( int nCh, int nzCh, double *sub, double *sup ); /*!< assigns the private variables after construction */
+    void setElems( int nCh, int nzCh, double *sub, double *sup); /*!< assigns the private variables after construction */
 #pragma acc routine
     void thomas( ChunkedArray &P, double *onDiag, const int i, const int j, const int dir,
                  const int index ); /*!< thomas with Dirichlet and Neuman Boundary conditions */
@@ -52,6 +53,8 @@ class TriDiag
 
 #pragma acc routine seq
    void thomasLowMem(int N, double *a, double *b, double *c, double *r, double *gam);
+
+void assignBC(char* BC);
 
     ~TriDiag(); /*!< destructor of the class*/
 };

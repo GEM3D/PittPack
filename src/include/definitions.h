@@ -36,7 +36,7 @@ using namespace std;
 typedef unsigned short sint;
 #else
 // typedef unsigned int sint;
-typedef int sint;
+typedef unsigned long sint;
 #endif
 
 

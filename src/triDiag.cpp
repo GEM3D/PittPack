@@ -2,13 +2,20 @@
 #include "mathFunction.h"
 #include "params.h"
 
-void TriDiag::setElems( int nCh, int nzCh, double *sub, double *sup )
+void TriDiag::setElems( int nCh, int nzCh, double *sub, double *sup)
 {
     nChunk = nCh;
     nzChunk = nzCh;
 
     subDiag = new double[3];
     supDiag = new double[3];
+    bc = new char[2];
+
+/*
+    bc[0]=BC[4];
+    bc[1]=BC[5];
+
+*/
 
     for ( int i = 0; i < 3; i++ )
     {
@@ -23,7 +30,18 @@ void TriDiag::setElems( int nCh, int nzCh, double *sub, double *sup )
 #pragma acc update device( subDiag[0 : 3] )
 #pragma acc enter data create( supDiag[0 : 3] )
 #pragma acc update device( supDiag[0 : 3] )
+#pragma acc enter data create( bc[0 : 2] )
 #endif
+}
+
+void TriDiag::assignBC(char* BC)
+{
+
+    bc[0]=BC[4];
+    bc[1]=BC[5];
+
+#pragma acc update device( bc[0 : 2] )
+
 }
 
 TriDiag::~TriDiag()
@@ -36,10 +54,16 @@ TriDiag::~TriDiag()
     {
         delete[] supDiag;
     }
+    if ( bc != NULL )
+    {
+        delete[] bc;
+    }
+
 
 #if ( PITTPACKACC )
 #pragma acc exit data delete ( subDiag )
 #pragma acc exit data delete ( supDiag )
+#pragma acc exit data delete ( bc )
 #pragma acc exit data delete ( this )
 #endif
 }
@@ -1547,11 +1571,26 @@ void   TriDiag::thomasLowMem( double *tmpMG, double *rh , double diag, int index
     b[1] = diag;
 
     // for Dirirchlet
-
+    if(bc[0]=='D')
+    {
     b[0] = b[1] - 1.;
+    }
+    if(bc[1]=='D')
+    {
     b[2] = b[1] - 1.;
+     }
+    // for Neumann, all modifications are done on the stencil 
 
-    rh[0] = rh[0] / ( bet = b[0] );
+    if(bc[0]=='N')
+    {
+    b[0] = b[1] + 1.;
+    }
+    if(bc[1]=='N')
+    {
+    b[2] = b[1]+1.0;
+     }
+
+   rh[0] = rh[0] / ( bet = b[0] );
 
     int j = 1; 
     tmpMG[j] = supDiag[j - 1] / bet; 
@@ -1644,7 +1683,52 @@ void TriDiag::thomasLowMem(int N, double *a, double *b, double *c, double *r, do
 
 }
 
+// sherman morrisson versions of Thomas to be integrated 
+#if(0)
+void Tridiag::shermanMorrisonThomas(double *a, double *b, double *c, const double alpha, const double beta, double *r, double *x) {
 
+    int i;
+
+    double fact, gamma;
+
+    assert(N > 2);
+
+    double *bb = new double[N];
+    double *u = new double[N];
+    double *z = new double[N];
+
+    gamma = -b[0];
+
+    bb[0] = b[0] - gamma;
+
+    bb[N - 1] = b[N - 1] - alpha * beta / gamma;
+
+    for (int i = 1; i < N - 1; i++) {
+        bb[i] = b[i];
+    }    
+
+    thomas(a, bb, c, r, x);
+
+    u[0] = gamma;
+    u[N - 1] = alpha;
+
+    for (int i = 1; i < N - 1; i++) {
+        u[i] = 0.0; 
+    }    
+
+    thomas(a, bb, c, u, z);
+
+    fact = (x[0] + beta * x[N - 1] / gamma) / (1. + z[0] + beta * z[N - 1] / gamma);
+
+    for (int i = 0; i < N; i++) {
+        x[i] -= fact * z[i];
+    }    
+
+    delete[] bb;
+    delete[] u;
+    delete[] z;
+}
+#endif
 
 
 

@@ -371,6 +371,13 @@ void fillInArrayBack( const int i, const int j,double *container, const int inde
 
 int createNodalCommunicator();
 
+#pragma acc routine seq 
+void imposeBoundaryonContainer(int i,int j,int index,double eig, double *container);
+
+
+#pragma acc routine seq  
+void imposeBoundaryonOffDiag(double eig, double *lower,double *upper);
+
 
     ~PencilDcmp(); /*!< Class destructor*/
 };

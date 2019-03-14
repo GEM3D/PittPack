@@ -4412,11 +4412,11 @@ void PencilDcmp::fillInArrayContig( const int i, const int j, int index, double 
         {
             if ( index == 0 )
             {
-                container[id * nzChunk + k + OFFS] = P( id, 3, i, j, k, index );
+                container[id * nzChunk + k ] = P( id, 3, i, j, k, index );
             }
             else
             {
-                container[id * nzChunk + k + OFFS] = P( id, 3, i, j, k, index );
+                container[id * nzChunk + k ] = P( id, 3, i, j, k, index );
             }
         }
     }
@@ -4501,11 +4501,16 @@ void PencilDcmp::solvePCR( const int index )
 
             fillInArrayContigNormalize( i, j, index, x1 + nz * i, eig );
 
+            imposeBoundaryonContainer( i,  j, index, eig, x1 +nz * i);
+
             offDiagNormalize( i, j, x2 + nz * i, crpcr_upper + nz * i, eig );
+    
+            imposeBoundaryonOffDiag(eig,x2+i*nz,crpcr_upper+nz*i);
 
             T.pcr( nz, x2 + i * nz, crpcr_upper + nz * i, x1 + nz * i );
 
             fillInArrayBack( i, j, x1 + nz * i, index );
+
         }
     }
 }
@@ -4563,46 +4568,59 @@ void PencilDcmp::fillInArrayContigNormalize( const int i, const int j, int index
 #pragma acc loop vector
         for ( int k = 0; k < nzChunk; k++ )
         {
-            if ( index == 0 && ( id * nzChunk + k ) != ( nz - 1 ) && ( id * nzChunk + k ) != 0 )
+            if ( index == 0 && (( id * nzChunk + k ) != ( nz - 1 )) && (( id * nzChunk + k ) != 0) )
             {
-                container[id * nzChunk + k + OFFS] = P( id, 3, i, j, k, index ) * eigInv;
+                container[id * nzChunk + k ] = P( id, 3, i, j, k, index ) * eigInv;
             }
-            else if ( index == 1 && ( id * nzChunk + k ) != ( nz - 1 ) && ( id * nzChunk + k ) != 0 )
+            else if ( index == 1 && (( id * nzChunk + k ) != ( nz - 1 )) && (( id * nzChunk + k ) != 0) )
             {
-                container[id * nzChunk + k + OFFS] = P( id, 3, i, j, k, index ) * eigInv;
+                container[id * nzChunk + k] = P( id, 3, i, j, k, index ) * eigInv;
             }
         }
     }
 //        container[0] = P( 0, 3, i, j, 0, index ) / ( eig - 1. );
 //        container[nz - 1] = P( nChunk - 1, 3, i, j, nz - 1, index ) / ( eig - 1. );
-//#pragma acc loop seq firstprivate(eig)
-//for(int i=0;i<1;i++)
-//{
-    // Dirichlet BC
 
+ //   imposeBoundaryonContainer( i, j,index,eig,container);
+
+}
+
+#if ( PITTPACKACC )
+#pragma acc routine seq
+#endif
+void PencilDcmp::imposeBoundaryonContainer(int i,int j,int index,double eig, double *container)
+{
+
+    // Dirichlet BC
    if ( bc[4] == 'D' )
     {
         container[0] = P( 0, 3, i, j, 0, index ) / ( eig - 1. );
     }
     if ( bc[5] == 'D' )
     {
-        container[nz - 1] = P( nChunk - 1, 3, i, j, nz - 1, index ) / ( eig - 1. );
+        container[nz - 1] = P( nChunk - 1, 3, i, j, nzChunk - 1, index ) / ( eig - 1. );
     }
 
     // Neuman BC
-    // Dirichlet BC
 
     if ( bc[4] == 'N' )
     {
         container[0] = P( 0, 3, i, j, 0, index ) / ( eig + 1. );
     }
+
     if ( bc[5] == 'N' )
     {
-        container[nz - 1] = P( nChunk - 1, 3, i, j, nz - 1, index ) / ( eig + 1. );
+        container[nz - 1] = P( nChunk - 1, 3, i, j, nzChunk - 1, index ) / ( eig + 1. );
     }
 
-//}
+
+/*
+        container[0] = P( 0, 3, i, j, 0, index ) / ( eig + 1. );
+        container[nz - 1] = P( nChunk - 1, 3, i, j, nzChunk - 1, index ) / ( eig + 1. );
+*/
 }
+
+
 
 #if ( PITTPACKACC )
 #pragma acc routine vector
@@ -4623,19 +4641,17 @@ void PencilDcmp::offDiagNormalize( const int i, const int j, double *lower, doub
         upper[k] = eigInv;
     }
 
-    lower[0]      = 0.0;
-    upper[nz - 1] = 0.0;
+//    imposeBoundaryonOffDiag(eig,lower,upper);
 
 /*
      upper[0] = 1. / ( eig - 1. );
-
      lower[nz - 1] = 1. / ( eig - 1. );
 */
     // boundary conditions affects the normalization
 //#pragma acc loop seq firstprivate(eig)
 //for(int i=0;i<1;i++)
 //{
-
+/*
     if ( bc[4] == 'D' )
     {
         upper[0] = 1. / ( eig - 1. );
@@ -4653,9 +4669,41 @@ void PencilDcmp::offDiagNormalize( const int i, const int j, double *lower, doub
     {
         lower[nz - 1] = 1. / ( eig + 1. );
     }
-
+*/
 //}
 }
+
+#if ( PITTPACKACC )
+#pragma acc routine seq
+#endif
+void PencilDcmp::imposeBoundaryonOffDiag(double eig, double *lower,double *upper)
+{
+
+    lower[0]      = 0.0;
+    upper[nz - 1] = 0.0;
+
+
+    if ( bc[4] == 'D' )
+    {
+        upper[0] = 1. / ( eig - 1. );
+    }
+    if ( bc[5] == 'D' )
+    {
+        lower[nz - 1] = 1. / ( eig - 1. );
+    }
+
+
+    if ( bc[4] == 'N' )
+    {
+        upper[0] = 1. / ( eig + 1. );
+    }
+    if ( bc[5] == 'N' )
+    {
+        lower[nz - 1] = 1. / ( eig + 1. );
+    }
+
+}
+
 
 #if ( PITTPACKACC )
 #pragma acc routine worker

@@ -484,6 +484,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             preprocessSignalAccordinglyReverse( 1, 1 );
 
             performInverseTransformYdir();
+
 #pragma acc parallel num_gangs( nSig1 ) vector_length( VECLENGTH )
             postprocessSignalAccordinglyReverse( 1, 1 );
             // step 15) restore the array to original status before IFFT

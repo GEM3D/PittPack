@@ -139,8 +139,8 @@ int main( int argcs, char *pArgs[] )
 
   //        char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
   //     char mybc[6] = {'D', 'D', 'D', 'D', 'D', 'D'};
-   //    char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
-        char mybc[6] = {'D', 'D', 'D', 'D', 'N', 'N'};
+      char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
+  //      char mybc[6] = {'D', 'D', 'D', 'D', 'N', 'N'};
     std::cout << mybc[0] << " " << mybc[1] << " " << mybc[2] << " " << mybc[3] << " " << mybc[4] << " " << mybc[5] << std::endl;
     M.assignBoundary( mybc );
     // testMpiClass(MPI_COMM_WORLD);

@@ -2754,11 +2754,11 @@ void PencilDcmp::changeLocationX()
 #endif
 void PencilDcmp::changeLocationX()
 {
-    double tm[TMPSIZE];
+    double tm[2*TMPSIZE];
 
 #if ( PITTPACKACC )
 //#pragma acc loop worker private( tm[1] )
-#pragma acc loop private( tm[TMPSIZE] )
+#pragma acc loop private( tm[2*TMPSIZE] )
 #endif
     for ( sint i = 0; i < iaxSize; i++ )
     {    
@@ -2812,9 +2812,9 @@ void PencilDcmp::changeLocationY()
 void PencilDcmp::changeLocationY()
 {
 
-    double tm[TMPSIZE];
+    double tm[2*TMPSIZE];
 #if ( PITTPACKACC )
-#pragma acc loop gang private( tm[TMPSIZE] )
+#pragma acc loop gang private( tm[2*TMPSIZE] )
 #endif
     for ( sint i = 0; i < iaySize; i++ )
     {
@@ -2862,9 +2862,9 @@ void PencilDcmp::restoreLocationY()
 void PencilDcmp::restoreLocationY()
 {
 
-    double tm[TMPSIZE];
+    double tm[2*TMPSIZE];
 #if ( PITTPACKACC )
-#pragma acc loop gang private( tm[TMPSIZE] )
+#pragma acc loop gang private( tm[2*TMPSIZE] )
 #endif
     for ( sint i = 0; i < iaySize; i++ )
     {
@@ -2917,10 +2917,10 @@ void PencilDcmp::restoreLocationX()
 
 void PencilDcmp::restoreLocationX()
 {
-    double tm[TMPSIZE];
+    double tm[2*TMPSIZE];
 
 #if ( PITTPACKACC )
-#pragma acc loop gang private( tm[TMPSIZE] )
+#pragma acc loop gang private( tm[2*TMPSIZE] )
 #endif
     for ( sint i = 0; i < iaxSize; i++ )
     {

@@ -15,7 +15,7 @@ the type as \f$int\f$ */
 #define MULTIGRIDON 0
 #define NXCHUNK1 256
 #define NYCHUNK1 256
-#define TMPSIZE  128
+#define TMPSIZE  256
 
 
 #define COMM_ON 1

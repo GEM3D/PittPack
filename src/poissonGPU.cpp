@@ -146,11 +146,11 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 //    P.moveHostToDevice();
 #if ( 1 )
 
-    int trsps_gang0 = MIN( 50, iaxSize );
-    int trsps_gang1 = MIN( 50, iaySize );
+    int trsps_gang0 = MIN( 1024, iaxSize );
+    int trsps_gang1 = MIN( 1024, iaySize );
 
-    int nSig0 = MIN( 50, nxChunk );
-    int nSig1 = MIN( 50, nyChunk );
+    int nSig0 =  nxChunk ;
+    int nSig1 =  nyChunk ;
     initMem   = acc_get_free_memory() / 1e9;
 
     if ( MONITOR_MEM )
@@ -169,7 +169,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
                 cout << "amount of free memory (0) = " << ( acc_get_free_memory() / 1e9 ) << endl;
             }
 
-#pragma acc parallel num_gangs( 50 ) vector_length( 32 )
+#pragma acc parallel num_gangs( 1024 ) vector_length( VECLENGTH )
             initializeTrigonometric();
 
 #if ( POSS )
@@ -179,7 +179,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             }
             if ( bc[0] != 'P' && bc[2] != 'P' )
             {
-#pragma acc parallel num_gangs( 50 ) vector_length( VECLENGTH )
+#pragma acc parallel num_gangs( 1024 ) vector_length( VECLENGTH )
                 modifyRhsDirichlet();
             }
 
@@ -187,6 +187,15 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             {
                 cout << "amount of free memory 1 " << acc_get_free_memory() / 1e9 << endl;
             }
+#if(COMM_PATTERN==1)
+{
+   #pragma acc parallel loop num_gangs(1024) 
+   for(int l=0;l<nChunk*R.chunkSize;l++)
+   {
+    R(l)=P(l);
+   }
+}
+#endif
 
             changeOwnershipPairwiseExchangeZX();
 
@@ -248,6 +257,18 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             {
                 P.moveDeviceToHost();
             }
+
+#if(COMM_PATTERN==1)
+{
+   #pragma acc parallel loop num_gangs(1024) 
+   for(int l=0;l<nChunk*R.chunkSize;l++)
+   {
+    R(l)=P(l);
+   }
+}
+#endif
+
+
             changeOwnershipPairwiseExchangeXY();
             if ( GPUAW2 == 0 )
             {
@@ -301,6 +322,16 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             {
                 P.moveDeviceToHost();
             }
+
+#if(COMM_PATTERN==1)
+{
+   #pragma acc parallel loop num_gangs(1024) 
+   for(int l=0;l<nChunk*R.chunkSize;l++)
+   {
+    R(l)=P(l);
+   }
+}
+#endif
 
             changeOwnershipPairwiseExchangeZX();
 
@@ -461,6 +492,18 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             {
                 P.moveDeviceToHost();
             }
+#if(COMM_PATTERN==1)
+{
+   #pragma acc parallel loop num_gangs(1024)
+   for(int l=0;l<nChunk*R.chunkSize;l++)
+   {
+    R(l)=P(l);
+   }
+}
+#endif
+
+
+
             changeOwnershipPairwiseExchangeZX();
 
             if ( GPUAW == 0 )
@@ -504,6 +547,17 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             {
                 P.moveDeviceToHost();
             }
+
+#if(COMM_PATTERN==1)
+{
+   #pragma acc parallel loop num_gangs(1024)
+   for(int l=0;l<nChunk*R.chunkSize;l++)
+   {
+    R(l)=P(l);
+   }
+}
+#endif
+
             changeOwnershipPairwiseExchangeXY();
 
             if ( GPUAW2 == 0 )
@@ -544,6 +598,21 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
                 cout << "amount of free memory 13 " << acc_get_free_memory() / 1e9 << " GB  " << endl;
             }
             // return back to the original set-up
+            //
+            //
+
+#if(COMM_PATTERN==1)
+{
+   #pragma acc parallel loop num_gangs(1024) 
+   for(int l=0;l<nChunk*R.chunkSize;l++)
+   {
+    R(l)=P(l);
+   }
+}
+#endif
+
+
+
             changeOwnershipPairwiseExchangeZX();
 
             //        setCoords( Xbox, 2 );

@@ -8,11 +8,15 @@
 #define DEBUG1 0       /*!<mainly turn off IO for debugging */
 #define DEBUG0 0       /*!<mainly turn off IO for debugging  for solverCPU */
 #define DEBUG 0        /*!<mainly turn off IO for debugging  for solverCPU */
-#define COMM_PATTERN 0 /*!< two type of comm_patterns are available, (0) Pairwise exchange (1) Neighorhood collective */
+#define COMM_PATTERN 1  /*!< two type of comm_patterns are available, (0) Pairwise exchange (1) Neighorhood collective, don not try comm_pattern with CPU yet */
 #define SHORT_  0 /*!< controls the type for \f$iax, iay, jax, jay\f$ arrays, setting to 1 selects \f$short int\f$  where settingt it to zero will set \
 the type as \f$int\f$ */
 #define ZSIZE 64 /*! shoud be nzChubk*nChunk, not required if the first 4 letters specifying the boundary are not 'P', also not required in new version of solve  */
 #define MULTIGRIDON 0
+#define NXCHUNK1 256
+#define NYCHUNK1 256
+#define TMPSIZE  128
+
 
 #define COMM_ON 1
 
@@ -42,7 +46,7 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     PITT_ABORT                  = 0,
     INCLUDE_ERROE_CAL_IN_TIMING = 0 , /*! uses an expensive allreduce function misleading to be included in profiling, takes 8 % of 512M
                                         mesh, suggest truning it off for profiling*/
-    SOLUTIONMETHOD = 1,                   /*!< (0) solves with Thomas (1) Uses PCR (2) CR-P (4) Multigrid and (5) cuSPARCE (CR and PCR ) 
+    SOLUTIONMETHOD = 1 ,                   /*!< (0) solves with Thomas (1) Uses PCR (2) CR-P (4) Multigrid and (5) cuSPARCE (CR and PCR ) 
                                                 the last two are disabled disabled to avoid unnecesary memory usage, 
                                                  need to change the MULTIGRIDON to 1 to enable allocation for multigrid and cuSPARSE */
     PIVOT = 1,                        /*!< This is only used for cuSPARSE, for diagonally dominant matrix pivoting is not required */
@@ -99,7 +103,9 @@ const double pi = 3.1415926535897932384;
 #define FFTX 1
 #define FFTY 1
 #define REV 1
+#define REVTRSP 1 /*!< 1) stands for simplest transform. 0) transposes using shared mem*/
 #define JIC 0
+
 
 PittPackResult OPENACC_Init( int &my_rank, int &com_size ); /*!< Initializes the GPU's. equivalent to MPI_Init()  */
 PittPackResult HostToDeviceAssign( int &my_rank, int &com_size ); /*!< Binds each CPU to a GPU  */

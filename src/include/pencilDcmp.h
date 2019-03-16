@@ -378,6 +378,8 @@ void imposeBoundaryonContainer(int i,int j,int index,double eig, double *contain
 #pragma acc routine seq  
 void imposeBoundaryonOffDiag(double eig, double *lower,double *upper);
 
+#pragma acc routine seq  
+void imposeBoundaryonCRPTmp(int i,int j,int index,double eig, double *container);
 
     ~PencilDcmp(); /*!< Class destructor*/
 };

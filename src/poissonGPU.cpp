@@ -114,7 +114,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
     //  struct timeval start_time, stop_time, elapsed_time;
     //  gettimeofday( &start_time, NULL );
     double t1;
-    MPI_Barrier( MPI_COMM_WORLD );
+ //   MPI_Barrier( MPI_COMM_WORLD );
     t1 = MPI_Wtime();
 
 #if ( DEBUG2 )
@@ -650,12 +650,16 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
     //  timersub( &stop_time, &start_time, &elapsed_time ); // Unix time subtract routine
 
     double t2;
-    MPI_Barrier( MPI_COMM_WORLD );
+//    MPI_Barrier( MPI_COMM_WORLD );
     t2 = MPI_Wtime();
+
+    double deT=t2-t1;
+
+    MPI_Reduce( &deT, &runTime, 1, MPI_DOUBLE, MPI_MAX,0, MPI_COMM_WORLD );
 
     if ( myRank == 0 )
     {
-        runTime = t2 - t1;
+        runTime = runTime;
         runInfo();
     }
 

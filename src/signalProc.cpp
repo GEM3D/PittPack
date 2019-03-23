@@ -6,7 +6,7 @@
 void SignalProc::copyin()
 {
 #if ( PITTPACKACC )
-#pragma acc enter data create( this[0 : 1] )
+#pragma acc enter data create( this [0:1] )
 #pragma acc update device( this )
 #endif
 }
@@ -14,7 +14,7 @@ void SignalProc::copyin()
 SignalProc::SignalProc()
 {
 #if ( 0 )
-#pragma acc enter data create( this[0 : 1] )
+#pragma acc enter data create( this [0:1] )
 #pragma acc update device( this )
 #endif
 }
@@ -50,8 +50,8 @@ void SignalProc::postprocessSignalDCT10( ChunkedArray &P, const int size, const 
 #endif
         for ( int j = 0; j < size / 2 - idx; j++ )
         {
-            P( 2 *( i *size + j + size / 2 + 1 ) ) = P( 2 * ( i * size + size / 2 - j - idx ) );
-            P( 2 *( i *size + j + size / 2 + 1 ) + 1 ) = -P( 2 * ( i * size + size / 2 - j - idx ) + 1 );
+            P( 2 * ( i * size + j + size / 2 + 1 ) )     = P( 2 * ( i * size + size / 2 - j - idx ) );
+            P( 2 * ( i * size + j + size / 2 + 1 ) + 1 ) = -P( 2 * ( i * size + size / 2 - j - idx ) + 1 );
         }
     }
     double theta;
@@ -64,8 +64,9 @@ void SignalProc::postprocessSignalDCT10( ChunkedArray &P, const int size, const 
     {
         theta = ( pi / 2. / size ) * j;
 
-        P( 2 *( i *size + j ) ) = 2. * ( P( 2 * ( i * size + j ) ) * ( cosine( theta ) ) + P( 2 * ( i * size + j ) + 1 ) * sine( theta ) );
-        P( 2 *( i *size + j ) + 1 ) = 0.0;
+        P( 2 * ( i * size + j ) )
+        = 2. * ( P( 2 * ( i * size + j ) ) * ( cosine( theta ) ) + P( 2 * ( i * size + j ) + 1 ) * sine( theta ) );
+        P( 2 * ( i * size + j ) + 1 ) = 0.0;
     }
 }
 
@@ -77,14 +78,14 @@ void SignalProc::postprocessSignalDCT01( ChunkedArray &P, const int size, const 
     // to prevent overwrite we use complex part and then swap real and complex
     // parts
     int upperBound = ( size - 1 ) / 2 + 1;
-    int istart = upperBound;
+    int istart     = upperBound;
 
 #if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int i = 0; i < upperBound; i++ )
     {
-        P( 2 *( j *size + 2 *i ) + 1 ) = P( 2 * ( j * size + i ) );
+        P( 2 * ( j * size + 2 * i ) + 1 ) = P( 2 * ( j * size + i ) );
     }
 
     int idx = size % 2;
@@ -94,15 +95,15 @@ void SignalProc::postprocessSignalDCT01( ChunkedArray &P, const int size, const 
 #endif
     for ( int i = 0; i < size / 2; i++ )
     {
-        P( 2 *( j *size + 2 *i + 1 ) + 1 ) = P( 2 * ( j * size + size - i - 1 ) );
+        P( 2 * ( j * size + 2 * i + 1 ) + 1 ) = P( 2 * ( j * size + size - i - 1 ) );
     }
 #if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int i = 0; i < size; i++ )
     {
-        P( 2 *( i + j *size ) ) = P( 2 * ( i + j * size ) + 1 );
-        P( 2 *( i + j *size ) + 1 ) = 0.0;
+        P( 2 * ( i + j * size ) )     = P( 2 * ( i + j * size ) + 1 );
+        P( 2 * ( i + j * size ) + 1 ) = 0.0;
     }
 }
 #if ( PITTPACKACC )
@@ -114,8 +115,8 @@ void SignalProc::preprocessSignalDCT01( ChunkedArray &P, const int size, const i
 
     double theta = 0.0;
 
-    P( 2 *i *size + 0 ) = 0.5 * cosine( theta ) * P( 2 * i * size );
-    P( 2 *i *size + 1 ) = 0.0;
+    P( 2 * i * size + 0 ) = 0.5 * cosine( theta ) * P( 2 * i * size );
+    P( 2 * i * size + 1 ) = 0.0;
 
 #if ( PITTPACKACC )
 #pragma acc loop vector
@@ -127,9 +128,10 @@ void SignalProc::preprocessSignalDCT01( ChunkedArray &P, const int size, const i
         // watch out the order, first assign the complex as I am performing in
         // place transform
         //
-        P( 2 *( i *size + j ) + 1 ) = 0.5
-                                      * ( sine( theta ) * P( 2 * ( i * size + j ) ) - cosine( theta ) * P( 2 * ( i * size + size - j ) ) );
-        P( 2 *( i *size + j ) ) = 0.5 * ( cosine( theta ) * P( 2 * ( i * size + j ) ) + sine( theta ) * P( 2 * ( i * size + size - j ) ) );
+        P( 2 * ( i * size + j ) + 1 )
+        = 0.5 * ( sine( theta ) * P( 2 * ( i * size + j ) ) - cosine( theta ) * P( 2 * ( i * size + size - j ) ) );
+        P( 2 * ( i * size + j ) )
+        = 0.5 * ( cosine( theta ) * P( 2 * ( i * size + j ) ) + sine( theta ) * P( 2 * ( i * size + size - j ) ) );
     }
 
 #if ( PITTPACKACC )
@@ -137,8 +139,8 @@ void SignalProc::preprocessSignalDCT01( ChunkedArray &P, const int size, const i
 #endif
     for ( int j = size / 2 + 1; j < size; j++ )
     {
-        P( 2 *( i *size + j ) ) = P( 2 * ( i * size + size - j ) );
-        P( 2 *( i *size + j ) + 1 ) = -P( 2 * ( i * size + size - j ) + 1 );
+        P( 2 * ( i * size + j ) )     = P( 2 * ( i * size + size - j ) );
+        P( 2 * ( i * size + j ) + 1 ) = -P( 2 * ( i * size + size - j ) + 1 );
     }
 
 #if ( PITTPACKACC )
@@ -146,8 +148,8 @@ void SignalProc::preprocessSignalDCT01( ChunkedArray &P, const int size, const i
 #endif
     for ( int j = size / 2 + 1; j < size; j++ )
     {
-        P( 2 *( i *size + j ) ) = P( 2 * ( i * size + size - j ) );
-        P( 2 *( i *size + j ) + 1 ) = -P( 2 * ( i * size + size - j ) + 1 );
+        P( 2 * ( i * size + j ) )     = P( 2 * ( i * size + size - j ) );
+        P( 2 * ( i * size + j ) + 1 ) = -P( 2 * ( i * size + size - j ) + 1 );
     }
 }
 
@@ -160,14 +162,14 @@ void SignalProc::preprocessSignalDCT10( ChunkedArray &P, const int size, const i
     // cout<<RED<<P.ny<<" vs " << NXCHUNK  <<endl;
 
     int upperBound = ( size - 1 ) / 2 + 1;
-    int istart = upperBound;
+    int istart     = upperBound;
 
 #if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int j = 0; j < upperBound; j++ )
     {
-        P( 2 *( i *size + j ) + 1 ) = P( 2 * ( i * size + 2 * j ) );
+        P( 2 * ( i * size + j ) + 1 ) = P( 2 * ( i * size + 2 * j ) );
     }
 
     int idx = size % 2;
@@ -177,7 +179,7 @@ void SignalProc::preprocessSignalDCT10( ChunkedArray &P, const int size, const i
 #endif
     for ( int j = istart; j < size; j++ )
     {
-        P( 2 *( i *size + j ) + 1 ) = P( 2 * i * size + 2 * ( size - 2 * ( j - istart ) - 1 - idx ) );
+        P( 2 * ( i * size + j ) + 1 ) = P( 2 * i * size + 2 * ( size - 2 * ( j - istart ) - 1 - idx ) );
     }
 
     double tmp;
@@ -186,9 +188,9 @@ void SignalProc::preprocessSignalDCT10( ChunkedArray &P, const int size, const i
 #endif
     for ( int j = 0; j < size; j++ )
     {
-        tmp = P( 2 * ( i * size + j ) + 1 );
-        P( 2 *( i *size + j ) ) = tmp;
-        P( 2 *( i *size + j ) + 1 ) = 0.0;
+        tmp                           = P( 2 * ( i * size + j ) + 1 );
+        P( 2 * ( i * size + j ) )     = tmp;
+        P( 2 * ( i * size + j ) + 1 ) = 0.0;
     }
 }
 
@@ -244,11 +246,11 @@ void SignalProc::swap( ChunkedArray &P, const int size, const int i, const int d
 #endif
     for ( int j = 0; j < size; j++ )
     {
-        P( 2 *( i *size + j ) + 1 ) = P( 2 * ( i * size + size - j - 1 ) );
+        P( 2 * ( i * size + j ) + 1 ) = P( 2 * ( i * size + size - j - 1 ) );
 
         if ( j % 2 == 1 )
         {
-            P( 2 *( i *size + j ) + 1 ) = -P( 2 * ( i * size + j ) + 1 );
+            P( 2 * ( i * size + j ) + 1 ) = -P( 2 * ( i * size + j ) + 1 );
         }
     }
 
@@ -257,7 +259,7 @@ void SignalProc::swap( ChunkedArray &P, const int size, const int i, const int d
 #endif
     for ( int j = 0; j < size; j++ )
     {
-        P( 2 *( i *size + j ) ) = P( 2 * ( i * size + j ) + 1 );
-        P( 2 *( i *size + j ) + 1 ) = 0.0;
+        P( 2 * ( i * size + j ) )     = P( 2 * ( i * size + j ) + 1 );
+        P( 2 * ( i * size + j ) + 1 ) = 0.0;
     }
 }

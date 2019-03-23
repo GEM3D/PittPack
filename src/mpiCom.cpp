@@ -177,7 +177,7 @@ void MpiCom::constructConnectivity()
 void MpiCom::changeOwnership()
 {
     MPI_Request request[p0], request1[p0];
-    MPI_Status status;
+    MPI_Status  status;
 
     // uses too much memory, use pairwise exhchange instead
 
@@ -253,7 +253,7 @@ void MpiCom::changeOwnership()
 void MpiCom::changeOwnershipPairwiseExchangeZX()
 {
     MPI_Request request[p0], request1[p0], request0[p0];
-    MPI_Status status;
+    MPI_Status  status;
 
 #if ( 1 )
 #if ( DEBUG5 )
@@ -298,7 +298,7 @@ void MpiCom::changeOwnershipPairwiseExchangeZX()
         */
         for ( int k = 0; k < P.chunkSize; k++ )
         {
-            P( k + P.chunkSize *getPeriodicIndex( i - j ) ) = R( k );
+            P( k + P.chunkSize * getPeriodicIndex( i - j ) ) = R( k );
         }
     }
 #endif
@@ -332,12 +332,12 @@ void MpiCom::changeOwnershipPairwiseExchangeZX()
 void MpiCom::changeOwnershipPairwiseExchangeXY()
 {
     MPI_Request request[p0], request1[p0], request0[p0];
-    MPI_Status status;
+    MPI_Status  status;
 
     int stride = p0;
-// uses too much memory, use pairwise exhchange instead
-//
-// network congestion
+    // uses too much memory, use pairwise exhchange instead
+    //
+    // network congestion
 
 #if ( DEBUG5 )
     int dest[2] = {myRank + 1, myRank - 1};
@@ -377,7 +377,7 @@ void MpiCom::changeOwnershipPairwiseExchangeXY()
 
         for ( int k = 0; k < P.chunkSize; k++ )
         {
-            P( k + P.chunkSize *getPeriodicIndex( i - j ) ) = R( k );
+            P( k + P.chunkSize * getPeriodicIndex( i - j ) ) = R( k );
         }
 
         /*
@@ -407,7 +407,7 @@ void MpiCom::initialize()
     {
         for ( int j = 0; j < P.chunkSize; j++ )
         {
-            P( j + P.chunkSize *i ) = ( myRank ) * 10 + i;
+            P( j + P.chunkSize * i ) = (myRank)*10 + i;
         }
     }
 }
@@ -415,7 +415,7 @@ void MpiCom::initialize()
 void MpiCom::changeOwnershipPairwiseExchangeYZ()
 {
     MPI_Request request[p0], request1[p0], request0[p0];
-    MPI_Status status;
+    MPI_Status  status;
 
     int stride = p0;
 
@@ -457,7 +457,7 @@ void MpiCom::changeOwnershipPairwiseExchangeYZ()
 
         for ( int k = 0; k < P.chunkSize; k++ )
         {
-            P( k + P.chunkSize *getPeriodicIndex( i - j ) ) = R( k );
+            P( k + P.chunkSize * getPeriodicIndex( i - j ) ) = R( k );
         }
 
         /*
@@ -489,7 +489,7 @@ int MpiCom::getPeriodicRank( int rank )
     //
 
     int index = rank;
-    int size = p0;
+    int size  = p0;
 
     // int qt=index/comSize;
     int qt = index / size;
@@ -500,7 +500,7 @@ int MpiCom::getPeriodicRank( int rank )
     }
     else if ( index < 0 )
     {
-        qt = ( index + 1 ) / size;
+        qt    = ( index + 1 ) / size;
         index = index + ( -qt + 1 ) * size;
     }
 
@@ -518,7 +518,7 @@ int MpiCom::getPeriodicRankXY( int rank )
     //
 
     int index = rank;
-    int size = p0;
+    int size  = p0;
 
     // int qt=index/comSize;
     int qt = index / size;
@@ -529,7 +529,7 @@ int MpiCom::getPeriodicRankXY( int rank )
     }
     else if ( index < 0 )
     {
-        qt = ( index + 1 ) / size;
+        qt    = ( index + 1 ) / size;
         index = index + ( -qt + 1 ) * size;
     }
 
@@ -547,7 +547,7 @@ int MpiCom::getPeriodicIndex( int rank )
     //
 
     int index = rank;
-    int size = p0;
+    int size  = p0;
 
     // int qt=index/comSize;
     int qt = index / size;
@@ -558,7 +558,7 @@ int MpiCom::getPeriodicIndex( int rank )
     }
     else if ( index < 0 )
     {
-        qt = ( index + 1 ) / size;
+        qt    = ( index + 1 ) / size;
         index = index + ( -qt + 1 ) * size;
     }
 
@@ -570,9 +570,9 @@ int MpiCom::getPeriodicIndex( int rank )
 
 void MpiCom::graphCreate() /*!Two different communicators are required due to the presence of stride in X to Y to rotation */
 {
-    int indegree = p0;
+    int indegree  = p0;
     int outdegree = p0;
-    int reorder = 0;
+    int reorder   = 0;
 
     // MPI_Dist_graph_create_adjacent( Comm, indegree, nbrs, MPI_UNWEIGHTED, indegree, nbrs, MPI_UNWEIGHTED, MPI_INFO_NULL, reorder,
     // &nbrComm0 );  MPI_Dist_graph_create_adjacent( Comm, indegree, nbrsXY, MPI_UNWEIGHTED, indegree, nbrsXY, MPI_UNWEIGHTED,
@@ -595,8 +595,8 @@ void MpiCom::graphCreate() /*!Two different communicators are required due to th
 void MpiCom::checkGraph( int index )
 {
     int nneighbors = 0;
-    int indegree = 0;
-    int outdegree = 0;
+    int indegree   = 0;
+    int outdegree  = 0;
 
     if ( index > 1 )
     {
@@ -609,7 +609,7 @@ void MpiCom::checkGraph( int index )
     MPI_Dist_graph_neighbors_count( nbrComm[index], &indegree, &outdegree, &weight );
 
     int *neighbors = new int[indegree];
-    nneighbors = indegree;
+    nneighbors     = indegree;
 
     cout << " nneighbors is = " << nneighbors << endl;
     if ( nneighbors != p0 )
@@ -618,10 +618,10 @@ void MpiCom::checkGraph( int index )
         exit( 0 );
     }
 
-    int *sources = new int[indegree];
+    int *sources       = new int[indegree];
     int *sourceweights = new int[indegree];
-    int *destinations = new int[outdegree];
-    int *destweights = new int[outdegree];
+    int *destinations  = new int[outdegree];
+    int *destweights   = new int[outdegree];
 
     MPI_Dist_graph_neighbors( nbrComm[index], indegree, sources, sourceweights, outdegree, destinations, destweights );
 
@@ -646,11 +646,11 @@ void MpiCom::checkGraph( int index )
 
 void MpiCom::nbrAllToAllZX() /*!Two different communicators are required due to the presence of stride in X to Y to rotation */
 {
-// for All to allV
+    // for All to allV
 
 #if ( DEBUG5 )
     int *sndCnts = new int[p0];
-    int *disp = new int[p0];
+    int *disp    = new int[p0];
 
     for ( int i = 0; i < p0; i++ )
     {
@@ -693,7 +693,7 @@ void MpiCom::nbrAllToAllXY() /*!Two different communicators are required due to 
 // for All to allV
 #if ( DEBUG5 )
     int *sndCnts = new int[p0];
-    int *disp = new int[p0];
+    int *disp    = new int[p0];
 
     for ( int i = 0; i < p0; i++ )
     {
@@ -742,7 +742,7 @@ void MpiCom::nbrAllToAllYZ() /*!Two different communicators are required due to 
 // for All to allV
 #if ( DEBUG5 )
     int *sndCnts = new int[p0];
-    int *disp = new int[p0];
+    int *disp    = new int[p0];
 
     for ( int i = 0; i < p0; i++ )
     {

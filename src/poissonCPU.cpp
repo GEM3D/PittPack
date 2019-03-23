@@ -6,8 +6,8 @@ void PoissonCPU::writeYLine( int j, fftw_complex *outC )
 {
     for ( int i = 0; i < nChunk * nyChunk; i++ )
     {
-        PencilDcmp::P( 2 *nyChunk *nChunk *j + 2 *i ) = outC[i][0];
-        PencilDcmp::P( 2 *nyChunk *nChunk *j + 2 *i + 1 ) = outC[i][1];
+        PencilDcmp::P( 2 * nyChunk * nChunk * j + 2 * i )     = outC[i][0];
+        PencilDcmp::P( 2 * nyChunk * nChunk * j + 2 * i + 1 ) = outC[i][1];
 #if ( DEBUG0 )
         cout << outC[i][0] << " " << outC[i][1] << '\t';
 #endif
@@ -58,7 +58,7 @@ void PoissonCPU::performTransformYdir()
 
 void PoissonCPU::performInverseTransformYdir()
 {
-    fftw_plan pl;
+    fftw_plan     pl;
     fftw_complex *in;
     in = (fftw_complex *)malloc( nChunk * nyChunk * sizeof( fftw_complex ) );
 
@@ -126,8 +126,8 @@ void PoissonCPU::writeXLine( int j, fftw_complex *outC )
 {
     for ( int i = 0; i < nChunk * nxChunk; i++ )
     {
-        PencilDcmp::P( 2 *nxChunk *nChunk *j + 2 *i ) = outC[i][0];
-        PencilDcmp::P( 2 *nxChunk *nChunk *j + 2 *i + 1 ) = outC[i][1];
+        PencilDcmp::P( 2 * nxChunk * nChunk * j + 2 * i )     = outC[i][0];
+        PencilDcmp::P( 2 * nxChunk * nChunk * j + 2 * i + 1 ) = outC[i][1];
 //     cout << " ???????????????????????" << out[i] << endl;
 #if ( DEBUG0 )
         if ( This == myRank )
@@ -146,7 +146,7 @@ void PoissonCPU::writeXLine( int j, fftw_complex *outC )
 
 void PoissonCPU::performInverseTransformXdir()
 {
-    fftw_plan pl;
+    fftw_plan     pl;
     fftw_complex *in;
     in = (fftw_complex *)malloc( nChunk * nxChunk * sizeof( fftw_complex ) );
 
@@ -227,14 +227,16 @@ void PoissonCPU::pittPack()
     myfile.open( filename );
 #endif
 
-    MPI_Barrier( MPI_COMM_WORLD );
+    //    MPI_Barrier( MPI_COMM_WORLD );
     double t1 = MPI_Wtime();
 
     //  struct timeval start_time, stop_time, elapsed_time;
     //   gettimeofday( &start_time, NULL );
     int result;
 
-    double err = 0.0;
+    double err    = 0.0;
+    double t1_com = 0.0;
+    double t2_com = 0.0;
 
     for ( int num = 0; num < 1; num++ )
     // for(int num=0;num<100;num++)
@@ -248,10 +250,12 @@ void PoissonCPU::pittPack()
 
 #if ( POSS )
 
+        t1_com = MPI_Wtime();
         changeOwnershipPairwiseExchangeZX();
+        t2_com = MPI_Wtime() - t1_com;
 
-//    M.rearrange( 0, 0, 1 );
-//   M.rearrange( 0, 2 );
+        //    M.rearrange( 0, 0, 1 );
+        //   M.rearrange( 0, 2 );
 
 #if ( DEBUG0 )
         myfile << "     Z to X rotation" << endl;
@@ -309,7 +313,10 @@ void PoissonCPU::pittPack()
         cout << "FFTX is done" << endl;
 #if ( FFTY )
         // step 5) pencils with n(1,0,0) is converted to pencil with n(0,1,0)
+
+        t1_com = MPI_Wtime();
         changeOwnershipPairwiseExchangeXY();
+        t2_com += MPI_Wtime() - t1_com;
 #if ( DEBUG0 )
         myfile << "     X to Y rotation" << endl;
         printY( myfile );
@@ -348,7 +355,7 @@ void PoissonCPU::pittPack()
 #endif
 
         performTransformYdir();
-// M.printX( myfile );
+        // M.printX( myfile );
 
 #if ( DEBUG0 )
         myfile << "     FFTY" << endl;
@@ -373,11 +380,14 @@ void PoissonCPU::pittPack()
 #endif
 #endif
         cout << "FFTY is done" << endl;
-// step 10) pencils with n(0,1,0) is converted to pencil with n(0,0,1)
+        // step 10) pencils with n(0,1,0) is converted to pencil with n(0,0,1)
+
 #if ( SOLVE )
 
+        t1_com = MPI_Wtime();
         //   M.changeOwnershipPairwiseExchangeYZ();
         changeOwnershipPairwiseExchangeZX();
+        t2_com += MPI_Wtime() - t1_com;
 
 #if ( DEBUG0 )
         myfile << "      Rotate Y to Z " << endl;
@@ -389,45 +399,43 @@ void PoissonCPU::pittPack()
         // step 11) Customized multiBlock Thomas and periodic Thomas (with Sherman-Morrison modification)
 
         //
-        if ( SOLUTIONMETHOD == 0 || SOLUTIONMETHOD==2 )
+        if ( SOLUTIONMETHOD == 0 || SOLUTIONMETHOD == 2 )
         {
+            /*
+                        if ( solveThm( 0 ) != SUCCESS )
+                        {
 
-/*
-            if ( solveThm( 0 ) != SUCCESS )
+                            solveThm( 1 );
+                            cout << "Exit Code: " << THOMAS_FAIL << endl;
+                            cout << BLUE << PittPackGetErrorEnum( THOMAS_FAIL ) << RESET << endl;
+                            exit( 1 );
+
+
+                        }
+
+            */
+
+            solveThmBatch( 0 );
+
+            if ( bc[0] == 'P' || bc[2] == 'P' )
             {
-
-                solveThm( 1 );
-                cout << "Exit Code: " << THOMAS_FAIL << endl;
-                cout << BLUE << PittPackGetErrorEnum( THOMAS_FAIL ) << RESET << endl;
-                exit( 1 );
-
-
+                solveThmBatch( 1 );
             }
 
-*/
+            //         solveThm(0);
 
-         solveThmBatch( 0 );
-
-    if ( bc[0] == 'P' || bc[2] == 'P' )
-{
-         solveThmBatch( 1 );
-}
-
-//         solveThm(0);
-
-
-//         solveCRP(0);
+            //         solveCRP(0);
         }
-        else if(SOLUTIONMETHOD==1)
+        else if ( SOLUTIONMETHOD == 1 )
         {
             // "0" solves for the real part and "1" solves for imaginary part
-           // solveMG();
+            // solveMG();
             //   solveMGC( );
- //        solveCRP(0);
+            //        solveCRP(0);
         }
 
-// M.printX( myfile );
-//
+        // M.printX( myfile );
+        //
 
 #if ( DEBUG0 )
         myfile << "      Thomasing" << endl;
@@ -436,7 +444,12 @@ void PoissonCPU::pittPack()
 #endif
         // step 12) pencils with n(0,0,1) is converted to pencil with n(0,1,0)
         // M.changeOwnershipPairwiseExchangeYZ();
+        //
+
+        t1_com = MPI_Wtime();
         changeOwnershipPairwiseExchangeZX();
+        t2_com += MPI_Wtime() - t1_com;
+
 #if ( DEBUG0 )
         myfile << "      Rotate Z to Y" << endl;
         // M.printX( myfile );
@@ -498,7 +511,10 @@ void PoissonCPU::pittPack()
 #endif
         // step 17) pencils with n(0,1,0) is converted to pencil with n(1,0,0)
 
+        t1_com = MPI_Wtime();
         changeOwnershipPairwiseExchangeXY();
+        t2_com += MPI_Wtime() - t1_com;
+
 #if ( DEBUG0 )
         myfile << "      Rotate Y to X" << endl;
         printX( myfile );
@@ -554,7 +570,10 @@ void PoissonCPU::pittPack()
 #endif
 
         // return back to the original set-up
+        t1_com = MPI_Wtime();
         changeOwnershipPairwiseExchangeZX();
+        t2_com += MPI_Wtime() - t1_com;
+
         if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
         {
             err = getError();
@@ -576,14 +595,18 @@ void PoissonCPU::pittPack()
     myfile.close();
 #endif
 
-    MPI_Barrier( Comm );
+    //    MPI_Barrier( Comm );
     double t2 = MPI_Wtime();
+
+    double deT = t2 - t1;
+
+    MPI_Reduce( &deT, &runTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
 
     if ( myRank == 0 )
     {
-        // cout << " Method " << COMM_PATTERN << " total_time " << t2 - t1 << endl;
-        runTime = t2 - t1;
+        runTime = runTime;
         runInfo();
+        printf( "change ownership time =%lf percent of solution and take %lf seconds \n", t2_com / deT * 100.0, t2_com );
     }
 }
 
@@ -769,8 +792,8 @@ void PoissonCPU::testDST01()
     fftw_plan pl;
 
     double *inEx = new double[2 * ( mysize )];
-    double *in = new double[2 * ( mysize )];
-    double *out = new double[2 * mysize];
+    double *in   = new double[2 * ( mysize )];
+    double *out  = new double[2 * mysize];
 
     // to obtain DST2
     for ( int i = 0; i < mysize; i++ )
@@ -798,7 +821,7 @@ void PoissonCPU::testDST01()
         cout << out[i] << endl;
     }
 
-    double *inC = new double[2 * ( mysize )];
+    double *inC  = new double[2 * ( mysize )];
     double *outC = new double[2 * mysize];
 
     for ( int i = 0; i < mysize; i++ )
@@ -850,8 +873,8 @@ void PoissonCPU::testDST10()
     fftw_plan pl;
 
     double *inEx = new double[2 * ( mysize )];
-    double *in = new double[2 * ( mysize )];
-    double *out = new double[2 * mysize];
+    double *in   = new double[2 * ( mysize )];
+    double *out  = new double[2 * mysize];
 
     // to obtain DST2
     for ( int i = 0; i < mysize; i++ )
@@ -879,7 +902,7 @@ void PoissonCPU::testDST10()
         cout << out[i] << endl;
     }
 
-    double *inC = new double[2 * ( mysize )];
+    double *inC  = new double[2 * ( mysize )];
     double *outC = new double[2 * mysize];
 
     for ( int i = 0; i < mysize; i++ )

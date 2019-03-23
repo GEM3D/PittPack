@@ -14,12 +14,11 @@
 static MPI_Datatype ConvertType( Abstraction::DataType type );
 
 template <class Type>
-CommPoint2Point
-<Type>::CommPoint2Point( void *buff, uint size, uint *tg, uint snd, uint rcv, uint type, MPI_Comm Comm ) /*!< If communicator is
-                                                                                                            not specified it will
-                                                                                                            be set as
-                                                                                                            MPI_COMM_WORLD by
-                                                                                                            default*/
+CommPoint2Point<Type>::CommPoint2Point( void *buff, uint size, uint *tg, uint snd, uint rcv, uint type, MPI_Comm Comm ) /*!< If communicator
+                                                                                                                           is not specified
+                                                                                                                           it will be set as
+                                                                                                                           MPI_COMM_WORLD by
+                                                                                                                           default*/
 {
     if ( Comm != MPI_COMM_NULL )
     {
@@ -54,7 +53,7 @@ CommPoint2Point
         Msg.tag = *tg;
     }
 
-    Msg.sender = snd;
+    Msg.sender   = snd;
     Msg.reciever = rcv;
 
     Msg.datatype = ConvertType( getAbstractionDataType<Type>() );
@@ -98,11 +97,11 @@ CommPoint2Point<Type>::CommPoint2Point( void *buff, uint size, uint snd, uint rc
         throw std::runtime_error( "Message Size can not be zero" );
     }
 
-    Msg.tag = 0;
-    Msg.sender = snd;
+    Msg.tag      = 0;
+    Msg.sender   = snd;
     Msg.reciever = rcv;
     Msg.datatype = ConvertType( getAbstractionDataType<Type>() );
-    Msg.buf = buff;
+    Msg.buf      = buff;
 }
 
 template <class Type>
@@ -123,9 +122,9 @@ CommPoint2Point<Type>::CommPoint2Point( void *buff, uint size ) /*!< another con
         MPI_Finalize();
         throw std::runtime_error( "Message Size can not be zero" );
     }
-    Msg.tag = 0;
+    Msg.tag      = 0;
     Msg.datatype = ConvertType( getAbstractionDataType<Type>() );
-    Msg.buf = buff;
+    Msg.buf      = buff;
 }
 
 template <class Type>
@@ -227,7 +226,7 @@ void CommPoint2Point<Type>::getOffset( uint myvalue, uint *offset ) /*!<gets the
             if ( Com.myRank > 0 )
             {
                 Msg.sender = Com.myRank - 1;
-                Msg.buf = &recvbuf;
+                Msg.buf    = &recvbuf;
                 //  Msg.print();
                 recv();
                 ( *offset ) = recvbuf;
@@ -236,8 +235,8 @@ void CommPoint2Point<Type>::getOffset( uint myvalue, uint *offset ) /*!<gets the
             if ( Com.myRank < ( Com.comSize - 1 ) )
             {
                 Msg.reciever = Com.myRank + 1;
-                recvbuf = recvbuf + myvalue;
-                Msg.buf = &recvbuf;
+                recvbuf      = recvbuf + myvalue;
+                Msg.buf      = &recvbuf;
 
                 send();
             }
@@ -269,11 +268,11 @@ CommCollective<Type>::CommCollective( void *buff, uint size, uint root ) /*!< an
         throw std::runtime_error( "Message Size can not be zero" );
     }
 
-    Msg.tag = 0;
-    Msg.sender = root;
+    Msg.tag      = 0;
+    Msg.sender   = root;
     Msg.reciever = root;
     Msg.datatype = ConvertType( getAbstractionDataType<Type>() );
-    Msg.buf = buff;
+    Msg.buf      = buff;
 }
 
 template <class Type>
@@ -295,11 +294,11 @@ CommCollective<Type>::CommCollective( void *buff, uint size ) /*!< another const
         throw std::runtime_error( "Message Size can not be zero" );
     }
 
-    Msg.tag = 0;
-    Msg.sender = Com.comSize - 1;
+    Msg.tag      = 0;
+    Msg.sender   = Com.comSize - 1;
     Msg.reciever = Com.comSize - 1;
     Msg.datatype = ConvertType( getAbstractionDataType<Type>() );
-    Msg.buf = buff;
+    Msg.buf      = buff;
 }
 
 template <class Type>
@@ -322,7 +321,7 @@ void CommCollective<uint>::getTotalNumber( uint *offset, uint *myvalue, uint *to
 // void CommCollective<uint>::getTotalNumber(uint *totalvalue) /*!< method 0
 // communicates with MPI-I and method 1 uses one-sided communication */
 {
-    uint c = ( *offset ) + ( *myvalue );
+    uint c  = ( *offset ) + ( *myvalue );
     Msg.buf = &c;
 
     /*!< the largest offset belongs to the processor with highest rank, add this
@@ -349,7 +348,7 @@ template <>
 void CommCollective<uint>::IgetTotalNumber( uint *offset, uint *myvalue, uint *totalvalue )
 {
     *totalvalue = ( *offset ) + ( *myvalue );
-    Msg.buf = totalvalue;
+    Msg.buf     = totalvalue;
 
     /*!< the largest offset belongs to the processor with highest rank, add this
        to its number of cubes

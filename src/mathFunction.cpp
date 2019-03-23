@@ -8,49 +8,29 @@
 #if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
-double sine( double x )
-{
-    return ( sin( x ) );
-}
+double sine( double x ) { return ( sin( x ) ); }
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
-double cosine( double x )
-{
-    return ( cos( x ) );
-}
+double cosine( double x ) { return ( cos( x ) ); }
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
-double absolute( double x )
-{
-    return ( fabs( x ) );
-}
+double absolute( double x ) { return ( fabs( x ) ); }
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
-double arctan( double x )
-{
-    return ( atan( x ) );
-}
+double arctan( double x ) { return ( atan( x ) ); }
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
-double squareRoot( double x )
-{
-    return ( sqrt( x ) );
-}
-
+double squareRoot( double x ) { return ( sqrt( x ) ); }
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
-int myLog2( int x ) 
-{
-    return ( log2( x ) );
-}
-
+int myLog2( int x ) { return ( log2( x ) ); }

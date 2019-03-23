@@ -46,7 +46,7 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     PITT_ABORT                  = 0,
     INCLUDE_ERROE_CAL_IN_TIMING = 0 , /*! uses an expensive allreduce function misleading to be included in profiling, takes 8 % of 512M
                                         mesh, suggest truning it off for profiling*/
-    SOLUTIONMETHOD = 1 ,                   /*!< (0) solves with Thomas (1) Uses PCR (2) CR-P (4) Multigrid and (5) cuSPARCE (CR and PCR ) 
+    SOLUTIONMETHOD = 0 ,                   /*!< (0) solves with Thomas (1) Uses PCR (2) CR-P (4) Multigrid and (5) cuSPARCE (CR and PCR ) 
                                                 the last two are disabled disabled to avoid unnecesary memory usage, 
                                                  need to change the MULTIGRIDON to 1 to enable allocation for multigrid and cuSPARSE */
     PIVOT = 1,                        /*!< This is only used for cuSPARSE, for diagonally dominant matrix pivoting is not required */
@@ -104,6 +104,7 @@ const double pi = 3.1415926535897932384;
 #define FFTY 1
 #define REV 1
 #define REVTRSP 1 /*!< 1) stands for simplest transform. 0) transposes using shared mem*/
+#define R_COPY 1
 #define JIC 0
 
 

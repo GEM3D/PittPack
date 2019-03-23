@@ -24,11 +24,11 @@ class ChunkedArray
     int    nz;                     /*!< nz for each chunk, depending on the direction of chunking this might be nz or nz/nChunk  */
     int    arraySize;              /*!<Total size of array */
     double Xa, Xb, Ya, Yb, Za, Zb; /*!< Block coordinates to be passed on to Class Phdf5 for visualization*/
-    double *__restrict__ P = NULL; /*!< Restricted main pointer to hold data*/
+    double * __restrict__ P = NULL; /*!< Restricted main pointer to hold data*/
     int    chunkSize       = 0;
     int    orientation;
     double dx, dy, dz;
-    complex<double> *__restrict__ Pc=NULL;
+//    complex<double> * __restrict__ Pc=NULL;
 
     public:
     ChunkedArray(){};                  /*!< Constructor  */

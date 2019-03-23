@@ -59,10 +59,10 @@ class PencilDcmp
     MPI_Comm nbrComm1;   /*!< MPI communicator to use for neighborhood collectives in y-dir */
 //    MPI_Comm nodalComm;  /*!< nodal communicator created to assure one-on-one mapping with GPU */
 
-    double *__restrict__ Xbox      = NULL;
-    double *__restrict__ coords    = NULL;
-    double *tmp                    = NULL;
-    double *tmpX                   = NULL;
+    double *__restrict__ Xbox       = NULL;
+    double *__restrict__ coords     = NULL;
+    double *tmp                     = NULL;
+    double *__restrict__  tmpX       = NULL;
     double * __restrict__ tmpY      = NULL;
     double * __restrict__ tmpMGReal = NULL;
     double * __restrict__ tmpMGImag = NULL;
@@ -71,7 +71,12 @@ class PencilDcmp
     double * __restrict__ crpcr_lower=NULL;
     double * __restrict__ crpcr_upper=NULL;
     double * __restrict__ crpcr_rhs=NULL;
+    MPI_Request *send_request = NULL;
+    MPI_Status *send_status   = NULL;
+    MPI_Request *recv_request = NULL;
+    MPI_Status *recv_status   = NULL;
 
+ 
 //   double *restrict 
 //    double *selectPointer[2]       = NULL; later on to solidfiy the rela amd imaginary functions
     //    double *tmpZ = NULL;
@@ -101,13 +106,13 @@ class PencilDcmp
     char   nameAppendix[80];
 
     sint  iaxSize;    /*!< size of the iax array, we use Compressed Row Storage format to compactly store these indices */
-    sint *iax = NULL; /*!< saves the extent for the array*/
-    sint *jax = NULL; /*!< saves tha shuffling sequence from local to global for a given index*/
+    sint * __restrict__ iax = NULL; /*!< saves the extent for the array*/
+    sint *__restrict__ jax = NULL; /*!< saves tha shuffling sequence from local to global for a given index*/
     sint  jaxSize;    /*!< saves tha size of the jax array for copy operations*/
 
     sint  iaySize;    /*!<size of the iax array, we use Compressed Row Storage format to compactly store these indices */
-    sint *iay = NULL; /*!< saves the extent for the array in y-direction*/
-    sint *jay = NULL; /*!< saves the shuffling sequence from local to global in y direction*/
+    sint * __restrict__ iay = NULL; /*!< saves the extent for the array in y-direction*/
+    sint * __restrict__ jay = NULL; /*!< saves the shuffling sequence from local to global in y direction*/
     sint  jaySize;    /*!< saves tha size of the jax array for copy operations*/
 
     int *Nbrs[2] = {NULL, NULL}; /*!< Nbrs[0] is the stride 1 neighbor where as Nbrs[1] is the stride p0 */
@@ -186,7 +191,7 @@ class PencilDcmp
     void saveToDest( const sint source, const sint dest, sint dir );
 
 #pragma acc routine vector
-    void saveTmpToDest( const double *tmp, const sint dest, sint dir );
+    void saveTmpToDest( const double *__restrict__ tmp, const sint dest, sint dir );
 
 #pragma acc routine gang
     void restoreLocationX(); /*!< restores the data stored at each chunk to its original x-major lay-out  */
@@ -204,8 +209,8 @@ class PencilDcmp
     void initializeTrigonometric(); /*!< Initializes the source using \f$sin(\omega x)\f$ and \f$cos(\omega)\f$ bases on the
                                                 boundary condition */
 
-    void saveToTmp( const sint id, double *tmp, sint dir );  /*!< saves the data to a temporary array */
-    void restoreTmp( const sint id, double *tmp, sint dir ); /*!< Assignes the data in the temporary array to its new location */
+    void saveToTmp( const sint id, double * __restrict__ tmp, sint dir );  /*!< saves the data to a temporary array */
+    void restoreTmp( const sint id, double *__restrict__ tmp, sint dir ); /*!< Assignes the data in the temporary array to its new location */
     void printX( ofstream &myfile ); /*!<Each rank prints x-major their own file name data* where '*' is appended by processor rank  */
     void printY( ofstream &myfile ); /*!<Each rank prints y-major their own file name data* where '*' is appended by processor rank  */
     //    void rearrangeXY();              /*!< rearranges storage of data  from x-major to y-major format*/
@@ -380,6 +385,10 @@ void imposeBoundaryonOffDiag(double eig, double *lower,double *upper);
 
 #pragma acc routine seq  
 void imposeBoundaryonCRPTmp(int i,int j,int index,double eig, double *container);
+
+
+void nbrAllToAllZXOverlap();
+void nbrAllToAllXYOverlap();
 
     ~PencilDcmp(); /*!< Class destructor*/
 };

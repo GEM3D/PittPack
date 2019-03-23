@@ -57,39 +57,43 @@ int main( int argcs, char *pArgs[] )
     int NYCHUNK = atoi( pArgs[2] );
     int NZCHUNK = atoi( pArgs[3] );
 
-    // always check for compatibility of the Class on GPU
-    if ( __has_trivial_copy( PoissonGPU ) == true )
-    {
-        std::cout << "Congrat! myClass will work with OpenACC copy operations " << std::endl;
-    }
-    else
-    {
-        std::cout << "OOPS! myClass will NOT work with OpenACC copy operations " << std::endl;
-        return 1;
-    }
-
     if ( MPI_Init( &argcs, &pArgs ) != MPI_SUCCESS )
     {
         cout << " Exit Code : " << PittPackGetErrorEnum( MPI_INIT_FAIL ) << endl;
         exit( 1 );
     }
 
-    // PencilDcmp N(argcs, pArgs, 10,10,10 );
-
     int my_rank, com_size;
     MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
     MPI_Comm_size( MPI_COMM_WORLD, &com_size );
 
+    // always check for compatibility of the Class on GPU
+    if ( my_rank == 0 )
+    {
+        if ( __has_trivial_copy( PoissonGPU ) == true )
+        {
+            std::cout << "Congrat! myClass will work with OpenACC copy operations " << std::endl;
+        }
+        else
+        {
+            std::cout << "OOPS! myClass will NOT work with OpenACC copy operations " << std::endl;
+            return 1;
+        }
+    }
+    // PencilDcmp N(argcs, pArgs, 10,10,10 );
+
 #if ( OPENACC )
     //    #if ( 0 )
-
-    cout << " ====================================== " << endl;
-    cout << " ====================================== " << endl;
-    cout << " OPENACC is defined "
-            "============" << endl;
-    cout << " ====================================== " << endl;
-    cout << " ====================================== " << endl;
-
+    if ( my_rank == 0 )
+    {
+        cout << " ====================================== " << endl;
+        cout << " ====================================== " << endl;
+        cout << " OPENACC is defined "
+                "============"
+             << endl;
+        cout << " ====================================== " << endl;
+        cout << " ====================================== " << endl;
+    }
     PittPackResult result;
     result = OPENACC_Init( my_rank, com_size );
 
@@ -106,7 +110,7 @@ int main( int argcs, char *pArgs[] )
     int p0 = sqrt( com_size );
     int p1 = p0;
 
-    cout << " p0 " << p0 <<" "<<p1<< endl;
+    cout << " p0 " << p0 << " " << p1 << endl;
 
     int Nx = NXCHUNK * p0;
     int Ny = NYCHUNK * p0;
@@ -137,10 +141,10 @@ int main( int argcs, char *pArgs[] )
 
 #endif
 
-  //        char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
-  //     char mybc[6] = {'D', 'D', 'D', 'D', 'D', 'D'};
-      char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
-  //      char mybc[6] = {'D', 'D', 'D', 'D', 'N', 'N'};
+    //        char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
+    //     char mybc[6] = {'D', 'D', 'D', 'D', 'D', 'D'};
+    char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
+    //      char mybc[6] = {'D', 'D', 'D', 'D', 'N', 'N'};
     std::cout << mybc[0] << " " << mybc[1] << " " << mybc[2] << " " << mybc[3] << " " << mybc[4] << " " << mybc[5] << std::endl;
     M.assignBoundary( mybc );
     // testMpiClass(MPI_COMM_WORLD);
@@ -172,9 +176,9 @@ int main( int argcs, char *pArgs[] )
     */
     // int tags[3]={1,1,1};
 
-   // int tags[3] = {0, 0, 0};
-   // double t1, t2;
-   // int this_rank = 3;
+    // int tags[3] = {0, 0, 0};
+    // double t1, t2;
+    // int this_rank = 3;
 #if ( DEBUG1 )
     ofstream myfile;
 
@@ -212,8 +216,8 @@ int main( int argcs, char *pArgs[] )
     cout << "xxxxxxxxxxxxInitilize done xxxxxxxxxxxxxxxxxxxxx" << endl;
     //     M.IO( 0, dir, 0 );
 
-   // MPI_Barrier( MPI_COMM_WORLD );
-   // t1 = MPI_Wtime();
+    // MPI_Barrier( MPI_COMM_WORLD );
+    // t1 = MPI_Wtime();
 
 #if ( DEBUG1 )
     myfile << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << endl;
@@ -224,7 +228,7 @@ int main( int argcs, char *pArgs[] )
         M.printX( myfile );
     }
 #endif
-// step 1) pencils with n(0,0,1) is converted to pencil with n(1,0,0)
+    // step 1) pencils with n(0,0,1) is converted to pencil with n(1,0,0)
 
 #if ( 1 )
 #if ( !EXACT )
@@ -268,40 +272,40 @@ int main( int argcs, char *pArgs[] )
 #if ( DEBUG1 )
     myfile.close();
 #endif
-if(INCLUDE_ERROE_CAL_IN_TIMING==0)
-{
-    cout << " err = " << M.getError() << endl;
-}
+    if ( INCLUDE_ERROE_CAL_IN_TIMING == 0 )
+    {
+        cout << " err = " << M.getError() << endl;
+    }
 //    M.runInfo();
 #endif
 
-//#pragma acc parallel
-//    M.solveThmSmallMesh(0 ); 
- //  cout<<BLUE<<"thomas solving "<<RESET<<endl;
-// M.testDST10();
-//   M.testDST10();
-//  M.testDST01();
+    //#pragma acc parallel
+    //    M.solveThmSmallMesh(0 );
+    //  cout<<BLUE<<"thomas solving "<<RESET<<endl;
+    // M.testDST10();
+    //   M.testDST10();
+    //  M.testDST01();
 
-/* not working for collectives yet
-int  a[1]={my_rank+100};
-int b[1]={0};
-#pragma acc enter data copyin(a[0:1],b[0:1])
-{
-
-#pragma acc host_data use_device(a,b)
-MPI_Allreduce(a, b,1,MPI_INT, MPI_MAX, MPI_COMM_WORLD);
-
-}
-cout<<"b = "<<b[0]<<endl;
-*/
-/*
-    if(my_rank==0)
+    /* not working for collectives yet
+    int  a[1]={my_rank+100};
+    int b[1]={0};
+    #pragma acc enter data copyin(a[0:1],b[0:1])
     {
-      cout<<"Grid Size"<<NXCHUNK<< " "<<  <<endl;
+
+    #pragma acc host_data use_device(a,b)
+    MPI_Allreduce(a, b,1,MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+
     }
-*/
-// ported to the class destructor
-//    MPI_Finalize();
+    cout<<"b = "<<b[0]<<endl;
+    */
+    /*
+        if(my_rank==0)
+        {
+          cout<<"Grid Size"<<NXCHUNK<< " "<<  <<endl;
+        }
+    */
+    // ported to the class destructor
+    //    MPI_Finalize();
 
 #endif
     if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )

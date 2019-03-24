@@ -8,7 +8,7 @@
 #define DEBUG1 0       /*!<mainly turn off IO for debugging */
 #define DEBUG0 0       /*!<mainly turn off IO for debugging  for solverCPU */
 #define DEBUG 0        /*!<mainly turn off IO for debugging  for solverCPU */
-#define COMM_PATTERN 1  /*!< two type of comm_patterns are available, (0) Pairwise exchange (1) Neighorhood collective, don not try comm_pattern with CPU yet */
+#define COMM_PATTERN 2  /*!< two type of comm_patterns are available, (0) Pairwise exchange (1) Neighorhood collective, don not try comm_pattern with CPU yet */
 #define SHORT_  0 /*!< controls the type for \f$iax, iay, jax, jay\f$ arrays, setting to 1 selects \f$short int\f$  where settingt it to zero will set \
 the type as \f$int\f$ */
 #define ZSIZE 64 /*! shoud be nzChubk*nChunk, not required if the first 4 letters specifying the boundary are not 'P', also not required in new version of solve  */

@@ -1454,7 +1454,7 @@ void PencilDcmp::nbrAllToAllZXOverlap()
 #pragma acc update device( ptr [0:end] ) async( i + 1 )
     }
 #endif
-
+int id;
 #if ( 1 )
     for ( int i = 0; i < p0; i++ )
     {
@@ -1465,23 +1465,28 @@ void PencilDcmp::nbrAllToAllZXOverlap()
          *                                      }
          *                                              */
         MPI_Waitany( p0, send_request, &indx, send_status );
+    
+        id=indx+1;
 
 #if ( PITTPACKACC )
-        acc_async_wait( indx + 1 );
+        acc_async_wait( id );
 #endif
-
+/*
 #pragma acc data present( P.P, R.P, this )
 #pragma acc parallel loop num_gangs( 1024 )
         for ( int l = 0; l < P.chunkSize; l++ )
         {
             P( P.chunkSize * indx + l ) = R( R.chunkSize * indx + l );
         }
+*/
     }
 #else
 
     MPI_Waitall( p0, send_request, send_status );
 #if ( PITTPACKACC )
     acc_wait_all();
+#endif
+
 #endif
 
 #pragma acc data present( P.P, R.P, this )
@@ -1491,7 +1496,6 @@ void PencilDcmp::nbrAllToAllZXOverlap()
         P( l ) = R( l );
     }
 
-#endif
 
     // update device
     //
@@ -1725,22 +1729,25 @@ void PencilDcmp::nbrAllToAllXYOverlap()
 #pragma acc update device( ptr [0:end] ) async( i + 1 )
     }
 #endif
-
+int id;
 #if ( 1 )
     for ( int i = 0; i < p0; i++ )
     {
        MPI_Waitany( p0, send_request, &indx, send_status );
 
-#if ( PITTPACKACC )
-        acc_async_wait( indx + 1 );
-#endif
+       id=indx+1;
 
+#if ( PITTPACKACC )
+        acc_async_wait( id );
+#endif
+/*
 #pragma acc data present( P.P, R.P, this )
 #pragma acc parallel loop num_gangs( 1024 )
         for ( int l = 0; l < P.chunkSize; l++ )
         {
             P( P.chunkSize * indx + l ) = R( R.chunkSize * indx + l );
         }
+*/
     }
 
 #else
@@ -1748,6 +1755,8 @@ void PencilDcmp::nbrAllToAllXYOverlap()
 
 #if ( PITTPACKACC )
     acc_wait_all();
+#endif
+
 #endif
 
 #pragma acc data present( P.P, R.P, this )
@@ -1759,7 +1768,7 @@ void PencilDcmp::nbrAllToAllXYOverlap()
 
 #endif
 
-#endif
+
     // update device
     //
 

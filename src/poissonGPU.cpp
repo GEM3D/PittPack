@@ -115,7 +115,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
     //  gettimeofday( &start_time, NULL );
     double t1;
     //   MPI_Barrier( MPI_COMM_WORLD );
-    t1 = MPI_Wtime();
+    //t1 = MPI_Wtime();
 
 #if ( DEBUG2 )
     ofstream myfile;
@@ -187,6 +187,8 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 #pragma acc parallel num_gangs( 1024 ) vector_length( VECLENGTH )
                 modifyRhsDirichlet();
             }
+
+            t1 = MPI_Wtime();
 
             if ( MONITOR_MEM )
             {

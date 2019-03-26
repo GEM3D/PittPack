@@ -58,7 +58,7 @@ class PencilDcmp
     MPI_Comm nbrComm0;   /*!< MPI communicator to use for neighborhood collectives in x-dir */
     MPI_Comm nbrComm1;   /*!< MPI communicator to use for neighborhood collectives in y-dir */
 //    MPI_Comm nodalComm;  /*!< nodal communicator created to assure one-on-one mapping with GPU */
-
+    int *__restrict__ indices=NULL;
     double *__restrict__ Xbox       = NULL;
     double *__restrict__ coords     = NULL;
     double *tmp                     = NULL;
@@ -389,6 +389,12 @@ void imposeBoundaryonCRPTmp(int i,int j,int index,double eig, double *container)
 
 void nbrAllToAllZXOverlap();
 void nbrAllToAllXYOverlap();
+
+#pragma acc routine gang
+void changeLocationXOverlap();
+
+#pragma acc routine gang
+void changeLocationYOverlap();
 
     ~PencilDcmp(); /*!< Class destructor*/
 };

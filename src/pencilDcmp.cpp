@@ -79,8 +79,15 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
     {
         gangTri = 2 * gangTri;
     }
+
+#if(THOM_FULL_BATCH==1)
+    x1 = new double[nxChunk* nyChunk * nz];
+    x2 = new double[nxChunk* nyChunk * nz];
+#else
     x1 = new double[gangTri * nz];
     x2 = new double[gangTri * nz];
+#endif
+
 
     if ( SOLUTIONMETHOD != 0 )
     {
@@ -123,39 +130,44 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
 
     faceTag = new sint[6];
 
-
+    indices = new int[p0];
 
 // allocate some indices for help swap the data in-place rather than allocating a whole matrix
 #if ( PITTPACKACC )
-#pragma acc enter data create( this [0:1] )
+#pragma acc enter data create( this [0:1] ) async( 1 )
 #pragma acc update device( this )
-#pragma acc enter data create( omega [0:3] )
-#pragma acc enter data create( dxyz [0:3] )
-#pragma acc enter data create( coords [0:6] )
-#pragma acc enter data create( tags [0:3] )
-#pragma acc enter data create( subDiag [0:3] )
-#pragma acc enter data create( freqs [0:2] )
-#pragma acc enter data create( supDiag [0:3] )
-#pragma acc enter data create( length [0:3] )
-#pragma acc enter data create( num [0:2] )
-#pragma acc enter data create( denum [0:2] )
-#pragma acc enter data create( bc [0:6] )
-#pragma acc enter data create( faceTag [0:6] )
+#pragma acc enter data create( omega [0:3] ) async( 2 )
+#pragma acc enter data create( dxyz [0:3] ) async( 3 )
+#pragma acc enter data create( coords [0:6] ) async( 4 )
+#pragma acc enter data create( tags [0:3] ) async( 5 )
+#pragma acc enter data create( subDiag [0:3] ) async( 5 )
+#pragma acc enter data create( freqs [0:2] ) async( 6 )
+#pragma acc enter data create( supDiag [0:3] ) async( 7 )
+#pragma acc enter data create( length [0:3] ) async( 8 )
+#pragma acc enter data create( num [0:2] ) async( 9 )
+#pragma acc enter data create( denum [0:2] ) async( 10 )
+#pragma acc enter data create( bc [0:6] ) async( 11 )
+#pragma acc enter data create( faceTag [0:6] ) async( 12 )
 #if ( MULTIGRIDON )
-#pragma acc enter data create( tmpMGReal [0:nz + SIZEMG] )
-#pragma acc enter data create( tmpMGImag [0:nz + SIZEMG] )
+#pragma acc enter data create( tmpMGReal [0:nz + SIZEMG] ) async( 13 )
+#pragma acc enter data create( tmpMGImag [0:nz + SIZEMG] ) async( 14 )
 #endif
-#pragma acc enter data create( Xbox [0:6] )
+#pragma acc enter data create( Xbox [0:6] ) async( 15 )
 #pragma acc update device( subDiag [0:3] )
 #pragma acc update device( supDiag [0:3] )
-#pragma acc enter data create( dl [0:nz] )
-#pragma acc enter data create( ds [0:nz] )
-#pragma acc enter data create( du [0:nz] )
+#pragma acc enter data create( dl [0:nz] ) async( 16 )
+#pragma acc enter data create( ds [0:nz] ) async( 17 )
+#pragma acc enter data create( du [0:nz] ) async( 18 )
 #pragma acc update device( dl [0:nz] )
 #pragma acc update device( du [0:nz] )
-#pragma acc enter data create( x1 [0:nz * gangTri] )
-#pragma acc enter data create( x2 [0:nz * gangTri] )
-
+#if(THOMAS_FULL_BATCH==1)
+#pragma acc enter data create( x1 [0:nz * nxChunk * nyChunk] ) async( 20 )
+#pragma acc enter data create( x2 [0:nz * nxChunk * nyChunk] ) async( 21 )
+#else
+#pragma acc enter data create( x1 [0:nz * gangTri] ) async( 20 )
+#pragma acc enter data create( x2 [0:nz * gangTri] ) async( 21 )
+#endif
+ 
     if ( SOLUTIONMETHOD != 0 )
     {
 //#pragma acc enter data create( crpcr_lower[0 : nz*gangTri] )
@@ -179,17 +191,19 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
     MG.construct( ( nz + SIZEMG ), INNERITER, INNERITER, OUTERITER, subDiag, supDiag );
     MGC.construct( ( nz + SIZEMG ), INNERITER, INNERITER, OUTERITER, subDiag, supDiag );
 
-    send_request              = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
-    send_status               = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
+    send_request = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
+    send_status  = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
 
     recv_request = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
-    recv_status = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
-
-
+    recv_status  = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
 
 #if ( DEBUG )
     cout << "iaxsize " << iaxSize << endl;
     cout << "iaysize " << iaySize << endl;
+#endif
+
+#if ( PITTPACKACC )
+    acc_async_wait_all();
 #endif
 }
 
@@ -263,9 +277,19 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
         gangTri = 2 * gangTri;
     }
 
+
+#if( THOM_FULL_BATCH==1)
+    x1 = new double[nxChunk* nyChunk * nz];
+    x2 = new double[nxChunk* nyChunk * nz];
+#else
     x1 = new double[gangTri * nz];
     x2 = new double[gangTri * nz];
+#endif
 
+/*
+    x1 = new double[gangTri * nz];
+    x2 = new double[gangTri * nz];
+*/
     if ( SOLUTIONMETHOD != 0 )
     {
         //    crpcr_lower=new double[gangTri*nz];
@@ -304,38 +328,44 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
         du[i - 1] = 1.0;
     }
 
+    indices = new int[p0];
 // allocate some indices for help swap the data in-place rather than allocating a whole matrix
 #if ( PITTPACKACC )
-#pragma acc enter data create( this [0:1] )
+#pragma acc enter data create( this [0:1] ) async( 1 )
 #pragma acc update device( this )
-#pragma acc enter data create( omega [0:3] )
-#pragma acc enter data create( dxyz [0:3] )
-#pragma acc enter data create( coords [0:6] )
-#pragma acc enter data create( tags [0:3] )
-#pragma acc enter data create( subDiag [0:3] )
-#pragma acc enter data create( freqs [0:2] )
-#pragma acc enter data create( supDiag [0:3] )
-#pragma acc enter data create( length [0:3] )
-#pragma acc enter data create( num [0:2] )
-#pragma acc enter data create( denum [0:2] )
-#pragma acc enter data create( bc [0:6] )
-#pragma acc enter data create( faceTag [0:6] )
-#pragma acc enter data create( Xbox [0:6] )
+#pragma acc enter data create( omega [0:3] ) async( 2 )
+#pragma acc enter data create( dxyz [0:3] ) async( 3 )
+#pragma acc enter data create( coords [0:6] ) async( 4 )
+#pragma acc enter data create( tags [0:3] ) async( 5 )
+#pragma acc enter data create( subDiag [0:3] ) async( 6 )
+#pragma acc enter data create( freqs [0:2] ) async( 7 )
+#pragma acc enter data create( supDiag [0:3] ) async( 8 )
+#pragma acc enter data create( length [0:3] ) async( 9 )
+#pragma acc enter data create( num [0:2] ) async( 10 )
+#pragma acc enter data create( denum [0:2] ) async( 11 )
+#pragma acc enter data create( bc [0:6] ) async( 12 )
+#pragma acc enter data create( faceTag [0:6] ) async( 13 )
+#pragma acc enter data create( Xbox [0:6] ) async( 14 )
 
 #if ( MULTIGRIDON )
-#pragma acc enter data create( tmpMGReal [0:nz + SIZEMG] )
-#pragma acc enter data create( tmpMGImag [0:nz + SIZEMG] )
+#pragma acc enter data create( tmpMGReal [0:nz + SIZEMG] ) async( 15 )
+#pragma acc enter data create( tmpMGImag [0:nz + SIZEMG] ) async( 16 )
 #endif
 
 #pragma acc update device( subDiag [0:3] )
 #pragma acc update device( supDiag [0:3] )
-#pragma acc enter data create( dl [0:nz] )
-#pragma acc enter data create( ds [0:nz] )
-#pragma acc enter data create( du [0:nz] )
+#pragma acc enter data create( dl [0:nz] ) async( 17 )
+#pragma acc enter data create( ds [0:nz] ) async( 18 )
+#pragma acc enter data create( du [0:nz] ) async( 19 )
 #pragma acc update device( du [0:nz] )
 #pragma acc update device( dl [0:nz] )
-#pragma acc enter data create( x1 [0:nz * gangTri] )
-#pragma acc enter data create( x2 [0:nz * gangTri] )
+#if( THOM_FULL_BATCH==1)
+#pragma acc enter data create( x1 [0:nz * nxChunk * nyChunk] ) async( 20 )
+#pragma acc enter data create( x2 [0:nz * nxChunk * nyChunk] ) async( 21 )
+#else
+#pragma acc enter data create( x1 [0:nz * gangTri] ) async( 20 )
+#pragma acc enter data create( x2 [0:nz * gangTri] ) async( 21 )
+#endif
     if ( SOLUTIONMETHOD != 0 )
     {
 //#pragma acc enter data create( crpcr_lower[0 : nz*gangTri] )
@@ -355,17 +385,19 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
     MGC.construct( ( nz + SIZEMG ), INNERITER, INNERITER, OUTERITER, subDiag, supDiag );
 
     //    acc_map_data(P.P,P.P,2*nxChunk*nyChunk*nz*sizeof(double) );
-    send_request              = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
-    send_status               = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
+    send_request = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
+    send_status  = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
 
     recv_request = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
-    recv_status = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
-
-
+    recv_status  = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
 
 #if ( DEBUG )
     cout << "iaxsize " << iaxSize << endl;
     cout << "iaysize " << iaySize << endl;
+#endif
+
+#if ( PITTPACKACC )
+    acc_async_wait_all();
 #endif
 }
 
@@ -482,6 +514,7 @@ PencilDcmp::~PencilDcmp()
         delete[] iay;
     }
 
+    delete[] indices;
 // freeing the resources should be in reverse order
 #if ( PITTPACKACC )
 #pragma acc exit data delete ( coords )
@@ -569,14 +602,11 @@ PencilDcmp::~PencilDcmp()
             exit( 1 );
         }
     }
-  delete[] send_request;   
-  delete[] send_status;
+    delete[] send_request;
+    delete[] send_status;
 
-  delete[]  recv_request;
-  delete[]  recv_status ;
-
-
-
+    delete[] recv_request;
+    delete[] recv_status;
 }
 
 //
@@ -719,7 +749,7 @@ void PencilDcmp::setCoords( int dir )
             X[5] = X[4] + dz;
             break;
     }
-        // modifying this from previous to monitor move of the chunks for Debug
+            // modifying this from previous to monitor move of the chunks for Debug
 
 #if ( DEBUG )
     cout << GREEN " rank= " << myRank << " Xa= " << X[0] << " Xb= " << X[1] << " dx " << dx << endl;
@@ -949,7 +979,7 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
 #endif
     }
 
-    //        #pragma acc wait(4)
+        //        #pragma acc wait(4)
 
 #if ( DEBUG )
     // cout<<"SUCCESS " <<endl;
@@ -1069,12 +1099,17 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
         ptr = &P( 0 ) + getPeriodicIndexStride( -j ) * P.chunkSize;
         end = P.chunkSize;
 #if ( PITTPACKACC )
-#pragma acc update device( ptr [0:end] )
+#pragma acc update device( ptr [0:end] ) async( 4 )
 #endif
 #else
         ptr = &R( 0 );
         end = R.chunkSize;
-#pragma acc update device( R.P [0:end] )
+#pragma acc update device( R.P [0:end] ) async( 5 )
+
+#if ( PITTPACKACC )
+#pragma acc wait( 4, 5 )
+#endif
+
 //#pragma acc data present(P.P,R.P)
 #pragma acc parallel loop
         for ( int k = 0; k < P.chunkSize; k++ )
@@ -1289,7 +1324,7 @@ void PencilDcmp::checkGraph( int index )
 
 void PencilDcmp::nbrAllToAllZX()
 {
-    // for All to allV
+// for All to allV
 
 #pragma acc parallel loop num_gangs( 1024 )
     for ( int l = 0; l < nChunk * R.chunkSize; l++ )
@@ -1365,12 +1400,12 @@ void PencilDcmp::nbrAllToAllZX()
         ptr = &P( 0 ) + end * i;
 #pragma acc update device( ptr [0:end] ) async( i )
     }
-    /*
-       for ( int i = 0; i < p0; i++ )
-        {
-    #pragma acc wait(i)
-        }
-    */
+        /*
+           for ( int i = 0; i < p0; i++ )
+            {
+        #pragma acc wait(i)
+            }
+        */
 
 #if ( PITTPACKACC )
     acc_wait_all();
@@ -1390,19 +1425,7 @@ void PencilDcmp::nbrAllToAllZXOverlap()
 
     double *ptr = NULL;
     int     end = P.chunkSize;
-/*
-    // move these inside the class to eliminate multiple allocations
-    MPI_Request *send_request = NULL;
-    send_request              = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
-    MPI_Status *send_status   = NULL;
-    send_status               = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
-
-    MPI_Request *recv_request;
-    recv_request = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
-    MPI_Status *recv_status;
-    recv_status = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
-*/
-    int ierr;
+    int     ierr;
 
     //
     // post recieves
@@ -1425,11 +1448,6 @@ void PencilDcmp::nbrAllToAllZXOverlap()
 
     for ( int i = 0; i < p0; i++ )
     {
-        if ( myRank == Nbrs[0][i] )
-        {
-            //   continue;
-        }
-
 #if ( PITTPACKACC )
         acc_async_wait( i + 1 );
 #endif
@@ -1442,67 +1460,52 @@ void PencilDcmp::nbrAllToAllZXOverlap()
     int indx;
     for ( int i = 0; i < p0; i++ )
     {
-        /*
-        if(myRank==Nbrs[0][i])
-        {
-             continue;
-        }
-        */
         MPI_Waitany( p0, recv_request, &indx, recv_status );
         // cout<<"my Rank "<<indx<<endl; ;
-        ptr = &R( 0 ) + R.chunkSize * indx;
-#pragma acc update device( ptr [0:end] ) async( i + 1 )
+        indices[i] = indx;
+        ptr        = &R( 0 ) + R.chunkSize * indx;
+#pragma acc update device( ptr [0:end] ) async( p0 + i + 1 )
     }
 #endif
-int id;
+    int id;
 #if ( 1 )
     for ( int i = 0; i < p0; i++ )
     {
-        /*
-         *         if(myRank==Nbrs[0][i])
-         *                 {
-         *                              continue;
-         *                                      }
-         *                                              */
-        MPI_Waitany( p0, send_request, &indx, send_status );
-    
-        id=indx+1;
-
+        id   = indices[i] + p0 + 1;
+        indx = indices[i];
 #if ( PITTPACKACC )
         acc_async_wait( id );
 #endif
-/*
-#pragma acc data present( P.P, R.P, this )
+        MPI_Wait( &( send_request[indx] ), &( send_status[indx] ) );
+#pragma acc data present( P.P, R.P, this ) copyin( indx )
 #pragma acc parallel loop num_gangs( 1024 )
         for ( int l = 0; l < P.chunkSize; l++ )
         {
             P( P.chunkSize * indx + l ) = R( R.chunkSize * indx + l );
         }
-*/
     }
+//    MPI_Waitall( p0, send_request, send_status );
 #else
 
     MPI_Waitall( p0, send_request, send_status );
 #if ( PITTPACKACC )
     acc_wait_all();
 #endif
-
 #endif
-
+/*
 #pragma acc data present( P.P, R.P, this )
 #pragma acc parallel loop num_gangs( 1024 )
     for ( int l = 0; l < nChunk * P.chunkSize; l++ )
     {
         P( l ) = R( l );
     }
+*/
+        // update device
+        //
 
-
-    // update device
-    //
-
-    // send
-    //
-    // if recieved push to device
+        // send
+        //
+        // if recieved push to device
 #if ( 0 )
     for ( int i = 0; i < nChunk; i++ )
     {
@@ -1654,47 +1657,26 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
 
 void PencilDcmp::nbrAllToAllXYOverlap()
 {
-    // for All to allV
+// for All to all
+
+//    int *indices=(int *) new int[p0];
 
 #if ( 1 )
 
     double *ptr = NULL;
     int     end = P.chunkSize;
-/*
-    MPI_Request *send_request = NULL;
-    send_request              = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
-    MPI_Status *send_status   = NULL;
-    send_status               = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
+    int     ierr;
 
-    MPI_Request *recv_request;
-    recv_request = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
-    MPI_Status *recv_status;
-    recv_status = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
-*/
-    int ierr;
-
-    //
-    // post recieves
-    //
-
+    // part A
     for ( int i = 0; i < ( p0 ); i++ )
     {
-        //
-        // post recieves
-        //
-        /*
-        if(myRank==Nbrs[0][i])
-        {
-        //     cout<<" rank in here "<<myRank<<" neighnor  "<<Nbrs[0][i]<<endl;
-             continue;
-        }
-        */
-        // need to pull from device to host before sending
-        // some update self directives ,
+        // pull from GPU to CPU,
 
         ptr = &P( 0 ) + P.chunkSize * i;
 
 #pragma acc update self( ptr [0:end] ) async( i + 1 )
+
+        // post recieves
 
         MPI_Irecv( &R( 0 ) + R.chunkSize * i, R.chunkSize, MPI_DOUBLE, Nbrs[1][i], Nbrs[1][i], Comm, &( recv_request[i] ) );
 
@@ -1705,51 +1687,58 @@ void PencilDcmp::nbrAllToAllXYOverlap()
 
     for ( int i = 0; i < p0; i++ )
     {
-        if ( myRank == Nbrs[0][i] )
-        {
-            //   continue;
-        }
-
+// make sure copy to GPU is complete
 #if ( PITTPACKACC )
         acc_async_wait( i + 1 );
 #endif
-
+        // send immediately
         MPI_Isend( &P( 0 ) + P.chunkSize * i, P.chunkSize, MPI_DOUBLE, Nbrs[1][i], myRank, Comm, &( send_request[i] ) );
 
         // cout<<" Myrank  "<<myRank<<"sending message from  Nbrs  "<<i <<" "<< Nbrs[0][i]<<" P0 "<<p0<<endl;
     }
 
+// part B
 #if ( 1 )
     // MPI_Waitall();
     int indx;
     for ( int i = 0; i < p0; i++ )
     {
-       MPI_Waitany( p0, recv_request, &indx, recv_status );
-        ptr = &R( 0 ) + R.chunkSize * indx;
-#pragma acc update device( ptr [0:end] ) async( i + 1 )
+        // check and see if any of the messages have arrived
+        MPI_Waitany( p0, recv_request, &indx, recv_status );
+        indices[i] = indx;
+        ptr        = &R( 0 ) + R.chunkSize * indx;
+// update the device immediately
+#pragma acc update device( ptr [0:end] ) async( p0 + i + 1 )
     }
 #endif
-int id;
+
+    int id;
+
+// at the previous loop, I save the messages according to their arrival order
+// assuming that the stream which started first can complete first
+//  we wait for the message in the same order to assign to P
 #if ( 1 )
     for ( int i = 0; i < p0; i++ )
     {
-       MPI_Waitany( p0, send_request, &indx, send_status );
+        //        MPI_Waitany( p0, send_request, &indx, send_status );
 
-       id=indx+1;
-
+        id   = p0 + indices[i] + 1;
+        indx = indices[i];
 #if ( PITTPACKACC )
         acc_async_wait( id );
 #endif
-/*
-#pragma acc data present( P.P, R.P, this )
+        // CPU version would have problems if we do not make sure send operation is completed before assigning it to R
+        MPI_Wait( &( send_request[indx] ), &( send_status[indx] ) );
+
+#pragma acc data present( P.P, R.P, this ) copyin( indx )
 #pragma acc parallel loop num_gangs( 1024 )
         for ( int l = 0; l < P.chunkSize; l++ )
         {
             P( P.chunkSize * indx + l ) = R( R.chunkSize * indx + l );
         }
-*/
     }
 
+//    MPI_Waitall( p0, send_request, send_status );
 #else
     MPI_Waitall( p0, send_request, send_status );
 
@@ -1758,23 +1747,22 @@ int id;
 #endif
 
 #endif
-
+/*
 #pragma acc data present( P.P, R.P, this )
 #pragma acc parallel loop
     for ( int l = 0; l < nChunk * R.chunkSize; l++ )
     {
         P( l ) = R( l );
     }
-
+*/
 #endif
 
+        // update device
+        //
 
-    // update device
-    //
-
-    // send
-    //
-    // if recieved push to device
+        // send
+        //
+        // if recieved push to device
 #if ( 0 )
     for ( int i = 0; i < nChunk; i++ )
     {
@@ -1790,23 +1778,23 @@ void PencilDcmp::IO( int app, int dir, int aligndir )
     IO.writeMultiBlockCellCenter( P, app, dir, aligndir );
 }
 
-/*
-#if ( PITTPACKACC )
-#pragma acc routine seq
-#endif
-static double sine( double x )
-{
-    return ( sin( x ) );
-}
+    /*
+    #if ( PITTPACKACC )
+    #pragma acc routine seq
+    #endif
+    static double sine( double x )
+    {
+        return ( sin( x ) );
+    }
 
-#if ( PITTPACKACC )
-#pragma acc routine seq
-#endif
-static double cosine( double x )
-{
-    return ( cos( x ) );
-}
-*/
+    #if ( PITTPACKACC )
+    #pragma acc routine seq
+    #endif
+    static double cosine( double x )
+    {
+        return ( cos( x ) );
+    }
+    */
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
@@ -1872,7 +1860,7 @@ void PencilDcmp::initializeTrigonometric()
         c2 = dxyz[1];
         c3 = dxyz[2];
     }
-    //   c3 = dxyz[2];
+        //   c3 = dxyz[2];
 
 #if ( DEBUG )
     cout << " rank " << myRank << " c1  " << c1 << " " << c2 << " " << c3 << endl;
@@ -1929,7 +1917,7 @@ void PencilDcmp::initializeTrigonometric()
                     x = Xa + i * c1 + shift * c1 * .5;
                 }
 
-                // cout << " rank "<<myRank <<" xyz  " << x << " " << y << " " << z << endl;
+                    // cout << " rank "<<myRank <<" xyz  " << x << " " << y << " " << z << endl;
 
 #if ( !EXACT )
 
@@ -1994,7 +1982,7 @@ void PencilDcmp::initializeTrigonometric()
             }
         }
     }
-    // P.moveHostToDevice();
+        // P.moveHostToDevice();
 
 #endif
     /*
@@ -2217,7 +2205,7 @@ void PencilDcmp::rearrangeX2Y()
         }
     }
 }
-//#endif
+    //#endif
 
 #else
 
@@ -2235,6 +2223,9 @@ void PencilDcmp::rearrangeX2Y()
 }
 
 #endif
+
+
+
 
 #if ( PITTPACKACC )
 #pragma acc routine worker
@@ -3127,6 +3118,63 @@ void PencilDcmp::changeLocationX()
 
 #endif
 
+#if ( PITTPACKACC )
+#pragma acc routine gang
+#endif
+void PencilDcmp::changeLocationXOverlap()
+{
+#pragma acc loop seq
+    for ( int id = 0; id < nChunk; id++ )
+    {
+#pragma acc loop gang
+        for ( int k = 0; k < nzChunk; k++ )
+        {
+#pragma acc loop worker
+            for ( int j = 0; j < nyChunk; j++ )
+            {
+#pragma acc loop vector
+                for ( int i = 0; i < nxChunk; i++ )
+                {
+                    P( 2 * ( k * nxChunk * nyChunk * nChunk + nChunk * nxChunk * j + nxChunk * id + i ) )     = R( id, 0, i, j, k, 0 );
+                    P( 2 * ( k * nxChunk * nyChunk * nChunk + nChunk * nxChunk * j + nxChunk * id + i ) + 1 ) = R( id, 0, i, j, k, 1 );
+                }
+            }
+        }
+    }
+}
+
+// not verified yet
+#if ( PITTPACKACC )
+#pragma acc routine gang
+#endif
+void PencilDcmp::changeLocationYOverlap()
+{
+#pragma acc loop gang
+        for ( int k = 0; k < nChunk*P.chunkSize; k++ )
+        {
+         R(k)=P(k);
+        }
+
+#pragma acc loop seq
+    for ( int id = 0; id < nChunk; id++ )
+    {
+#pragma acc loop gang
+        for ( int k = 0; k < nzChunk; k++ )
+        {
+#pragma acc loop worker
+            for ( int j = 0; j < nxChunk; j++ )
+            {
+#pragma acc loop vector
+                for ( int i = 0; i < nyChunk; i++ )
+                {
+                    P( 2 * ( k * nxChunk * nyChunk * nChunk + nChunk * nyChunk * j + nyChunk * id + i ) )     = R( id, 3, i, j, k, 0 );
+                    P( 2 * ( k * nxChunk * nyChunk * nChunk + nChunk * nyChunk * j + nyChunk * id + i ) + 1 ) = R( id, 3, i, j, k, 1 );
+                }
+            }
+        }
+    }
+}
+
 #if ( REV == 1 )
 #if ( PITTPACKACC )
 #pragma acc routine gang
@@ -3861,7 +3909,7 @@ int PencilDcmp::solve()
 }
 #endif
 
-// continue form here
+    // continue form here
 
 #if ( 1 )
 #if ( PITTPACKACC )
@@ -4862,6 +4910,7 @@ void PencilDcmp::runInfo()
     }
 }
 
+#if( THOM_FULL_BATCH==0)
 #if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
@@ -4947,13 +4996,45 @@ int PencilDcmp::solveThmBatch( const int index )
     // int index=0;
     return ( 0 );
 }
+#else
+#if ( PITTPACKACC )
+#pragma acc routine gang
+#endif
+int PencilDcmp::solveThmBatch( const int index )
+{
+   double eig;
+
+    // cout<< RED<<"multiGrid" <<RESET<<endl;
+
+    int count = 0;
+    int i, j;
+#if ( PITTPACKACC )
+#pragma acc loop private( eig,i,j ) 
+#endif
+       for ( int l = 0; l < nyChunk*nxChunk; l++ )
+        {
+            i=l%nyChunk;
+            j=l/nyChunk; 
+            eig = getEigenVal( i, j );
+            fillInArrayContig( i, j, index, x1 + l * nz );
+            T.thomasLowMem( x2 + l * nz, x1 + nz * l, eig, index );
+            fillInArrayBack( i, j, index, x1 + nz * l );
+        }
+
+   return ( 0 );
+}
+
+#endif
+
+
+
 
 #if ( PITTPACKACC )
 #pragma acc routine worker
 #endif
 void PencilDcmp::fillInArrayContig( const int i, const int j, int index, double *container )
 {
-    //    cout<<"before inside fill in"<<endl;
+//    cout<<"before inside fill in"<<endl;
 
 #pragma acc loop worker
     for ( int id = 0; id < nChunk; id++ )

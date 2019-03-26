@@ -88,7 +88,7 @@ void TriDiag::thomas( ChunkedArray &P, double *onDiag, const int i, const int j,
         result = THOMAS_FAIL;
     }
 
-    // seprate the last loop because of boundary condition
+        // seprate the last loop because of boundary condition
 
 #if ( DEBUG )
     if ( myRank == this_rank )
@@ -200,12 +200,12 @@ void TriDiag::thomas( ChunkedArray &P, double *onDiag, const int i, const int j,
         }
     }
 #endif
-    /*
-        for ( int k = ( n - 2 ); k >= 0; k-- )
-        {
-            P( i, j, k, dir, index ) -= Sn[k + 1] * P( i, j, k + 1, dir, index );
-        }
-    */
+        /*
+            for ( int k = ( n - 2 ); k >= 0; k-- )
+            {
+                P( i, j, k, dir, index ) -= Sn[k + 1] * P( i, j, k + 1, dir, index );
+            }
+        */
 
 #if ( 1 )
     count = nChunk * nzChunk - 2;
@@ -448,14 +448,14 @@ void TriDiag::thomasPeriodic( ChunkedArray &P, double *onDiag, int i, int j, int
     {
         // cout << RED << "my_rank " << myRank << " Pn [ " << 1 << "] " << P( 0, dir, i, j, k, index ) << RESET << endl;
     }
-    /* Mudify this to accommodate several chunks
-        for ( int k = 2; k < n - 1; k++ )
-        {
-            Sn[k] = supDiag[1] / bet;
-            bet = onDiag[1] - subDiag[1] * Sn[k];
-            P( i, j, k, dir, index ) = ( P( i, j, k, dir, index ) - subDiag[1] * P( i, j, k - 1, dir, index ) ) / bet;
-        }
-    */
+        /* Mudify this to accommodate several chunks
+            for ( int k = 2; k < n - 1; k++ )
+            {
+                Sn[k] = supDiag[1] / bet;
+                bet = onDiag[1] - subDiag[1] * Sn[k];
+                P( i, j, k, dir, index ) = ( P( i, j, k, dir, index ) - subDiag[1] * P( i, j, k - 1, dir, index ) ) / bet;
+            }
+        */
 
 #endif
     int kstart = 2;
@@ -520,12 +520,12 @@ void TriDiag::thomasPeriodic( ChunkedArray &P, double *onDiag, int i, int j, int
     }
 
 #endif
-    /*
-        for ( int k = ( n - 2 ); k >= 0; k-- )
-        {
-            P( i, j, k, dir, index ) -= Sn[k + 1] * P( i, j, k + 1, dir, index );
-        }
-    */
+        /*
+            for ( int k = ( n - 2 ); k >= 0; k-- )
+            {
+                P( i, j, k, dir, index ) -= Sn[k + 1] * P( i, j, k + 1, dir, index );
+            }
+        */
 
 #if ( 1 )
     count = nChunk * nzChunk - 2;
@@ -677,12 +677,12 @@ void TriDiag::thomasPeriodic( ChunkedArray &P, double *onDiag, int i, int j, int
         }
     }
 #endif
-    /*
-        for ( int k = ( n - 2 ); k >= 0; k-- )
-        {
-            P( i, j, k, dir, index ) -= Sn[k + 1] * P( i, j, k + 1, dir, index );
-        }
-    */
+        /*
+            for ( int k = ( n - 2 ); k >= 0; k-- )
+            {
+                P( i, j, k, dir, index ) -= Sn[k + 1] * P( i, j, k + 1, dir, index );
+            }
+        */
 
 #if ( 1 )
     count = nChunk * nzChunk - 2;
@@ -1020,14 +1020,14 @@ void TriDiag::thomasPeriodicReal( ChunkedArray &P, double *onDiag, int i, int j,
     {
         // cout << RED << "my_rank " << myRank << " Pn [ " << 1 << "] " << P( 0, dir, i, j, k, index ) << RESET << endl;
     }
-    /* Mudify this to accommodate several chunks
-        for ( int k = 2; k < n - 1; k++ )
-        {
-            Sn[k] = supDiag[1] / bet;
-            bet = onDiag[1] - subDiag[1] * Sn[k];
-            P( i, j, k, dir, index ) = ( P( i, j, k, dir, index ) - subDiag[1] * P( i, j, k - 1, dir, index ) ) / bet;
-        }
-    */
+        /* Mudify this to accommodate several chunks
+            for ( int k = 2; k < n - 1; k++ )
+            {
+                Sn[k] = supDiag[1] / bet;
+                bet = onDiag[1] - subDiag[1] * Sn[k];
+                P( i, j, k, dir, index ) = ( P( i, j, k, dir, index ) - subDiag[1] * P( i, j, k - 1, dir, index ) ) / bet;
+            }
+        */
 
 #endif
     int kstart = 2;
@@ -1204,12 +1204,12 @@ void TriDiag::thomasPeriodicReal( ChunkedArray &P, double *onDiag, int i, int j,
         }
     }
 #endif
-    /*
-        for ( int k = ( n - 2 ); k >= 0; k-- )
-        {
-            P( i, j, k, dir, index ) -= Sn[k + 1] * P( i, j, k + 1, dir, index );
-        }
-    */
+        /*
+            for ( int k = ( n - 2 ); k >= 0; k-- )
+            {
+                P( i, j, k, dir, index ) -= Sn[k + 1] * P( i, j, k + 1, dir, index );
+            }
+        */
 
 #if ( 1 )
     count = nChunk * nzChunk - 2;
@@ -1516,8 +1516,8 @@ void TriDiag::pcr( int n, double *a, double *c, double *d )
             }
         }
 
-        // both indices are ok to assign
-        //
+            // both indices are ok to assign
+            //
 
 #if ( PITTPACKACC )
 #pragma acc loop private( a0, a1, a2, c0, c1, c2, d0, d1, d2, r, index )

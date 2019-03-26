@@ -232,9 +232,9 @@ void SignalProc::postprocessSignalDST01( ChunkedArray &P, const int size, const 
     swap( P, size, i, direction );
 }
 
-// A DST-III  can be computed from a DCT-III or DCT-IV (see discrete cosine transform),
-// respectively, by reversing the order of the inputs and flipping the sign of every other output,
-// and vice versa for DST-II from DCT-II, ref : https://en.wikipedia.org/wiki/Discrete_sine_transform
+    // A DST-III  can be computed from a DCT-III or DCT-IV (see discrete cosine transform),
+    // respectively, by reversing the order of the inputs and flipping the sign of every other output,
+    // and vice versa for DST-II from DCT-II, ref : https://en.wikipedia.org/wiki/Discrete_sine_transform
 
 #if ( PITTPACKACC )
 #pragma acc routine vector

@@ -46,9 +46,9 @@ PittPackResult ChunkedArray::allocate( int *n, int nbl )
                                     array divided by nchunks, this is to get rid of multiplication by two */
 
 #if ( PITTPACKACC )
-#pragma acc enter data create( this [0:1] )
-#pragma acc update device( this )
-#pragma acc enter data create( P [0:arraySize] )
+#pragma acc enter data create( this [0:1] ) async(2)
+#pragma acc update device( this ) 
+#pragma acc enter data create( P [0:arraySize] ) async(3)
 #endif
 
     if ( P == NULL )
@@ -59,6 +59,12 @@ PittPackResult ChunkedArray::allocate( int *n, int nbl )
     {
         return ( SUCCESS );
     }
+
+#if ( PITTPACKACC )
+acc_async_wait_all();
+#endif
+
+
 }
 
 int  ChunkedArray::getChunkSize() { return ( chunkSize ); }

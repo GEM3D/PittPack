@@ -267,7 +267,11 @@ void PoissonCPU::pittPack()
 
         // step 2) change location of the array such that FFT can be performed on a contegeous array
 
+#if ( COMM_PATTERN == 2 )
+        changeLocationXOverlap();
+#else
         changeLocationX();
+#endif
 
 #if ( DEBUG0 )
         myfile << "     change Loc in X-- where FFT should be envoked" << endl;
@@ -434,8 +438,8 @@ void PoissonCPU::pittPack()
             //        solveCRP(0);
         }
 
-        // M.printX( myfile );
-        //
+            // M.printX( myfile );
+            //
 
 #if ( DEBUG0 )
         myfile << "      Thomasing" << endl;

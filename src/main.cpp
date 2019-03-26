@@ -80,7 +80,7 @@ int main( int argcs, char *pArgs[] )
             return 1;
         }
     }
-    // PencilDcmp N(argcs, pArgs, 10,10,10 );
+        // PencilDcmp N(argcs, pArgs, 10,10,10 );
 
 #if ( OPENACC )
     //    #if ( 0 )
@@ -141,9 +141,9 @@ int main( int argcs, char *pArgs[] )
 
 #endif
 
-    //        char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
-    //     char mybc[6] = {'D', 'D', 'D', 'D', 'D', 'D'};
-    char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
+    //char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
+   //      char mybc[6] = {'D', 'D', 'D', 'D', 'D', 'D'};
+     char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
     //      char mybc[6] = {'D', 'D', 'D', 'D', 'N', 'N'};
     std::cout << mybc[0] << " " << mybc[1] << " " << mybc[2] << " " << mybc[3] << " " << mybc[4] << " " << mybc[5] << std::endl;
     M.assignBoundary( mybc );
@@ -228,7 +228,7 @@ int main( int argcs, char *pArgs[] )
         M.printX( myfile );
     }
 #endif
-    // step 1) pencils with n(0,0,1) is converted to pencil with n(1,0,0)
+        // step 1) pencils with n(0,0,1) is converted to pencil with n(1,0,0)
 
 #if ( 1 )
 #if ( !EXACT )
@@ -279,33 +279,33 @@ int main( int argcs, char *pArgs[] )
 //    M.runInfo();
 #endif
 
-    //#pragma acc parallel
-    //    M.solveThmSmallMesh(0 );
-    //  cout<<BLUE<<"thomas solving "<<RESET<<endl;
-    // M.testDST10();
-    //   M.testDST10();
-    //  M.testDST01();
+        //#pragma acc parallel
+        //    M.solveThmSmallMesh(0 );
+        //  cout<<BLUE<<"thomas solving "<<RESET<<endl;
+        // M.testDST10();
+        //   M.testDST10();
+        //  M.testDST01();
 
-    /* not working for collectives yet
-    int  a[1]={my_rank+100};
-    int b[1]={0};
-    #pragma acc enter data copyin(a[0:1],b[0:1])
-    {
-
-    #pragma acc host_data use_device(a,b)
-    MPI_Allreduce(a, b,1,MPI_INT, MPI_MAX, MPI_COMM_WORLD);
-
-    }
-    cout<<"b = "<<b[0]<<endl;
-    */
-    /*
-        if(my_rank==0)
+        /* not working for collectives yet
+        int  a[1]={my_rank+100};
+        int b[1]={0};
+        #pragma acc enter data copyin(a[0:1],b[0:1])
         {
-          cout<<"Grid Size"<<NXCHUNK<< " "<<  <<endl;
+
+        #pragma acc host_data use_device(a,b)
+        MPI_Allreduce(a, b,1,MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+
         }
-    */
-    // ported to the class destructor
-    //    MPI_Finalize();
+        cout<<"b = "<<b[0]<<endl;
+        */
+        /*
+            if(my_rank==0)
+            {
+              cout<<"Grid Size"<<NXCHUNK<< " "<<  <<endl;
+            }
+        */
+        // ported to the class destructor
+        //    MPI_Finalize();
 
 #endif
     if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )

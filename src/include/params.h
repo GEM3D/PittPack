@@ -18,6 +18,7 @@ the type as \f$int\f$ */
 #define TMPSIZE  256
 
 
+
 #define COMM_ON 1
 
 //#define GPUAWARE 1
@@ -105,6 +106,7 @@ const double pi = 3.1415926535897932384;
 #define REV 1
 #define REVTRSP 1 /*!< 1) stands for simplest transform. 0) transposes using shared mem*/
 #define R_COPY 1
+#define THOM_FULL_BATCH 0
 #define JIC 0
 
 

@@ -228,7 +228,10 @@ void PoissonCPU::pittPack()
 #endif
 
     //    MPI_Barrier( MPI_COMM_WORLD );
-    double t1 = MPI_Wtime();
+    //double t1 = MPI_Wtime();
+
+    double t1=0.0;
+    double t2=0.0;
 
     //  struct timeval start_time, stop_time, elapsed_time;
     //   gettimeofday( &start_time, NULL );
@@ -237,8 +240,10 @@ void PoissonCPU::pittPack()
     double err    = 0.0;
     double t1_com = 0.0;
     double t2_com = 0.0;
+    double deT=0.0;
 
-    for ( int num = 0; num < 1; num++ )
+
+    for ( int num = 0; num < NITER; num++ )
     // for(int num=0;num<100;num++)
     {
         initializeTrigonometric();
@@ -248,14 +253,23 @@ void PoissonCPU::pittPack()
             modifyRhsDirichlet();
         }
 
+        t1 = MPI_Wtime();
+
 #if ( POSS )
 
-        t1_com = MPI_Wtime();
-        changeOwnershipPairwiseExchangeZX();
-        t2_com = MPI_Wtime() - t1_com;
+        if ( PROFILE_COMM )
+        {
+            t1_com = MPI_Wtime();
+            changeOwnershipPairwiseExchangeZX();
+            t2_com = MPI_Wtime() - t1_com;
+        }
+        else
+        {
+            changeOwnershipPairwiseExchangeZX();
+        }
 
-        //    M.rearrange( 0, 0, 1 );
-        //   M.rearrange( 0, 2 );
+            //    M.rearrange( 0, 0, 1 );
+            //   M.rearrange( 0, 2 );
 
 #if ( DEBUG0 )
         myfile << "     Z to X rotation" << endl;
@@ -314,13 +328,21 @@ void PoissonCPU::pittPack()
 #endif
 #endif
 
-        cout << "FFTX is done" << endl;
+ //       cout << "FFTX is done" << endl;
 #if ( FFTY )
         // step 5) pencils with n(1,0,0) is converted to pencil with n(0,1,0)
 
-        t1_com = MPI_Wtime();
-        changeOwnershipPairwiseExchangeXY();
-        t2_com += MPI_Wtime() - t1_com;
+        if ( PROFILE_COMM )
+        {
+            t1_com = MPI_Wtime();
+            changeOwnershipPairwiseExchangeXY();
+            t2_com += MPI_Wtime() - t1_com;
+        }
+        else
+        {
+            changeOwnershipPairwiseExchangeXY();
+        }
+
 #if ( DEBUG0 )
         myfile << "     X to Y rotation" << endl;
         printY( myfile );
@@ -383,15 +405,22 @@ void PoissonCPU::pittPack()
         printY( myfile );
 #endif
 #endif
-        cout << "FFTY is done" << endl;
+        //cout << "FFTY is done" << endl;
         // step 10) pencils with n(0,1,0) is converted to pencil with n(0,0,1)
 
 #if ( SOLVE )
 
-        t1_com = MPI_Wtime();
-        //   M.changeOwnershipPairwiseExchangeYZ();
-        changeOwnershipPairwiseExchangeZX();
-        t2_com += MPI_Wtime() - t1_com;
+        if ( PROFILE_COMM )
+        {
+            t1_com = MPI_Wtime();
+            //   M.changeOwnershipPairwiseExchangeYZ();
+            changeOwnershipPairwiseExchangeZX();
+            t2_com += MPI_Wtime() - t1_com;
+        }
+        else
+        {
+            changeOwnershipPairwiseExchangeZX();
+        }
 
 #if ( DEBUG0 )
         myfile << "      Rotate Y to Z " << endl;
@@ -450,9 +479,16 @@ void PoissonCPU::pittPack()
         // M.changeOwnershipPairwiseExchangeYZ();
         //
 
-        t1_com = MPI_Wtime();
-        changeOwnershipPairwiseExchangeZX();
-        t2_com += MPI_Wtime() - t1_com;
+        if ( PROFILE_COMM )
+        {
+            t1_com = MPI_Wtime();
+            changeOwnershipPairwiseExchangeZX();
+            t2_com += MPI_Wtime() - t1_com;
+        }
+        else
+        {
+            changeOwnershipPairwiseExchangeZX();
+        }
 
 #if ( DEBUG0 )
         myfile << "      Rotate Z to Y" << endl;
@@ -515,10 +551,16 @@ void PoissonCPU::pittPack()
 #endif
         // step 17) pencils with n(0,1,0) is converted to pencil with n(1,0,0)
 
-        t1_com = MPI_Wtime();
-        changeOwnershipPairwiseExchangeXY();
-        t2_com += MPI_Wtime() - t1_com;
-
+        if ( PROFILE_COMM )
+        {
+            t1_com = MPI_Wtime();
+            changeOwnershipPairwiseExchangeXY();
+            t2_com += MPI_Wtime() - t1_com;
+        }
+        else
+        {
+            changeOwnershipPairwiseExchangeXY();
+        }
 #if ( DEBUG0 )
         myfile << "      Rotate Y to X" << endl;
         printX( myfile );
@@ -565,6 +607,11 @@ void PoissonCPU::pittPack()
 #endif
         rescale();
 
+        t2=MPI_Wtime();
+
+        deT += (t2-t1);
+
+
 #if ( DEBUG0 )
         myfile << "     Final result Rescaled" << endl;
         printX( myfile );
@@ -574,9 +621,20 @@ void PoissonCPU::pittPack()
 #endif
 
         // return back to the original set-up
-        t1_com = MPI_Wtime();
-        changeOwnershipPairwiseExchangeZX();
-        t2_com += MPI_Wtime() - t1_com;
+        if ( PROFILE_COMM )
+        {
+            t1_com = MPI_Wtime();
+            changeOwnershipPairwiseExchangeZX();
+            t2_com += MPI_Wtime() - t1_com;
+        }
+        else
+        {
+            changeOwnershipPairwiseExchangeZX();
+        }
+
+        t2=MPI_Wtime();
+        deT += (t2-t1);
+
 
         if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
         {
@@ -599,19 +657,19 @@ void PoissonCPU::pittPack()
     myfile.close();
 #endif
 
-    //    MPI_Barrier( Comm );
-    double t2 = MPI_Wtime();
-
-    double deT = t2 - t1;
 
     MPI_Reduce( &deT, &runTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
 
-    if ( myRank == 0 )
+if ( myRank == 0 )
     {
-        runTime = runTime;
+        runTime = runTime/(double)NITER;
         runInfo();
-        printf( "change ownership time =%lf percent of solution and take %lf seconds \n", t2_com / deT * 100.0, t2_com );
+        if(PROFILE_COMM)
+         {
+        printf( "change ownership time =%lf percent of solution and take %lf seconds \n", t2_com / deT * 100., t2_com );
+        }
     }
+
 }
 
 /* absolute value version

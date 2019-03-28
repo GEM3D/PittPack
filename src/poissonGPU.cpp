@@ -113,9 +113,10 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 {
     //  struct timeval start_time, stop_time, elapsed_time;
     //  gettimeofday( &start_time, NULL );
-    double t1;
+    double t1 = 0.0;
+    double t2 = 0.0;
     //   MPI_Barrier( MPI_COMM_WORLD );
-//    t1 = MPI_Wtime();
+    //    t1 = MPI_Wtime();
 
 #if ( DEBUG2 )
     ofstream myfile;
@@ -146,6 +147,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
     double t1_com = 0.0;
     double t2_com = 0.0;
+    double deT    = 0.0;
 
     //    P.moveHostToDevice();
 
@@ -164,7 +166,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
     }
     int result = SUCCESS;
 
-    for ( int num = 0; num < 1; num++ )
+    for ( int num = 0; num < NITER; num++ )
     {
 #pragma acc data present( P.P [0:2 * nxChunk * nyChunk * nzChunk * nChunk], this ) copy( result, err )
         //#pragma acc data  copy( result, err )
@@ -193,13 +195,18 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
                 cout << "amount of free memory 1 " << acc_get_free_memory() / 1e9 << endl;
             }
 
-
             t1 = MPI_Wtime();
 
-            t1_com = MPI_Wtime();
-            changeOwnershipPairwiseExchangeZX();
-            t2_com = MPI_Wtime() - t1_com;
-
+            if ( PROFILE_COMM )
+            {
+                t1_com = MPI_Wtime();
+                changeOwnershipPairwiseExchangeZX();
+                t2_com = MPI_Wtime() - t1_com;
+            }
+            else
+            {
+                changeOwnershipPairwiseExchangeZX();
+            }
             if ( GPUAW == 0 )
             {
                 P.moveHostToDevice();
@@ -208,8 +215,8 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             {
                 cout << "amount of free memory 2 " << acc_get_free_memory() / 1e9 << endl;
             }
-                // perform FFT in x direction
-                // remember, need to rearrange and restore each time
+            // perform FFT in x direction
+            // remember, need to rearrange and restore each time
 
 #if ( FFTX )
 // step 2) change location of the array such that FFT can be performed on a contegeous array
@@ -218,7 +225,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             changeLocationXOverlap();
 #else
 #pragma acc parallel num_gangs( trsps_gang0 ) vector_length( VECLENGTH )
-             changeLocationX();
+            changeLocationX();
 #endif
 
             if ( MONITOR_MEM )
@@ -263,15 +270,22 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             {
                 P.moveDeviceToHost();
             }
+            if ( PROFILE_COMM )
+            {
+                t1_com = MPI_Wtime();
+                changeOwnershipPairwiseExchangeXY();
+                t2_com += MPI_Wtime() - t1_com;
+            }
+            else
+            {
+                changeOwnershipPairwiseExchangeXY();
+            }
 
-            t1_com = MPI_Wtime();
-            changeOwnershipPairwiseExchangeXY();
-            t2_com += MPI_Wtime() - t1_com;
             if ( GPUAW2 == 0 )
             {
                 P.moveHostToDevice();
             }
-                // step 6) swaps X and Y coordinates, now X is Y and nx is ny
+            // step 6) swaps X and Y coordinates, now X is Y and nx is ny
 
 #pragma acc parallel num_gangs( trsps_gang0 ) vector_length( VECLENGTH )
             rearrangeX2Y();
@@ -279,9 +293,9 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             // step 7) change location of the array such that FFT can be performed on a contegeous array in the transverse direction
 
             //#pragma acc parallel
-#if(COMM_PATTERN==2)
+#if ( COMM_PATTERN == 2 )
 #pragma acc parallel num_gangs( trsps_gang1 ) vector_length( VECLENGTH )
-           // changeLocationYOverlap();
+            // changeLocationYOverlap();
             changeLocationY();
 #else
 #pragma acc parallel num_gangs( trsps_gang1 ) vector_length( VECLENGTH )
@@ -299,7 +313,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
                 cout << "amount of free memory 8 " << acc_get_free_memory() / 1e9 << endl;
             }
 
-                // acc_clear_freelists();
+            // acc_clear_freelists();
 #pragma acc parallel num_gangs( nSig1 ) vector_length( VECLENGTH )
             postprocessSignalAccordingly( 1, 1 );
             // M.printX( myfile );
@@ -325,10 +339,16 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
                 P.moveDeviceToHost();
             }
 
-            t1_com = MPI_Wtime();
-            changeOwnershipPairwiseExchangeZX();
-            t2_com += MPI_Wtime() - t1_com;
-
+            if ( PROFILE_COMM )
+            {
+                t1_com = MPI_Wtime();
+                changeOwnershipPairwiseExchangeZX();
+                t2_com += MPI_Wtime() - t1_com;
+            }
+            else
+            {
+                changeOwnershipPairwiseExchangeZX();
+            }
             if ( GPUAW == 0 )
             {
                 P.moveHostToDevice();
@@ -367,19 +387,19 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
             else if ( SOLUTIONMETHOD == 1 )
             {
-            /*
-            //#pragma acc parallel async(123)
-            #pragma acc parallel
-                            solveThm( 0 );
+                /*
+                //#pragma acc parallel async(123)
+                #pragma acc parallel
+                                solveThm( 0 );
 
-            #pragma acc parallel
-                            solveThm( 1 );
-            */
+                #pragma acc parallel
+                                solveThm( 1 );
+                */
 
-            /*
-            #pragma acc parallel num_gangs(nxChunk)
-                        solveThmBatch( 0 );
-            */
+                /*
+                #pragma acc parallel num_gangs(nxChunk)
+                            solveThmBatch( 0 );
+                */
 
 #pragma acc parallel num_gangs( gangTri ) vector_length( VECLENGTH )
                 solvePCR( 0 );
@@ -404,15 +424,15 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
             else
             {
-            // adding CUSPARSE
+                // adding CUSPARSE
 
 #if ( 0 )
                 for ( int j = 0; j < nxChunk; j++ )
                 {
                     for ( int i = 0; i < nyChunk; i++ )
                     {
-                    //#pragma acc parallel
-                    //                        eig = getEigenVal( i, j );
+                        //#pragma acc parallel
+                        //                        eig = getEigenVal( i, j );
 
 #pragma acc parallel async( 4 )
                         setDiag( i, j );
@@ -485,10 +505,16 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             {
                 P.moveDeviceToHost();
             }
-            t1_com = MPI_Wtime();
-
-            changeOwnershipPairwiseExchangeZX();
-            t2_com += MPI_Wtime() - t1_com;
+            if ( PROFILE_COMM )
+            {
+                t1_com = MPI_Wtime();
+                changeOwnershipPairwiseExchangeZX();
+                t2_com += MPI_Wtime() - t1_com;
+            }
+            else
+            {
+                changeOwnershipPairwiseExchangeZX();
+            }
 
             if ( GPUAW == 0 )
             {
@@ -532,11 +558,16 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
                 P.moveDeviceToHost();
             }
 
-            t1_com = MPI_Wtime();
-
-            changeOwnershipPairwiseExchangeXY();
-            t2_com += MPI_Wtime() - t1_com;
-
+            if ( PROFILE_COMM )
+            {
+                t1_com = MPI_Wtime();
+                changeOwnershipPairwiseExchangeXY();
+                t2_com += MPI_Wtime() - t1_com;
+            }
+            else
+            {
+                changeOwnershipPairwiseExchangeXY();
+            }
             if ( GPUAW2 == 0 )
             {
                 P.moveHostToDevice();
@@ -548,12 +579,12 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
                 cout << "amount of free memory 12 " << acc_get_free_memory() / 1e9 << " GB " << endl;
             }
 #if ( IFFTX )
-                // step 18) change location of the array such that IFFT can be performed on a contegeous array
+            // step 18) change location of the array such that IFFT can be performed on a contegeous array
 
 #if ( COMM_PATTERN == 2 )
 #pragma acc parallel num_gangs( trsps_gang0 ) vector_length( VECLENGTH )
             changeLocationXOverlap();
-           //  changeLocationX();
+            //  changeLocationX();
 #else
 #pragma acc parallel num_gangs( trsps_gang0 ) vector_length( VECLENGTH )
             changeLocationX();
@@ -583,13 +614,22 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             // return back to the original set-up
             //
             //
-            t1_com = MPI_Wtime();
 
-            changeOwnershipPairwiseExchangeZX();
-            t2_com += MPI_Wtime() - t1_com;
-
+            if ( PROFILE_COMM )
+            {
+                t1_com = MPI_Wtime();
+                changeOwnershipPairwiseExchangeZX();
+                t2_com += MPI_Wtime() - t1_com;
+            }
+            else
+            {
+                changeOwnershipPairwiseExchangeZX();
+            }
             //        setCoords( Xbox, 2 );
             //#pragma acc update device()
+
+            t2 = MPI_Wtime();
+            deT += ( t2 - t1 );
 
 #endif
 
@@ -622,21 +662,22 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
     //  gettimeofday( &stop_time, NULL );
     //  timersub( &stop_time, &start_time, &elapsed_time ); // Unix time subtract routine
 
-    double t2;
-
     //   MPI_Barrier( MPI_COMM_WORLD );
 
-    t2 = MPI_Wtime();
+    //  t2 = MPI_Wtime();
 
-    double deT = t2 - t1;
+    //   double deT = t2 - t1;
 
     MPI_Reduce( &deT, &runTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
 
     if ( myRank == 0 )
     {
-        runTime = runTime;
+        runTime = runTime / (double)NITER;
         runInfo();
-        printf( "change ownership time =%lf percent of solution and take %lf seconds \n", t2_com / deT * 100., t2_com );
+        if ( PROFILE_COMM )
+        {
+            printf( "change ownership time =%lf percent of solution and take %lf seconds \n", t2_com / deT * 100., t2_com );
+        }
     }
 
     if ( JIC )

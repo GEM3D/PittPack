@@ -18,7 +18,6 @@ the type as \f$int\f$ */
 #define TMPSIZE  256
 
 
-
 #define COMM_ON 1
 
 //#define GPUAWARE 1
@@ -59,8 +58,10 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     COEFF0=1,                         /*!< (COEFF0*pi) is the frequency of the exact solution in the x-direction  */
     COEFF1=2,                         /*!< (COEFF0*pi) is the frequency of the exact solution in the y-direction  */
     COEFF2=3,                         /*!< (COEFF0*pi) is the frequency of the exact solution in the z-direction  */
-    CUFFT_STREAMS=0,                  /*!<  uses different stream for fft transform  */
-    MONITOR_MEM=0,                    /*!<  set this to 1 to monitor memory usage at each level of solution  */
+    CUFFT_STREAMS=0,                  /*!< uses different stream for fft transform  */
+    MONITOR_MEM=0,                    /*!< set this to 1 to monitor memory usage at each level of solution  */
+    PROFILE_COMM=0,                   /*!< Turn it on and it will report the amount of time spent for communication */  
+    NITER=10,                          /*!< Number of iteration for Poisson Solver*/                
 
 };
 
@@ -103,7 +104,7 @@ const double pi = 3.1415926535897932384;
 #define IFFTY 1
 #define FFTX 1
 #define FFTY 1
-#define REV 1
+#define REV 0
 #define REVTRSP 1 /*!< 1) stands for simplest transform. 0) transposes using shared mem*/
 #define R_COPY 1
 #define THOM_FULL_BATCH 0

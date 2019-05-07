@@ -525,7 +525,7 @@ PencilDcmp::~PencilDcmp()
 #pragma acc exit data delete ( freqs )
 #pragma acc exit data delete ( bc )
 #pragma acc exit data delete ( faceTag )
-#if ( REV == 1 )
+#if (  USE_SHARED != 1  )
 #pragma acc exit data delete ( tmpX )
 #pragma acc exit data delete ( tmpY )
 #endif
@@ -564,7 +564,7 @@ PencilDcmp::~PencilDcmp()
     delete[] num;
     delete[] denum;
     delete[] faceTag;
-#if ( REV == 1 )
+#if (  USE_SHARED != 1  )
     delete[] tmpX;
     delete[] tmpY;
 #endif
@@ -2751,7 +2751,7 @@ void PencilDcmp::setUpShuffleArraysX( vector<shuffle0> &a )
     */
 
     int xSize = 2 * a.size() * nxChunk + 1;
-#if ( REV == 1 )
+#if (  USE_SHARED != 1  )
     tmpX = new double[xSize];
 #endif
     cout << " xSize  " << xSize << " iaxSize  " << endl;
@@ -2766,7 +2766,7 @@ void PencilDcmp::setUpShuffleArraysX( vector<shuffle0> &a )
 #pragma acc enter data create( jax [0:jaxSize] )
 #pragma acc update device( jax [0:jaxSize] )
 
-#if ( REV == 1 )
+#if (  USE_SHARED != 1  )
 #pragma acc enter data create( tmpX [0:xSize] )
 #pragma acc update device( tmpX [0:xSize] )
 #endif
@@ -2940,7 +2940,7 @@ void PencilDcmp::setUpShuffleArraysY( vector<shuffle0> &a )
 
     // I added one to prvent seg fault for allocation of size 0 while deleting
     int ySize = 2 * a.size() * nyChunk + 1;
-#if ( REV == 1 )
+#if (  USE_SHARED != 1  )
     tmpY = new double[ySize];
 #endif
 #if ( PITTPACKACC )
@@ -2953,7 +2953,7 @@ void PencilDcmp::setUpShuffleArraysY( vector<shuffle0> &a )
 #pragma acc enter data create( jay [0:jaySize] )
 #pragma acc update device( jay [0:jaySize] )
 
-#if ( REV == 1 )
+#if (  USE_SHARED != 1  )
 #pragma acc enter data create( tmpY [0:ySize] )
 #pragma acc update device( tmpY [0:ySize] )
 #endif
@@ -3047,7 +3047,7 @@ void PencilDcmp::restoreTmp( const sint id, double *tmp, sint dir )
     }
 }
 
-#if ( REV == 1 )
+#if ( USE_SHARED != 1 )
 #if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
@@ -3170,7 +3170,7 @@ void PencilDcmp::changeLocationYOverlap()
     }
 }
 
-#if ( REV == 1 )
+#if ( USE_SHARED != 1 )
 #if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
@@ -3214,7 +3214,7 @@ void PencilDcmp::changeLocationY()
 
 #endif
 
-#if ( REV == 1 )
+#if ( USE_SHARED != 1 )
 #if ( PITTPACKACC )
 #pragma acc routine gang
 //#pragma acc routine gang
@@ -3263,7 +3263,7 @@ void PencilDcmp::restoreLocationY()
 
 #endif
 
-#if ( REV == 1 )
+#if (  USE_SHARED != 1  )
 #if ( PITTPACKACC )
 #pragma acc routine gang
 //#pragma acc routine vector

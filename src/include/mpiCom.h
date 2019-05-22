@@ -3,7 +3,6 @@
 
 #include "chunkedArray.h"
 #include "mpi.h"
-#include "statevector.h"
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>

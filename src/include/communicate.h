@@ -8,14 +8,10 @@ typedef unsigned int uint;
 
 using namespace std;
 
-// using integer=int;
-// using uint=unsigned int;
-
 /*!
  * \struct MpiCom
  * \brief class for embedding data related to the communicator
  */
-
 struct MpiCom
 {
     MPI_Comm mpiCom;        /*!< Communicator  */

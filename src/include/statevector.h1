@@ -1,0 +1,84 @@
+#ifndef _STATEVECTOR_H_
+#define _STATEVECTOR_H_
+
+using namespace std;
+
+/*!
+ *
+ * \class Complex Pressure Overloads Some Operators and makes
+ *  the padded complex use easy
+ * This class initiates a cell centered pressure field
+ *
+ * */
+
+class ComplexPressure
+{
+    private:
+    int Nx;
+    int Ny;
+    int Nz;
+    int arraySize;
+    double *__restrict__ P; /*!< Main array to hold complex data  */
+
+    public:
+    ComplexPressure(){};      /*!< Defauld Constructor */
+    ComplexPressure( int n ); /*!< Constructor  */
+    void moveHostToDevice();  /*!< Constructor  */
+    void moveDeviceToHost();  /*!< Constructor  */
+    void allocate( int n );   /*!< allocates n cube elements */
+    void allocate( int *n );  
+    int  size();
+    void print();
+#if ( PITTPACKACC )
+#pragma acc routine
+#endif
+    double &operator()( int i, int j, int k, int index );
+#if ( PITTPACKACC )
+#pragma acc routine
+#endif
+    double &operator()( int i, int j, int k );
+
+    friend class Fourier;
+    friend void poisson();
+
+    void getAddress( double *rt );
+    void performTransform();
+
+    ~ComplexPressure(); 
+};
+
+/*!
+ *
+ * \class Double  Pressure Overloads Some Operators and makes
+ *  the padded complex use easy
+ * This class initiates a cell centered pressure field
+ *
+ * */
+
+class Pressure
+{
+    private:
+    int Nx;
+    int Ny;
+    int Nz;
+    int arraySize;
+    double *__restrict__ P;
+
+    public:
+    Pressure(){};
+    Pressure( int n );       /*! Constructor  */
+    void moveHostToDevice(); /*! Constructor  */
+    void moveDeviceToHost(); /*! Constructor  */
+    void allocate( int n );
+    void allocate( int *n );
+    int  size();
+    void print();
+#if ( PITTPACKACC )
+#pragma acc routine
+#endif
+    double &operator()( int i, int j, int k );
+
+    ~Pressure();
+};
+
+#endif

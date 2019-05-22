@@ -19,7 +19,7 @@ class Phdf5
     uint totalnumber;
 
     public:
-    Phdf5(){};
+    Phdf5(){}; /*!< Constrcutor */
     void writeMultiBlock( ChunkedArray &F, uint appx ); /*!< writes each element as block and mesh is combination of blocks, appx sets the
                                                            appendix as string for the output file  */
     void writeMultiBlockCellCenter( ChunkedArray &F, uint appx ); /*!< writes each element as block and mesh is combination of blocks, appx
@@ -32,13 +32,9 @@ class Phdf5
     void getZcoord( int *L, const double Za, const double Zh, const int aligndir, double *ztemp );
     void getYcoord( int *L, const double Za, const double Zh, const int aligndir, double *ztemp );
     void getQ( ChunkedArray &F, const int chunkId, int *L, const int aligndir, double *qtemp );
-#if ( 0 )
-    void xdmfPolyvertex( integer my_rank, uint appx );
-    void calcOff(int *a0, int *b0);
-    void writePolyvertex( ChunkedArray &p,
-                          uint appx ); /*!< writes only the centeroids of the mesh, appx sets the appendix as string for the output file  */
-#endif
-    ~Phdf5(){};
+
+
+   ~Phdf5(){}; /*!< Deconstructor  */
 };
 
 #endif

@@ -143,12 +143,14 @@ fi
 
 if [ $cluster == "crc" ]; then
 
-    module purge
-    module load intel/2017.1.132
-    module load intel-mpi/2017.1.132
-    module load hdf5/1.10.0
-    module load  cmake/3.7.1
-    module load fftw/3.3.5
+     module purge
+     module load intel/2018.2.199
+     module load intel-mpi/2018.2.199
+     module load gcc/6.3.0
+     module load hdf5/1.10.0
+     module load fftw/3.3.8
+     module load  cmake/3.7.1
+
 
 
     if [ $GPU -lt 1 ]; then

@@ -1,7 +1,6 @@
 # taken from https://github.com/libigl/eigen/blob/master/cmake/FindMPI.cmake
-# The part for finding suffixes is removed since it found the wrong sufixes
-# - Find the MPI library
 #
+# - Find the MPI library
 # Usage:
 #   find_package(MPI [REQUIRED] [QUIET] )
 #     
@@ -18,33 +17,28 @@
 #   MPI_INCLUDE_DIR        ... fftw include directory
 #
 
-
-#If environment variable MPI_DIR is specified, it has same effect as MPI_ROOT
-
-#if( NOT MPI_ROOT AND $ENV{MPIDIR} )
-#  set( MPI_ROOT $ENV{MPI_DIR} )
-#endif()
-
-#set( MPI_ROOT "/opt/packages/openmpi/openmpi-2.0.1/" )
 set( MPI_ROOT $ENV{MPI_ROOT} )
 
 if(NOT MPI_ROOT)
-set(MPI_ROOT $ENV{MPIHOME})
+	set(MPI_ROOT $ENV{MPIHOME})
 endif()
 
 if(NOT MPI_ROOT)
-set(MPI_ROOT $ENV{MPI_DIR})
+	set(MPI_ROOT $ENV{MPI_DIR})
 endif()
+
 if(NOT MPI_ROOT)
-set(MPI_ROOT $ENV{MPI_HOME})
+	set(MPI_ROOT $ENV{MPI_HOME})
 endif()
+
+# Stampede (TACC)
 if(NOT MPI_ROOT)
-# stampede
-set(MPI_ROOT $ENV{I_MPI_ROOT})
+	set(MPI_ROOT $ENV{I_MPI_ROOT})
 endif()
+
+# Titan (ORNL)
 if(NOT MPI_ROOT)
-# titan
-set(MPI_ROOT $ENV{MPICH_DIR})
+	set(MPI_ROOT $ENV{MPICH_DIR})
 endif()
 
 
@@ -55,7 +49,7 @@ find_package(PkgConfig)
 
 #Determine from PKG
 if( PKG_CONFIG_FOUND AND NOT MPI_ROOT )
-  pkg_check_modules( PKG_MPI QUIET "mpi" )
+	pkg_check_modules( PKG_MPI QUIET "mpi" )
 endif()
 
 #Check whether to search static or dynamic libs
@@ -63,32 +57,32 @@ set( CMAKE_FIND_LIBRARY_SUFFIXES_SAV ${CMAKE_FIND_LIBRARY_SUFFIXES} )
 
 message("Suffixes"  ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
- find_library(
-    MPI_LIB
-    NAMES "libmpi.so" "libmpich.so"
-    PATHS ${MPI_ROOT}
-    PATH_SUFFIXES "lib" "lib64"
-    NO_DEFAULT_PATH
+find_library(
+	MPI_LIB
+	NAMES "libmpi.so" "libmpich.so"
+	PATHS ${MPI_ROOT}
+	PATH_SUFFIXES "lib" "lib64"
+	NO_DEFAULT_PATH
 )
-  #find includes
-  find_path(
-    MPI_INCLUDES
-    NAMES "mpi.h"
-    PATHS ${MPI_ROOT}/include
-    PATH_SUFFIXES "include"
-    NO_DEFAULT_PATH
-  )
+#find includes
+find_path(
+	MPI_INCLUDES
+	NAMES "mpi.h"
+	PATHS ${MPI_ROOT}/include
+	PATH_SUFFIXES "include"
+	NO_DEFAULT_PATH
+)
 
 
 set(MPI_LIBRARIES ${MPI_LIB})
 
 if(MPIL_LIB)
-  set(MPI_LIBRARIES ${MPI_LIBRARIES} ${MPIL_LIB})
+	set(MPI_LIBRARIES ${MPI_LIBRARIES} ${MPIL_LIB})
 endif()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(MPI DEFAULT_MSG
-                                  MPI_INCLUDES MPI_LIBRARIES)
+
+find_package_handle_standard_args(MPI DEFAULT_MSG MPI_INCLUDES MPI_LIBRARIES)
 
 mark_as_advanced(MPI_INCLUDES MPI_LIBRARIES )
 

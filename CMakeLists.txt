@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.8.11)
-
 project(pittPack)
 
 #disable in source build
@@ -13,7 +12,6 @@ set(CMAKE_FILES_DIRECTORY ${dir}/build)
 message("Files Directory" ${CMAKE_FILES_DIRECTORY})
 
 #define some colors (Unix-based systems)
-
 if(NOT WIN32)
   string(ASCII 27 Esc)
   set(ColourReset "${Esc}[m")
@@ -34,15 +32,12 @@ if(NOT WIN32)
   set(BoldWhite   "${Esc}[1;37m")
 endif()
 
-
-# get the number of physical procesors 
-
 message("project binary dir" ${EXECUTABLE_OUTPUT_PATH})
 message("CMAKE SOURCE DIR:" ${CMAKE_SOURCE_DIR})
 message("CMAKE_BINARY_DIR:" ${CMAKE_BINARY_DIR})
 
-# Out-of-Source build is required by amrGem, this if statement prevents
-# in-source-builds 
+# Out-of-Source build is required by PittPack, 
+# The following if statement prevents in-source-builds 
 
 if ( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message( FATAL_ERROR "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there. You may need to remove CMakeCache.txt." )
@@ -68,20 +63,11 @@ message("cmake source dir:" ${CMAKE_SOURCE_DIR})
 # specify the path for Modules 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 
-#find HDF5
-#find_package(HDF5 ${HDF5_MIN_VERSION} REQUIRED)
-#if(HDF5_FOUND)
-#include_directories(${HDF5_INCLUDE_DIRS})
-#message( "${Red}HDF5 Library Found: ${ColourReset}" ${HDF5_INCLUDE_DIRS})
-#message("${Green} HDF5 Library Found: ${ColourReset}")
-#endif()
-
 find_package(MYMPI ${MPI_MIN_VERSION} REQUIRED)
 if(MPI_FOUND)
 include_directories(${MPI_INCLUDE_PATH})
 message( "${Red} MPI Include Path : ${ColourReset}" ${MPI_INCLUDES})
 message( "${Red} MPI Library Path : ${ColourReset}"  ${MPI_LIBRARIES})
-#message("${Red} MPI Library Found : ${ColourReset}")
 endif()
 
 
@@ -101,23 +87,6 @@ message( "${Red} HDF5 Library Found: ${ColourReset}" ${HDF5_INCLUDE_DIRS})
 message("${Green} 2. HDF5 Library : Found ${ColourReset}")
 endif()
 
-
-#find_package(PGI REQUIRED)
-#if(PGI_FOUND)
-#include_directories(${PGI_INCLUDES})
-#message("${Red} PGI Library Found: ${ColourReset}")
-#endif()
-#message("${Red} ${PGI_INCLUDES} ${ColourReset}")
-
-#find_package(CUFFT REQUIRED)
-#if(CUFFT_FOUND)
-#include_directories(${CUFFT_INCLUDES})
-#message("${Red}  CUFFT Found: ${ColourReset}")
-#endif()
-
-#message("${Green} CUFFT Library Found: ${CUFFT_LIBRARIES} ${ColourReset}")
-#message("${Green} CUFFT includes:  ${CUFFT_INCLUDES}  ${ColourReset}")
-
 ###########################################################################
 #
 #                    SECTION: BUILD AND INSTALL
@@ -135,23 +104,8 @@ add_definitions(-DOPENACC=1)
 endif(GPU)
 message("${Red} GPU is ${GPU} ${ColourReset}" )
 
-# This is performed by source modules.sh
-#if(GPU)
-#set(CC /opt/packages/pgi/linux86-64/2018/mpi/openmpi-2.1.2/bin/mpicc)
-#set(CXX /opt/packages/pgi/linux86-64/2018/mpi/openmpi-2.1.2/bin/mpiCC)
-#else(GPU)
-#set(CXX /opt/packages/openmpi/openmpi-2.0.1/bin/mpiCC)
-#set(CC /opt/packages/openmpi/openmpi-2.0.1/bin/mpicc)
-#endif(GPU)
-
-
 message("${Green} CXX ${CXX}   ${ColourReset} ")
-
-
 include_directories(${dir}/src/include)
-# dont forget to modify the address of the source files
-#set(CMAKE_BUILD_FILES_DIRECTORY ${dir})
-#set(CMAKE_BUILD_DIRECTORY ${dir}/bin)      
 
 file(GLOB OBJ "${dir}/src/*.cpp" )
 set(EXECUTABLE_OUTPUT_PATH ${dir}/bin)
@@ -160,12 +114,7 @@ set(EXECUTABLE_OUTPUT_PATH ${dir}/bin)
 # have to hardcode the directories for I/O operations and hence ensure
 # portability
 
-#set(HEADER_FILES "${dir}/src/include/tridiag.h" "${dir}/src/include/statevector.h" "${dir}/src/include/fft.h" )
 set(HEADER_FILES    "${dir}/src/include/communicate.h"  "${dir}/src/include/pencilDcmp.h"  "${dir}/src/include/definitions.h"  "${dir}/src/include/datatype.h" "${dir}/src/include/chunkedArray.h" "${dir}/src/include/phdf5.h"   "${dir}/src/include/params.h"  "${dir}/src/include/signalProc.h"  "${dir}/src/include/mathFunction.h"  "${dir}/src/include/multiGrid.h" )
-
-#set(HEADER_FILES  "${dir}/src/include/*")
-
-
 
 message("header files" ${HEADER_FILES})
 
@@ -177,10 +126,8 @@ message("GPU" $ENV{GPU1})
 
 if($ENV{GPU1})
 ## for GPU
-
  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DOMPI_SKIP_MPICXX -acc -fast -Minfo=accel -Mlarge_arrays -Mcudalib=cufft,cusparse  -ta=tesla,gvmode   -std=c++11")
  SET(CMAKE_EXEC_LINKER_FLAGS "${CMAKE_EXEC_LINKER_FLAGS} -DOMPI_SKIP_MPICXX -acc -fast -Minfo=accel -Mlarge_arrays  -ta=tesla,gvmode -Mcudalib=cufft,cusparse -std=c++11" )
-
 else()
    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -O3  -Wno-unknown-pragmas  ")
    #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -O3  -Wall ")
@@ -205,14 +152,10 @@ add_executable(PittPack ${OBJ} ${HEADER_FILES})
 
 #add_library()
 
-# do not forget to link external libraries here 
+# Link to external libraries here 
 #if(!GPU)
 target_link_libraries(PittPack ${HDF5_LIBRARIES} ${FFTW_LIB} ${MPI_LIBRARIES} )
 #endif
-#target_link_libraries(amrGem )
-#target_link_libraries(amrGem  )
-
-#install(TARGETS amrGem DESTINATION ${dir/}bin)
 
 ############################################################################
 #
@@ -248,17 +191,7 @@ message(STATUS "Compilation date = ${DATE}")
 
 SET(CPACK_GENERATOR "TGZ")
 SET(CPACK_SOURCE_GENERATOR "TGZ")
-
-#INCLUDE(CPack)
-# Do not rely on CPACK_xxx variables, they are not set till INCLUDE(CPack) is
-# invoked, so there is no way to set them and as cpack to name the file as you
-# like, I hard coded the project name and the date as a file_name to be used
-# by cpack, this works fine 
-
-#message("package name: " ${CPACK_PACKAGE_NAME})
-
 set(CPACK_PACKAGE_FILE_NAME "PittPack-${DATE}")
-
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "PittPack-${DATE}")
 
 # set the directory you would like to be compressed, For under development

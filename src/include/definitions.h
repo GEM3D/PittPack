@@ -14,7 +14,6 @@
 #include <sys/time.h>
 #include <time.h>
 #include <vector>
-#include <complex>
 
 #if(PITTPACKACC)
 #include "math.h"
@@ -27,7 +26,6 @@
 typedef int integer;
 
 typedef unsigned int unit;
-// typedef float real;
 typedef double PittPackReal;
 
 using namespace std;

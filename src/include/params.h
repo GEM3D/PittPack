@@ -17,11 +17,7 @@ the type as \f$int\f$ */
 #define NYCHUNK1 256
 #define TMPSIZE  256
 
-
 #define COMM_ON 1
-
-//#define GPUAWARE 1
-//#define GPUAWARE2 1
 
 #define DISABLE_CHECKS 1
 
@@ -38,12 +34,11 @@ enum PittPackParams /*!<Parameters to set before compiling  */
 {
     I_O                         = 0, /*!< set o zero to disable IO */
     SHIFT                       = 1, /*!< Set to 0 for no shifts and 1 to shift*/
-    THOM                        = 1,
-    This                        = 0,        /*!<Junk for debugging, will be removed later */
-    GPUAW                       = 1,        /*! chunkwise send/recieve for ZX rotation */
-    GPUAW2                      = 1,        /*! chunkwise send/recieve for XY rotation */
-    MPI_ERROR_DISABLE           = 0,        /*! if set to 1 it will reset MPI_ERROR_FATAl to MPI_ERROR_RETURN */
-    PITT_ABORT                  = 0,
+    This                        = 0, /*!<Junk for debugging, will be removed later */
+    GPUAW                       = 1, /*! chunkwise send/recieve for ZX rotation */
+    GPUAW2                      = 1, /*! chunkwise send/recieve for XY rotation */
+    MPI_ERROR_DISABLE           = 0, /*! if set to 1 it will reset MPI_ERROR_FATAl to MPI_ERROR_RETURN */
+    PITT_ABORT                  = 0, 
     INCLUDE_ERROE_CAL_IN_TIMING = 0 , /*! uses an expensive allreduce function misleading to be included in profiling, takes 8 % of 512M
                                         mesh, suggest truning it off for profiling*/
     SOLUTIONMETHOD = 0 ,                   /*!< (0) solves with Thomas (1) Uses PCR (2) CR-P (4) Multigrid and (5) cuSPARCE (CR and PCR ) 
@@ -69,8 +64,8 @@ typedef enum PittPackErrorCodes {
     SUCCESS                        = 0, /*!< Succesful execution */
     GPU_INIT_FAILURE               = 1, /*!< GPU initialization and binding failed*/
     SOLVER_ARRAY_INCONSISTENT      = 2,
-    MPI_INIT_FAIL                  = 3,  /*!< MPI initialization failed */
-    MPI_DUP_FAIL                   = 4,  /*!< MPI Comm Duplication failed  */
+    MPI_INIT_FAIL                  = 3, /*!< MPI initialization failed */
+    MPI_DUP_FAIL                   = 4, /*!< MPI Comm Duplication failed  */
     COMSIZE_FAIL                   = 5, 
     MESH_DIVISIBLE                 = 6,
     MPI_GET_RANK_FAIL              = 7,
@@ -88,9 +83,9 @@ typedef enum PittPackErrorCodes {
     THOMAS_FAIL                    = 18, /*!< Thomas algorithm failed */
     INPUT_ARGS                     = 19,
     CUFFT_FAIL_X                   = 20, /*!< CUFFT Failure in X-direction transoformation */  
-    CUFFT_FAIL_INV_X               = 21,  /*!< CUFFT Failure in inverse transform in X-direction */  
-    CUFFT_FAIL_Y                   = 22,   /*!< CUFFT Failure in Y-direction transoformation */  
-    CUFFT_FAIL_INV_Y               = 23,   /*!< CUFFT Failure in inverse transformation in Y-direction */  
+    CUFFT_FAIL_INV_X               = 21, /*!< CUFFT Failure in inverse transform in X-direction */  
+    CUFFT_FAIL_Y                   = 22, /*!< CUFFT Failure in Y-direction transoformation */  
+    CUFFT_FAIL_INV_Y               = 23, /*!< CUFFT Failure in inverse transformation in Y-direction */  
 
 } PittPackResult;
 

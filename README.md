@@ -4,9 +4,10 @@
 
 
 ## On the Linux Terminal do:
-## source config.sh 
-### enter 0 for CPU 
-### enter 1 for GPU
+### source config.sh 
+## When prompted respond by entering 0 or 1    
+###  0 will configure for CPU clusters 
+###  1 will configure for GPU clusters
 
 
 for complete documentation visit www.pittpack.com

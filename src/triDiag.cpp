@@ -39,7 +39,9 @@ void TriDiag::assignBC( char *BC )
     bc[0] = BC[4];
     bc[1] = BC[5];
 
+#if ( PITTPACKACC )
 #pragma acc update device( bc [0:2] )
+#endif
 }
 
 TriDiag::~TriDiag()
@@ -1277,7 +1279,9 @@ void TriDiag::thomasPeriodicReal( ChunkedArray &P, double *onDiag, int i, int j,
 }
 
 // only works for 2^n-1
+#if ( PITTPACKACC )
 #pragma acc routine vector
+#endif
 void TriDiag::crp( const int n, double offdiag, double *tmpA, double *tmpC, double *tmpRHS, double *thmA, double *thmC, double *thmB,
                    double *gam1, double *rhs )
 {
@@ -1310,7 +1314,9 @@ void TriDiag::crp( const int n, double offdiag, double *tmpA, double *tmpC, doub
         cte = 1. - ( 2. * a0 * c0 );
         //  printf("%lf %lf\n",a0,c0);
 #if ( 1 )
+#if ( PITTPACKACC )
 #pragma acc loop vector firstprivate( cte ) private( ind0, indMinus1, indPlus1 )
+#endif
         //#pragma acc loop vector
         for ( int j = 0; j < m; j = j + 1 )
         {

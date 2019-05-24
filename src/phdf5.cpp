@@ -16,14 +16,14 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
     hsize_t block[4];
     hsize_t offset[4];
     hid_t   plist_id; /* property list identifier */
-    uint    i, j, k, l;
+   // uint    i, j, k, l;
     herr_t  status;
     // int         *data=NULL;
 
     /*
      * MPI variables
      */
-    int           mpi_size, mpi_rank;
+    //int           mpi_size, mpi_rank;
     PittPackReal *xtemp = NULL;
     PittPackReal *ytemp = NULL;
     PittPackReal *ztemp = NULL;
@@ -185,7 +185,7 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
 
         offset[3] = myoffset + co;
 
-        printf( "offset=%d\n", offset[3] );
+        printf( "offset=%llu\n", offset[3] );
         // status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL,
         // count, block);
         H5Sselect_hyperslab( filespace, H5S_SELECT_SET, offset, NULL, count, block );
@@ -1506,7 +1506,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
 
         offset[3] = myoffset + co;
 
-        printf( "offset=%d\n", offset[3] );
+        printf( "offset=%llu\n", offset[3] );
         // status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL,
         // count, block);
         H5Sselect_hyperslab( filespace, H5S_SELECT_SET, offset, NULL, count, block );

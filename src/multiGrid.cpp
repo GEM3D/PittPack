@@ -289,10 +289,14 @@ void MultiGrid::initialize( double *uIn )
 #endif
 }
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
 void                MultiGrid::assign( double *uIn )
 {
+#if ( PITTPACKACC )
 #pragma acc loop gang
+#endif
     for ( int i = 0; i < N; i++ )
     {
         rhs[i] = -uIn[i];
@@ -332,7 +336,9 @@ void MultiGrid::getRequiredSize()
 void MultiGrid::setDelx( double dx )
 {
     delx[0] = dx;
+#if ( PITTPACKACC )
 #pragma acc update device( delx[0] )
+#endif
 }
 
 #if ( CELL == 1 )
@@ -1082,7 +1088,9 @@ void MultiGrid::print( double delx, int level )
 #endif
 void MultiGrid::reFill( double *out )
 {
+#if ( PITTPACKACC )
 #pragma acc loop gang
+#endif
     for ( int i = 0; i < N; i++ )
     {
         out[i] = u[i];
@@ -1328,7 +1336,7 @@ void MultiGrid::weightedJacobiMono()
             // error +=(u[i]-sin(i*delx[0]*pi))*(u[i]-sin(i*delx[0]*pi));
         }
 
-        /*
+        
         for(int i=0;i<n;i++)
         {
         if(error<fabs(u[i]-sin(OMEGA*i*delx[0]*pi)))
@@ -1410,7 +1418,6 @@ void MultiGrid::solveMulti( double *out )
     int    count  = 0;
 
     // printf("Multigrid Solving\n ");
-
     //   printf("delx inside multigrid= %lf ", delx[0]);
 
     int bol = 1;
@@ -1603,7 +1610,9 @@ void                MultiGrid::thomasLowMem( double *tmpMG )
 }
 #endif
 
+#if ( PITTPACKACC )
 #pragma acc routine seq
+#endif
 void                MultiGrid::thomasLowMem( double *tmpMG, double diag, int index )
 {
     double  bet;
@@ -1708,7 +1717,9 @@ void                MultiGrid::thomasLowMem( double *tmpMG, double diag, int ind
 
     */
 
+#if ( PITTPACKACC )
 #pragma acc routine vector
+#endif
 void                MultiGrid::thomasPutBack( double *tmpMG, int index )
 {
     double *rh[2];
@@ -1716,7 +1727,9 @@ void                MultiGrid::thomasPutBack( double *tmpMG, int index )
     rh[0] = rhs;
     rh[1] = rhsImag;
 
+#if ( PITTPACKACC )
 #pragma acc loop vector
+#endif
     for ( int i = 0; i < N; i++ )
     {
         tmpMG[i] = -rh[index][i];

@@ -25,11 +25,13 @@ class TriDiag
     public:
     TriDiag(){};                                                  /*!< class constructor */
     void setElems( int nCh, int nzCh, double *sub, double *sup); /*!< assigns the private variables after construction */
+
 #if ( PITTPACKACC )
 #pragma acc routine
 #endif
     void thomas( ChunkedArray &P, double *onDiag, const int i, const int j, const int dir,
                  const int index ); /*!< thomas with Dirichlet and Neuman Boundary conditions */
+
 #if ( PITTPACKACC )
 #pragma acc routine
 #endif

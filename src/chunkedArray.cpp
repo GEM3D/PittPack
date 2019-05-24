@@ -2,8 +2,7 @@
 #include "params.h"
 #include <stdio.h>
 #include <stdlib.h>
-// N,Ny,Nx denote the number of complex variables at directions 0, 1 and 2
-//#pragma acc routine
+
 void ChunkedArray::moveHostToDevice()
 {
 #if ( PITTPACKACC )
@@ -21,12 +20,6 @@ PittPackResult ChunkedArray::allocate( int *n, int nbl )
 
     // cout << " allocated P with size " << arraySize << endl;
     P = new ( std::nothrow ) double[arraySize];
-
-    //      P = (double*)malloc( arraySize*sizeof(double));
-
-    //    P = new double[arraySize];
-    //    coords = new double[6];
-    //    dxyz = new double[3];
 
     if ( nbl <= 0 )
     {
@@ -51,6 +44,10 @@ PittPackResult ChunkedArray::allocate( int *n, int nbl )
 #pragma acc enter data create( P [0:arraySize] ) async(3)
 #endif
 
+#if ( PITTPACKACC )
+acc_async_wait_all();
+#endif
+
     if ( P == NULL )
     {
         return ( ALLOCATION_FAIL );
@@ -59,10 +56,6 @@ PittPackResult ChunkedArray::allocate( int *n, int nbl )
     {
         return ( SUCCESS );
     }
-
-#if ( PITTPACKACC )
-acc_async_wait_all();
-#endif
 
 
 }
@@ -76,12 +69,6 @@ void ChunkedArray::setCoords( double *X )
     Yb = X[3];
     Za = X[4];
     Zb = X[5];
-    /*
-       for(int i=0;i<6;i++)
-    {
-        coords[i]=X[i];
-     }
-    */
 }
 
 void ChunkedArray::setDirection( int dir )
@@ -100,10 +87,11 @@ void ChunkedArray::setDirection( int dir )
     cout << "each chunk dims=" << nx << " " << ny << " " << nz << endl;
 }
 
+#if ( PITTPACKACC )
 #pragma acc routine seq
+#endif
 int                 ChunkedArray::size() { return ( arraySize ); }
 
-//#pragma acc routine
 void ChunkedArray::moveDeviceToHost()
 {
 #if ( PITTPACKACC )
@@ -144,6 +132,11 @@ inline double &ChunkedArray::operator()( int i, int j, int k, int dir, int index
     {
         return ( P[2 * ( j + ny * i + nx * ny * k ) + index] );
     }
+    else
+    {
+        return ( P[index] );
+    }
+ 
 }
 #else
 
@@ -157,6 +150,13 @@ double &ChunkedArray::operator()( int i, int j, int k, int dir, int index )
     {
         return ( P[2 * ( j + ny * i + nx * ny * k ) + index] );
     }
+    else
+    {
+        cout<<"incorrect index in ChunkedArray operator " <<endl;
+        exit(1);  
+        return ( P[index] );
+    }
+ 
 }
 
 #endif
@@ -164,7 +164,6 @@ double &ChunkedArray::operator()( int i, int j, int k, int dir, int index )
 #if ( PITTPACKACC )
 #pragma acc routine seq
 inline double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int k, int index )
-// double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int k, int index )
 {
     /*! brief: rearrangement is consistent with the planes where (1,0,0) (0,1,0) and (0,0,1) around which rotation occurs */
 
@@ -193,6 +192,12 @@ inline double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int
     {
         return ( P[2 * ( chunkId * chunkSize / 2 + k + nz * j + nz * ny * i ) + index] );
     }
+   else
+    {
+        return ( P[index] );
+    }
+ 
+
 }
 #else
 double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int k, int index )
@@ -224,6 +229,13 @@ double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int k, int
     {
         return ( P[2 * ( chunkId * chunkSize / 2 + k + nz * j + nz * ny * i ) + index] );
     }
+    else
+    {
+        cout<<"incorrect index in ChunkedArray operator " <<endl;
+        exit(1);  
+        return ( P[index] );
+    }
+ 
 }
 
 #endif
@@ -258,7 +270,7 @@ double &ChunkedArray::operator()( int i )
 }
 
 #endif
-/*! the order is not important */
+/*!< the order is not important */
 ChunkedArray::~ChunkedArray()
 {
     if ( P != NULL )
@@ -267,7 +279,6 @@ ChunkedArray::~ChunkedArray()
 #pragma acc exit data delete ( P [0:arraySize] )
 #endif
         delete[] P;
-        //        free(P);
     }
 #if ( PITTPACKACC )
 #pragma acc exit data delete ( this )

@@ -57,7 +57,6 @@ class PencilDcmp
     MPI_Comm nbrComm[2]; /*!< stores MPI communicators to be used for neighborhood collectives in x- and y-directions */
     MPI_Comm nbrComm0;   /*!< MPI communicator to use for neighborhood collectives in x-dir */
     MPI_Comm nbrComm1;   /*!< MPI communicator to use for neighborhood collectives in y-dir */
-//    MPI_Comm nodalComm;  /*!< nodal communicator created to assure one-on-one mapping with GPU */
     int *__restrict__ indices=NULL;
     double *__restrict__ Xbox       = NULL;
     double *__restrict__ coords     = NULL;
@@ -75,11 +74,7 @@ class PencilDcmp
     MPI_Status *send_status   = NULL;
     MPI_Request *recv_request = NULL;
     MPI_Status *recv_status   = NULL;
-
  
-//   double *restrict 
-//    double *selectPointer[2]       = NULL; later on to solidfiy the rela amd imaginary functions
-    //    double *tmpZ = NULL;
     double scale; /*!< store the scaling factor for the two inverse transformations depending on the boundary conditons */
     sint * faceTag = NULL;
 
@@ -143,7 +138,6 @@ class PencilDcmp
     int  getPeriodicIndex( int rank );
     void changeOwnershipPairwiseExchangeZX(); /*!< Redistributes data by rotating from Z to X direction using pairwise exchange */
     void changeOwnershipPairwiseExchangeXY(); /*!< Redistributes data by rotating from X to Y direction using pairwise exchange*/
-
     static int getPeriodicRankYZ( int rank );
 #if ( PITTPACKACC )
 #pragma acc routine gang
@@ -187,25 +181,39 @@ class PencilDcmp
     /*!< This is only done once on CPU, it sets up the order in which data shuffling should be performed in y-dir */
 
     void changeLocation();
+#if ( PITTPACKACC )
 #pragma acc routine vector
+#endif
     void saveToDest( const sint source, const sint dest, sint dir );
 
+#if ( PITTPACKACC )
 #pragma acc routine vector
+#endif
     void saveTmpToDest( const double *__restrict__ tmp, const sint dest, sint dir );
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void restoreLocationX(); /*!< restores the data stored at each chunk to its original x-major lay-out  */
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void restoreLocationY(); /*!< restores the data stored at each chunk to its original y-major lay-out */
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void changeLocationX(); /*!<changes storage layout from local to global for perfoming FFT in x-dir*/
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void changeLocationY(); /*!<changes storage layout from local to global for perfoming FFT in y-dir*/
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void initializeTrigonometric(); /*!< Initializes the source using \f$sin(\omega x)\f$ and \f$cos(\omega)\f$ bases on the
                                                 boundary condition */
 
@@ -216,25 +224,40 @@ class PencilDcmp
     //    void rearrangeXY();              /*!< rearranges storage of data  from x-major to y-major format*/
     void assignTempX2Y( const int chunkId, const int k, double *tmp );
 
+
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void assignTempY2X( const int chunkId );
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void assignTempY2Z( const int chunkId );
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void assignBackTempZ2Y( const int chunkId );
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void assignTempZ2Y( const int chunkId );
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void rearrangeX2Y(); /*!< rearranges storage of data  from x-major to y-major format*/
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void rearrangeX2YInverse(); /*!< rearranges storage of data  from y-major back to x-major format*/
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void rescale(); /*!< Rescales the inverse transformation, dince FFT transforms by FFTW and CuFFT are not normalized */
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -242,31 +265,45 @@ class PencilDcmp
 //           Direct solve related methods
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#if ( PITTPACKACC )
 #pragma acc routine vector
+#endif
     int thomas( int i, int j, int dir, int index ); /*!< performs direct solve using Thomas algorithm*/
 
     void setEigenVal(); /*!< sets the eigenvalue based for each filament  */
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     int solveThm( const int index ); /*!< Performs the solve operaton by calling thomas method */
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void solveMG(  ); /*!< index=0 solves for the real part and index=1 solves for the immaginary part */
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void solveMGC(  ); /*!< index=0 solves for the real part and index=1 solves for the immaginary part */
 
 
     void eigenVal( ofstream &myfile ); /*!< prints the eigenvcalues to a file for debugging*/
 
+#if ( PITTPACKACC )
 #pragma acc routine
+#endif
     PittPackReal getEigenVal( int i, int j ); /*!< Calculates the eigen vale based on the offset, note that, at the tridiagonal solve, j- direction
                                         is the dominant direction
                                         if nxChunk==nyChunk && dx=dy, the eigenvalues are symmetric  */
+#if ( PITTPACKACC )
 #pragma acc routine
+#endif
     void thomasPeriodic( int i, int j, int dir,
                          int index ); /*!< Sherman-Morrison version of the Thomas algorithm (also called cyclic Thomas)*/
+#if ( PITTPACKACC )
 #pragma acc routine
+#endif
     void thomasSingleBlock( int i, int j, int dir, int index ); /*!< Singke Block solver used for debugging */
 
     // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -278,7 +315,9 @@ class PencilDcmp
     void assignBoundary( char *boundary ); /*!< assig the boundary from user to the object*/
     void extractTag();                     /*!< Extracts transformation tags based on the Boundary Conditions */
     void detectTransforms(); /*!< Detects the appropriate transformation, i.e. DST00, DCT10, etc based on the boundary conditions */
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     double getError();
 
     //  void getError(  );
@@ -304,96 +343,149 @@ class PencilDcmp
 
     // rearrnages in z- direction
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void rearrangeY2Z();
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void rearrangeY2ZInverse();
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void assignBackTempY2Z( const int chunkId );
 
     // pre and post processing the signals
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void preprocessSignalAccordinglyReverse( const int direction, const int counter );
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void postprocessSignalAccordinglyReverse( const int direction, const int counter );
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void preprocessSignalAccordingly( const int direction, const int counter );
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void postprocessSignalAccordingly( const int direction, const int counter );
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void fillInArrayContig( const int i, const int j, const int index );
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
     void fillInArrayBack( const int i, const int j, const int index );
 
     PittPackResult checkInput();
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
 void setDiag(int i,int j );
 
+#if ( PITTPACKACC )
 #pragma acc routine  gang 
+#endif
 void copyAnsFromMG(int index);
 
+#if ( PITTPACKACC )
 #pragma acc routine  gang 
+#endif
 void copySourceToMG(int index  );
 
+#if ( PITTPACKACC )
 #pragma acc routine  gang 
+#endif
 int solveThmBatch( const int index );
 
+#if ( PITTPACKACC )
 #pragma acc routine worker 
+#endif
 void fillInArrayContig( const int i, const int j,int index, double *container );
 
+#if ( PITTPACKACC )
 #pragma acc routine worker 
+#endif
 void fillInArrayBack( const int i, const int j, const int index, double *container );
 
+#if ( PITTPACKACC )
 #pragma acc routine seq
+#endif
 void thomasLowMem( double *tmpMG, double *rh , double diag, int index );
 
+#if ( PITTPACKACC )
 #pragma acc routine vector 
+#endif
 void pcr(int n, double *a, double *c, double *d); /*!< Parallel Cyclic Reduction */
 
+#if ( PITTPACKACC )
 #pragma acc routine worker 
+#endif
 void fillInArrayContigNormalize( const int i, const int j,int index, double *container,double eig );
 
+#if ( PITTPACKACC )
 #pragma acc routine gang 
+#endif
 void solveCRP( const int index );
 
+#if ( PITTPACKACC )
 #pragma acc routine gang 
+#endif
 void solvePCR( const int index );
 
+#if ( PITTPACKACC )
 #pragma acc routine vector 
+#endif
 void offDiagNormalize( const int i, const int j,double *lower,double *upper,double eig );
 
+#if ( PITTPACKACC )
 #pragma acc routine worker 
+#endif
 void fillInArrayBack( const int i, const int j,double *container, const int index );
 
 int createNodalCommunicator();
 
+#if ( PITTPACKACC )
 #pragma acc routine seq 
+#endif
 void imposeBoundaryonContainer(int i,int j,int index,double eig, double *container);
 
 
+#if ( PITTPACKACC )
 #pragma acc routine seq  
+#endif
 void imposeBoundaryonOffDiag(double eig, double *lower,double *upper);
 
+#if ( PITTPACKACC )
 #pragma acc routine seq  
+#endif
 void imposeBoundaryonCRPTmp(int i,int j,int index,double eig, double *container);
 
 
 void nbrAllToAllZXOverlap();
 void nbrAllToAllXYOverlap();
-
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
 void changeLocationXOverlap();
 
+#if ( PITTPACKACC )
 #pragma acc routine gang
+#endif
 void changeLocationYOverlap();
 
     ~PencilDcmp(); /*!< Class destructor*/
@@ -410,9 +502,10 @@ class PoissonCPU : public PencilDcmp
     PoissonCPU( int nx, int ny, int nz, int p0 ) : PencilDcmp( nx, ny, nz, p0, p0 ){}; /*!< constructor */
     PoissonCPU( int argcs, char *pArgs[], int nx, int ny, int nz )
     : PencilDcmp( argcs, pArgs, nx, ny, nz ){}; /*!< Alternative Class constructor */
+
     // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     //
-    //            FFTW3 related methods, modified using inheritance
+    //   FFTW3 related methods, modified using inheritance
     //
     // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -456,7 +549,6 @@ class PoissonGPU : public PencilDcmp
     //void triDiagCusparse(double *rhs);
 
     void triDiagCusparse(double *dl, double*ds,double *du,double *rhs);
-
 
     void pittPack(); /*!<  method to call FFT and Thomas for solve  */
                      //   static const char *PittPackGetErrorEnum(PittPackResult error);

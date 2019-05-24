@@ -79,7 +79,7 @@ void TriDiag::thomas( ChunkedArray &P, double *onDiag, const int i, const int j,
     // the two ends decided by BC
 
     double Sn[ZSIZE];
-    int    this_rank = 1;
+    //int    this_rank = 1;
 
 #if ( 1 )
     bet                         = onDiag[0];
@@ -89,6 +89,7 @@ void TriDiag::thomas( ChunkedArray &P, double *onDiag, const int i, const int j,
     {
         result = THOMAS_FAIL;
     }
+   
 
         // seprate the last loop because of boundary condition
 
@@ -757,7 +758,7 @@ int TriDiag::thomasReal( ChunkedArray &P, double *onDiag, const int i, const int
 {
     int    index = 0;
     double bet;
-    int    this_rank = 1;
+    //int    this_rank = 1;
     int    result    = SUCCESS;
 
 #if ( DEBUG )
@@ -1289,9 +1290,9 @@ void TriDiag::crp( const int n, double offdiag, double *tmpA, double *tmpC, doub
     int d0;
     int d1;
     int m = n;
-    int d02;
+    //int d02;
 
-    double a0, c0, aMinus1, cMinus1, aPlus1, cPlus1, cte;
+    double a0, c0,cte;// aMinus1, cMinus1, aPlus1, cPlus1, cte;
     int    ind0;
     int    indMinus1;
     int    indPlus1;
@@ -1447,7 +1448,7 @@ void TriDiag::pcr( int n, double *a, double *c, double *d )
     double r;
     // these go on register
     int m    = VECLENGTH;
-    int size = n / m + 1;
+    //int size = n / m + 1;
 
     double a0[20];
     double a1[20];

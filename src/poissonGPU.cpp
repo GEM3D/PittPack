@@ -28,6 +28,7 @@ void PoissonGPU::performInverseTransformXdir() /*!< Called on Host and Ran on GP
 {
     cufftHandle plan = NULL;
     double *    ptr  = P.P;
+
 #pragma acc host_data use_device( ptr )
     {
         cufftPlan1d( &plan, nx, CUFFT_Z2Z, nyChunk * nzChunk );
@@ -48,6 +49,7 @@ void PoissonGPU::performTransformYdir() /*!< Called on Host and Ran on GPU*/
 {
     cufftHandle plan = NULL;
     double *    ptr  = P.P;
+
 #pragma acc host_data use_device( ptr )
     {
         cufftPlan1d( &plan, ny, CUFFT_Z2Z, nxChunk * nzChunk );
@@ -69,6 +71,7 @@ void PoissonGPU::performInverseTransformYdir() /*!< Called on Host and Ran on GP
 {
     cufftHandle plan = NULL;
     double *    ptr  = P.P;
+
 #pragma acc host_data use_device( ptr )
     {
         cufftPlan1d( &plan, ny, CUFFT_Z2Z, nxChunk * nzChunk );
@@ -91,6 +94,7 @@ void PoissonGPU::triDiagCusparse( double *dl, double *ds, double *du, double *rh
     // cout<< " size of nz" <<nz<<endl;
 
     cusparseHandle_t handle = NULL;
+
 #pragma acc host_data use_device( rhs, du, dl, ds )
     {
         cusparseCreate( &handle );
@@ -111,12 +115,8 @@ void PoissonGPU::triDiagCusparse( double *dl, double *ds, double *du, double *rh
 
 void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 {
-    //  struct timeval start_time, stop_time, elapsed_time;
-    //  gettimeofday( &start_time, NULL );
     double t1 = 0.0;
     double t2 = 0.0;
-    //   MPI_Barrier( MPI_COMM_WORLD );
-    //    t1 = MPI_Wtime();
 
 #if ( DEBUG2 )
     ofstream myfile;
@@ -143,7 +143,8 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
     }
     double err = 0.0;
     finalErr   = 0.0;
-    double eig;
+    
+   //double eig;
 
     double t1_com = 0.0;
     double t2_com = 0.0;
@@ -454,26 +455,17 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
                   {
                         for ( int i = 0; i < nyChunk; i++ )
                         {
-
-
                 #pragma acc parallel
                          eig = getEigenVal( i, j );
-
-
                 #pragma acc parallel async(4)
                          setDiag(i,j);
-
                 #pragma acc parallel async(5)
                          fillInArrayContig( i, j, 1 );
-
                 #pragma acc wait(4)
                 #pragma acc wait(5)
-
                          triDiagCusparse(dl,ds,du,tmpMGImag);
-
                 #pragma acc parallel
                          fillInArrayBack( i, j, 1 );
-
                  }
                  }
 */
@@ -482,7 +474,6 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             //#pragma acc wait(123)
             //            #pragma acc parallel
             //                        solveThm(1);
-
             /*
             #pragma acc update self (result)
                      // M.printX( myfile );
@@ -635,7 +626,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
             if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
             {
-#pragma acc parallel vector_length( 50 ) reduction( max : err )
+#pragma acc parallel vector_length( 32 ) reduction( max : err )
                 err = getError();
 
                 // cout<<" ****** "<<err<<endl;
@@ -651,24 +642,20 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
     //#pragma acc update self(err)
 
+    if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
+    {
     MPI_Allreduce( &err, &finalErr, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
-
+    finalErr = finalErr / p0 / p0;
+     
+    if ( myRank == 0 )
+    {
     // cout << YELLOW << "Error  (" << myRank << ") =" << err << " " << finalErr << RESET << endl;
     cout << YELLOW << "Error Per processor"
-         << " " << finalErr / p0 / p0 << RESET << endl;
+         << " " << finalErr << RESET << endl;
+     }
+    }
 
-    finalErr = finalErr / p0 / p0;
-
-    //  gettimeofday( &stop_time, NULL );
-    //  timersub( &stop_time, &start_time, &elapsed_time ); // Unix time subtract routine
-
-    //   MPI_Barrier( MPI_COMM_WORLD );
-
-    //  t2 = MPI_Wtime();
-
-    //   double deT = t2 - t1;
-
-    MPI_Reduce( &deT, &runTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+     MPI_Reduce( &deT, &runTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
 
     if ( myRank == 0 )
     {

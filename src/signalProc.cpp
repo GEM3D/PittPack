@@ -78,7 +78,7 @@ void SignalProc::postprocessSignalDCT01( ChunkedArray &P, const int size, const 
     // to prevent overwrite we use complex part and then swap real and complex
     // parts
     int upperBound = ( size - 1 ) / 2 + 1;
-    int istart     = upperBound;
+ //   int istart     = upperBound;
 
 #if ( PITTPACKACC )
 #pragma acc loop vector
@@ -88,7 +88,7 @@ void SignalProc::postprocessSignalDCT01( ChunkedArray &P, const int size, const 
         P( 2 * ( j * size + 2 * i ) + 1 ) = P( 2 * ( j * size + i ) );
     }
 
-    int idx = size % 2;
+   // int idx = size % 2;
 
 #if ( PITTPACKACC )
 #pragma acc loop vector

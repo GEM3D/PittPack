@@ -795,8 +795,8 @@ PittPackResult PencilDcmp::constructConnectivity()
     Nbrs[1] = new ( std::nothrow ) int[p0];
 
     int id = myRank / p0;
-    int id1;
-    int counter = 0;
+    //int id1;
+    //int counter = 0;
 
     for ( int i = 0; i < p0; i++ )
     {
@@ -1219,7 +1219,8 @@ void PencilDcmp::graphCreate() /*!Two different communicators are required due
                                   rotation */
 {
     int indegree  = p0;
-    int outdegree = p0;
+    // symmetric communications and hence outdegree and indegree are the same
+    //int outdegree = p0;
     int reorder   = 0;
     int ierr;
 
@@ -1249,7 +1250,7 @@ void PencilDcmp::graphCreate() /*!Two different communicators are required due
 
 void PencilDcmp::checkGraph( int index )
 {
-    int nneighbors = 0;
+    //int nneighbors = 0;
     int indegree   = 0;
     int outdegree  = 0;
 
@@ -1264,7 +1265,7 @@ void PencilDcmp::checkGraph( int index )
     MPI_Dist_graph_neighbors_count( nbrComm[index], &indegree, &outdegree, &weight );
 
     int *neighbors = new int[indegree];
-    nneighbors     = indegree;
+    //nneighbors     = indegree;
 
 #if ( DEBUG )
     cout << " nneighbors is = " << nneighbors << endl;
@@ -1412,7 +1413,7 @@ void PencilDcmp::nbrAllToAllZXOverlap()
 
     double *ptr = NULL;
     int     end = P.chunkSize;
-    int     ierr;
+    //int     ierr;
 
     //
     // post recieves
@@ -1663,7 +1664,7 @@ void PencilDcmp::nbrAllToAllXYOverlap()
 
     double *ptr = NULL;
     int     end = P.chunkSize;
-    int     ierr;
+    //int     ierr;
 
     // part A
     for ( int i = 0; i < ( p0 ); i++ )
@@ -2087,7 +2088,6 @@ double PencilDcmp::getError()
     }
 
     double err      = 0.0;
-    double finalErr = 0.0;
 
 #if ( PITTPACKACC )
 #pragma acc loop vector firstprivate( err ) reduction( + : err )
@@ -2100,6 +2100,7 @@ double PencilDcmp::getError()
     err = squareRoot( err );
 
     /*
+    double finalErr = 0.0;
         MPI_Allreduce( &err, &finalErr, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 
         cout << YELLOW << "Error  (" << myRank << ") =" << err << " " << finalErr << RESET << endl;
@@ -2598,9 +2599,9 @@ void PencilDcmp::constructShuffleVectorX()
 
     memset( bol, '1', size * sizeof( char ) );
 
-    sint i0, j0, k0, chunkId0;
-    sint i1, j1, k1, chunkId1;
-    sint index0, id, dest;
+    //sint i0, j0, k0, chunkId0,index0;
+    //sint i1, j1, k1, chunkId1;
+    sint id, dest;
 
     // need to save this due to parallelization issue,
     // might lead to race condition if done on GPU
@@ -2792,9 +2793,9 @@ void PencilDcmp::constructShuffleVectorY()
 
     memset( bol, '1', size * sizeof( char ) );
 
-    sint i0, j0, k0, chunkId0;
-    sint i1, j1, k1, chunkId1;
-    sint index0, id, dest;
+    //sint i0, j0, k0, chunkId0;
+    //sint i1, j1, k1, chunkId1,index0;
+    sint  id, dest;
 
     // need to save this due to parallelization issue,
     // might lead to race condition if done on GPU
@@ -3027,7 +3028,7 @@ void PencilDcmp::restoreTmp( const sint id, double *tmp, sint dir )
 #endif
 void PencilDcmp::changeLocationX()
 {
-    double *tm;
+    double *tm=NULL;
 
 #if ( PITTPACKACC )
 //#pragma acc loop worker private( tm[1] )
@@ -3168,7 +3169,7 @@ void PencilDcmp::changeLocationYOverlap()
 #endif
 void PencilDcmp::changeLocationY()
 {
-    double *tm;
+    double *tm=NULL;
 
 #if ( PITTPACKACC )
 #pragma acc loop gang private( tm[1] )
@@ -3213,7 +3214,7 @@ void PencilDcmp::changeLocationY()
 #endif
 void PencilDcmp::restoreLocationY()
 {
-    double *tm;
+    double *tm=NULL;
 
 #if ( PITTPACKACC )
 #pragma acc loop gang private( tm[1] )
@@ -3262,7 +3263,7 @@ void PencilDcmp::restoreLocationY()
 #endif
 void PencilDcmp::restoreLocationX()
 {
-    double *tm;
+    double *tm=NULL;
 
 #if ( PITTPACKACC )
 #pragma acc loop gang private( tm[1] )
@@ -3640,7 +3641,7 @@ void PencilDcmp::detectTransforms()
 #endif
 int PencilDcmp::thomas( int i, int j, int dir, int index )
 {
-    double bet;
+    //double bet;
 
     // the enterior is always set according to eigenvalues
     // the two ends decided by BC
@@ -3649,7 +3650,7 @@ int PencilDcmp::thomas( int i, int j, int dir, int index )
     double onDiag[3];
     onDiag[1] = getEigenVal( i, j );
 
-    int this_rank = 1;
+    //int this_rank = 1;
 
     // assign bc
     // bc 0 >> dirichlet, value known at ghost point
@@ -3730,14 +3731,15 @@ result=THOMAS_FAIL;
 #endif
 void PencilDcmp::thomasSingleBlock( int i, int j, int dir, int index )
 {
+    /*
     double bet;
     int    n;
-  
+    */
 
     double onDiag[3];
     onDiag[1] = getEigenVal( i, j );
 
-    int this_rank = 0;
+    //int this_rank = 0;
 
     // assign bc
     // bc 0 >> dirichlet, value known at ghost point
@@ -3777,17 +3779,18 @@ void PencilDcmp::thomasSingleBlock( int i, int j, int dir, int index )
 #endif
 void PencilDcmp::thomasPeriodic( int i, int j, int dir, int index )
 {
+/*
     double bet;
-    int    n;
 
     // the enterior is always set according to eigenvalues
     // the two ends decided by BC
 
-    double onDiag[3];
 
+    int    n;
     double alpha = 1.0;
     double beta  = 1.0;
-
+*/
+    double onDiag[3];
     onDiag[1] = getEigenVal( i, j );
 
     if ( bc[0] == 'P' || bc[2] == 'P' )
@@ -3957,7 +3960,7 @@ void PencilDcmp::solveMG()
     double eig;
     int    index = 0;
     // cout<< RED<<"multiGrid" <<RESET<<endl;
-    int count = 0;
+    //int count = 0;
 
     int bol = MG.gridSizePowerTwoPlusOne;
 
@@ -4043,7 +4046,7 @@ void PencilDcmp::solveMG()
 void PencilDcmp::solveMGC()
 {
     double eig;
-    int    count = 0;
+    //int    count = 0;
     int    index = 1;
     int    bol   = MGC.gridSizePowerTwoPlusOne;
 
@@ -4211,7 +4214,7 @@ int PencilDcmp::solveThm( const int index )
     // not that rhs already scaled for initialization for Thomas so here we need to rescale
     //  back as MultiGrid has its own scaling
 
-    double diag[3];
+    //double diag[3];
     double eig;
     double *tm[2];
 
@@ -4220,7 +4223,7 @@ int PencilDcmp::solveThm( const int index )
 
     // cout<< RED<<"multiGrid" <<RESET<<endl;
 
-    int count = 0;
+    //int count = 0;
 
 #if ( 1 )
 
@@ -4272,9 +4275,9 @@ void PencilDcmp::eigenVal( ofstream &myfile )
 {
     // note that we perform solve when the data is aligned in y direction
 
-    int    ioffset;
-    int    joffset;
-    double onDiag;
+    //int    ioffset;
+    //int    joffset;
+    //double onDiag;
     myfile << endl;
     myfile << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << endl;
 
@@ -4565,7 +4568,7 @@ void PencilDcmp::modifyRhsDirichlet()
     ;
 #endif
     double omega[3] = {pi, pi, pi};
-    double val;
+    //double val;
     // z direction, acting on facetags 5 and 6 with Zmin and Zmax
     if ( faceTag[4] == 1 )
     {
@@ -4933,8 +4936,8 @@ int PencilDcmp::solveThmBatch( const int index )
 
     // cout<< RED<<"multiGrid" <<RESET<<endl;
 
-    int count = 0;
-    int i, j;
+    //int count = 0;
+    //int i, j;
 
     for ( int j = 0; j < nxChunk; j++ )
     {
@@ -5069,8 +5072,8 @@ void PencilDcmp::fillInArrayBack( const int i, const int j, const int index, dou
 void PencilDcmp::solvePCR( const int index )
 {
     double eig;
-    int    count = 0;
-    int    i, j;
+   // int    count = 0;
+   // int    i, j;
 #if ( PITTPACKACC )
 #pragma acc loop seq
 #endif

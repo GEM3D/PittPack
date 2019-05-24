@@ -274,7 +274,7 @@ int main( int argcs, char *pArgs[] )
 #endif
     if ( INCLUDE_ERROE_CAL_IN_TIMING == 0 )
     {
-        cout << " err = " << M.getError() << endl;
+        cout <<RED <<" err = " << M.getError() <<RESET<< endl;
     }
 //    M.runInfo();
 #endif

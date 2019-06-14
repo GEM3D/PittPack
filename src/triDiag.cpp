@@ -1756,9 +1756,9 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
 // first enforce dirchlet type bc
 // the goal is [1 ...... -1] at first and 
 // [-1 ...........1] at the last row
-    b[0]=-1.0;
+    b[0]=diag;
     b[1]=diag;
-    b[2]=-1.0;
+    b[2]=diag;
  
     // cout<<diag<<endl;
 
@@ -1772,7 +1772,11 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
     bb[1]= b[1];
 
     bb[2] = b[2] - alpha * beta / gamma;
-   
+ 
+    rh[0]=0.0;
+    rh[N-1]=0.0;
+    
+
     thomasLowMemNoBC(tmpMG,rh,bb,index );
 
 //  rhs is the new rhs 

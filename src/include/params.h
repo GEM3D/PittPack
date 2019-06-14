@@ -32,7 +32,7 @@ the type as \f$int\f$ */
 
 enum PittPackParams /*!<Parameters to set before compiling  */
 {
-    I_O                         = 1, /*!< set o zero to disable IO */
+    I_O                         = 0, /*!< set o zero to disable IO */
     SHIFT                       = 1, /*!< Set to 0 for no shifts and 1 to shift*/
     This                        = 0, /*!<Junk for debugging, will be removed later */
     GPUAW                       = 1, /*! chunkwise send/recieve for ZX rotation */

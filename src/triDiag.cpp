@@ -1753,9 +1753,12 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
     double b[3];
     double bb[3];
 
-    b[0]=diag;
+// first enforce dirchlet type bc
+// the goal is [1 ...... -1] at first and 
+// [-1 ...........1] at the last row
+    b[0]=-1.0;
     b[1]=diag;
-    b[2]=diag;
+    b[2]=-1.0;
  
     // cout<<diag<<endl;
 

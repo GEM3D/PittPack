@@ -141,8 +141,9 @@ int main( int argcs, char *pArgs[] )
 
 #endif
 
-    // char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
-         char mybc[6] = {'N', 'N', 'N', 'N', 'P', 'P'};
+     char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
+   //  char mybc[6] = {'P', 'P', 'P', 'P', 'P', 'P'};
+   //      char mybc[6] = {'N', 'N', 'N', 'N', 'P', 'P'};
     //  char mybc[6] = {'D', 'D', 'D', 'D', 'P', 'P'};
     // ill posed  char mybc[6] = {'P', 'P', 'P', 'P', 'N', 'N'};
    //        char mybc[6] = {'D', 'D', 'D', 'D', 'P', 'P'};

@@ -1934,7 +1934,7 @@ void PencilDcmp::initializeTrigonometric()
                 else
                 {
                     //  For big mesh sizes calling class operator calls problems
-                    P( i, j, k, 0 ) = ( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                    P( i, j, k, 0 ) =-( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
                                         * exactValue( omega[2] * z, tags[2] )
                                         + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] )
                                           * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
@@ -1948,13 +1948,13 @@ void PencilDcmp::initializeTrigonometric()
 //   P(i,j,k,1)=(x*y*z);
 
 // all peridic meaning PPPPP
-/*
+
                  if( bc[0] == 'P' && bc[2] == 'P' && bc[4]=='P')
                  {
                     P( i, j, k, 0 ) = -3. * omega[1] * omega[1] * ( cos( omega[1] * ( x + y + z ) ) ) * c3 * c3;
                     P( i, j, k, 1 ) = -3. * omega[1] * omega[1] * ( sin( omega[1] * ( x + y + z ) ) ) * c3 * c3;
                  }
-*/
+
 #else
                 //           P(i,j,k,0)=(sin(omega[1]*z)*cos(omega[1]*(x+y)));
                 //           P(i,j,k,1)=(sin(omega[1]*z)*sin(omega[1]*(x+y)));
@@ -2086,17 +2086,17 @@ double PencilDcmp::getError()
                 else
                 {
                     val = P( i, j, k )
-                          + exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                          - exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
 
                     val1 = 0.0;
                 }
-/*
+
                  if( bc[0] == 'P' && bc[2] == 'P' && bc[4]=='P')
                  {
-                   val=P(i,j,k,0)-cos( omega[1] * ( x + y + z ) );
-                   val1=P(i,j,k,0)-sin( omega[1] * ( x + y + z ) );
+                   val=P(i,j,k,0)-cosine( omega[1] * ( x + y + z ) );
+                   val1=P(i,j,k,0)-sine( omega[1] * ( x + y + z ) );
                  }
-*/
+
                 // cout<<"val 1 "<<val1<<endl;
                 //   cout << RED << " myRank " << myRank << " x= " << x << " y= " << y << " z= " << z << " P= " << P( i, j, k ) << RESET
                 P( i, j, k ) = ( val * val + val1 * val1 );
@@ -4979,7 +4979,7 @@ int PencilDcmp::solveThmBatch( const int index )
             }
             else
             {
-            T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3+i*nz , eig,-1.0,-1.0, index );
+            T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3+i*nz , eig,1.0,1.0, index );
           // cout<< RED<<"solveThmBatch 0 N" <<RESET<<endl;
             }
             fillInArrayBack( i, j, index, x1 + nz * i );
@@ -5019,7 +5019,7 @@ int PencilDcmp::solveThmBatch( const int index )
             else
             {
          //  cout<< RED<<"solve full batch N" <<RESET<<endl;
-           T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3+l*nz ,eig, -1.0, -1.0, index );
+           T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3+l*nz ,eig, 1.0, 1.0, index );
             }
 
 

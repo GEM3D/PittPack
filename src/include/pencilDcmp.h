@@ -67,6 +67,7 @@ class PencilDcmp
     double * __restrict__ tmpMGImag = NULL;
     double * __restrict__ x1 = NULL;
     double * __restrict__ x2 = NULL;
+    double * __restrict__ x3 = NULL;
     double * __restrict__ crpcr_lower=NULL;
     double * __restrict__ crpcr_upper=NULL;
     double * __restrict__ crpcr_rhs=NULL;

@@ -1541,6 +1541,67 @@ void TriDiag::pcr( int n, double *a, double *c, double *d )
         //    printf("i+s = %d  i+s =  %d\n",i-s,i+s );
     }
 }
+//  no boundary version
+#if ( PITTPACKACC )
+#pragma acc routine seq
+#endif
+void TriDiag::thomasLowMemNoBC( double *tmpMG, double *rh, double *diag, int index )
+{
+    double bet;
+
+    //   double a[3],c[3];
+    double b[3];
+
+    int n = nChunk * nzChunk;
+    int N = n;
+    /*
+    #if(PITTPACKACC)
+    #pragma acc loop seq
+    #endif
+        for ( int i = 0; i < 3; i++ )
+        {
+            a[i] = subDiag[i];
+            c[i] = supDiag[i];
+        }
+    */
+    b[0] = diag[0];
+    b[1] = diag[1];
+    b[2] = diag[2];
+
+    rh[0] = rh[0] / ( bet = b[0] );
+
+    int j    = 1;
+    tmpMG[j] = supDiag[j - 1] / bet;
+    bet      = b[1] - subDiag[1] * tmpMG[j];
+    rh[1]    = ( rh[1] - subDiag[1] * rh[j - 1] ) / bet;
+
+#if ( PITTPACKACC )
+#pragma acc loop seq
+#endif
+    for ( int j = 2; j < n - 1; j++ )
+    {
+        //       DecompositioN and forward substitution.
+        tmpMG[j] = supDiag[1] / bet;
+        bet      = b[1] - subDiag[1] * tmpMG[j];
+        rh[j]    = ( rh[j] - subDiag[1] * rh[j - 1] ) / bet;
+    }
+
+    j        = N - 1;
+    tmpMG[j] = supDiag[1] / bet;
+    bet      = b[2] - subDiag[2] * tmpMG[j];
+    rh[j]    = ( rh[j] - subDiag[2] * rh[j - 1] ) / bet;
+
+    //  cout << a[2] << " " << b[2] << eNdl;
+#if ( PITTPACKACC )
+#pragma acc loop seq
+#endif
+    for ( int j = ( n - 2 ); j >= 0; j-- )
+    {
+        rh[j] -= tmpMG[j + 1] * rh[j + 1];
+        // cout << " j " << j << eNdl;
+    }
+}
+
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
@@ -1564,7 +1625,9 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
             c[i] = supDiag[i];
         }
     */
+    b[0] = diag;
     b[1] = diag;
+    b[2] = diag;
 
     // for Dirirchlet
     if ( bc[0] == 'D' )
@@ -1592,6 +1655,7 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
     tmpMG[j] = supDiag[j - 1] / bet;
     bet      = b[1] - subDiag[1] * tmpMG[j];
     rh[1]    = ( rh[1] - subDiag[1] * rh[j - 1] ) / bet;
+
 #if ( PITTPACKACC )
 #pragma acc loop seq
 #endif
@@ -1678,6 +1742,62 @@ void TriDiag::thomasLowMem( int N, double *a, double *b, double *c, double *r, d
     }
 }
 
+#if ( PITTPACKACC )
+#pragma acc routine seq 
+#endif
+void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, double diag, const double alpha,const double beta, int index)
+{
+    int n = nChunk * nzChunk;
+    int N = n;
+
+    double b[3];
+    double bb[3];
+
+    b[0]=diag;
+    b[1]=diag;
+    b[2]=diag;
+ 
+    // cout<<diag<<endl;
+
+    double fact, gamma;
+    gamma = -b[0];
+
+// this is for diagonal entry modification  
+// only 3 elements are needed
+    bb[0] = b[0] - gamma;
+
+    bb[1]= b[1];
+
+    bb[2] = b[2] - alpha * beta / gamma;
+   
+    thomasLowMemNoBC(tmpMG,rh,bb,index );
+
+//  rhs is the new rhs 
+    rh1[0]     = gamma;
+    rh1[N - 1] = alpha;
+
+// no need for this, if already set to zero before calling this coutine 
+#if ( PITTPACKACC )
+//#pragma acc loop vector 
+#endif
+    for ( int i = 1; i < N - 1; i++ )
+    {
+        rh1[i] = 0.0;
+    }
+
+    thomasLowMemNoBC(tmpMG,rh1,bb, index );
+
+    fact = ( rh[0] + beta * rh[N - 1] / gamma ) / ( 1. + rh1[0] + beta * rh1[N - 1] / gamma );
+#if ( PITTPACKACC )
+//#pragma acc loop vector 
+#endif
+    for ( int i = 0; i < N; i++ )
+    {
+        rh[i] -= fact * rh1[i];
+    }
+
+}
+
 // sherman morrisson versions of Thomas to be integrated
 #if ( 0 )
 void Tridiag::shermanMorrisonThomas( double *a, double *b, double *c, const double alpha, const double beta, double *r, double *x )
@@ -1705,6 +1825,10 @@ void Tridiag::shermanMorrisonThomas( double *a, double *b, double *c, const doub
 
     thomas( a, bb, c, r, x );
 
+//   thomasLowMem( int N, double *a, double *b, double *c, double *r, double *gam );
+
+/*
+ *  also size N
     u[0]     = gamma;
     u[N - 1] = alpha;
 
@@ -1712,9 +1836,11 @@ void Tridiag::shermanMorrisonThomas( double *a, double *b, double *c, const doub
     {
         u[i] = 0.0;
     }
-
+*/
     thomas( a, bb, c, u, z );
 
+//   thomasLowMem( int N, double *a, double *b, double *c, double *r, double *gam );
+//
     fact = ( x[0] + beta * x[N - 1] / gamma ) / ( 1. + z[0] + beta * z[N - 1] / gamma );
 
     for ( int i = 0; i < N; i++ )

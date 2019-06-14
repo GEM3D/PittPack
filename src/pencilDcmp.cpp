@@ -82,9 +82,11 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
 #if ( THOM_FULL_BATCH == 1 )
     x1 = new double[nxChunk * nyChunk * nz];
     x2 = new double[nxChunk * nyChunk * nz];
+    x3 = new double[nxChunk * nyChunk * nz];
 #else
     x1 = new double[gangTri * nz];
     x2 = new double[gangTri * nz];
+    x3 = new double[gangTri * nz];
 #endif
 
     if ( SOLUTIONMETHOD != 0 )
@@ -161,9 +163,11 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
 #if ( THOMAS_FULL_BATCH == 1 )
 #pragma acc enter data create( x1 [0:nz * nxChunk * nyChunk] ) async( 20 )
 #pragma acc enter data create( x2 [0:nz * nxChunk * nyChunk] ) async( 21 )
+#pragma acc enter data create( x3 [0:nz * nxChunk * nyChunk] ) async( 22 )
 #else
-#pragma acc enter data create( x1 [0:nz * gangTri] ) async( 20 )
-#pragma acc enter data create( x2 [0:nz * gangTri] ) async( 21 )
+#pragma acc enter data create( x1 [0:nz * gangTri] ) async( 23 )
+#pragma acc enter data create( x2 [0:nz * gangTri] ) async( 24 )
+#pragma acc enter data create( x2 [0:nz * gangTri] ) async( 25 )
 #endif
 
     if ( SOLUTIONMETHOD != 0 )
@@ -278,9 +282,11 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
 #if ( THOM_FULL_BATCH == 1 )
     x1 = new double[nxChunk * nyChunk * nz];
     x2 = new double[nxChunk * nyChunk * nz];
+    x3 = new double[nxChunk * nyChunk * nz];
 #else
     x1 = new double[gangTri * nz];
     x2 = new double[gangTri * nz];
+    x3 = new double[gangTri * nz];
 #endif
 
     /*
@@ -359,9 +365,11 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
 #if ( THOM_FULL_BATCH == 1 )
 #pragma acc enter data create( x1 [0:nz * nxChunk * nyChunk] ) async( 20 )
 #pragma acc enter data create( x2 [0:nz * nxChunk * nyChunk] ) async( 21 )
+#pragma acc enter data create( x3 [0:nz * nxChunk * nyChunk] ) async( 22 )
 #else
-#pragma acc enter data create( x1 [0:nz * gangTri] ) async( 20 )
-#pragma acc enter data create( x2 [0:nz * gangTri] ) async( 21 )
+#pragma acc enter data create( x1 [0:nz * gangTri] ) async( 23 )
+#pragma acc enter data create( x2 [0:nz * gangTri] ) async( 24 )
+#pragma acc enter data create( x3 [0:nz * gangTri] ) async( 25 )
 #endif
     if ( SOLUTIONMETHOD != 0 )
     {
@@ -535,6 +543,7 @@ PencilDcmp::~PencilDcmp()
     }
 #pragma acc exit data delete ( x1 )
 #pragma acc exit data delete ( x2 )
+#pragma acc exit data delete ( x3 )
 #pragma acc exit data delete ( this )
 #endif
 
@@ -566,6 +575,7 @@ PencilDcmp::~PencilDcmp()
     delete[] du;
     delete[] x1;
     delete[] x2;
+    delete[] x3;
 
     if ( SOLUTIONMETHOD != 0 )
     {
@@ -1939,8 +1949,11 @@ void PencilDcmp::initializeTrigonometric()
 
 // all peridic meaning PPPPP
 /*
+                 if( bc[0] == 'P' && bc[2] == 'P' && bc[4]=='P')
+                 {
                     P( i, j, k, 0 ) = -3. * omega[1] * omega[1] * ( cos( omega[1] * ( x + y + z ) ) ) * c3 * c3;
                     P( i, j, k, 1 ) = -3. * omega[1] * omega[1] * ( sin( omega[1] * ( x + y + z ) ) ) * c3 * c3;
+                 }
 */
 #else
                 //           P(i,j,k,0)=(sin(omega[1]*z)*cos(omega[1]*(x+y)));
@@ -2077,6 +2090,13 @@ double PencilDcmp::getError()
 
                     val1 = 0.0;
                 }
+/*
+                 if( bc[0] == 'P' && bc[2] == 'P' && bc[4]=='P')
+                 {
+                   val=P(i,j,k,0)-cos( omega[1] * ( x + y + z ) );
+                   val1=P(i,j,k,0)-sin( omega[1] * ( x + y + z ) );
+                 }
+*/
                 // cout<<"val 1 "<<val1<<endl;
                 //   cout << RED << " myRank " << myRank << " x= " << x << " y= " << y << " z= " << z << " P= " << P( i, j, k ) << RESET
                 P( i, j, k ) = ( val * val + val1 * val1 );
@@ -4939,7 +4959,7 @@ int PencilDcmp::solveThmBatch( const int index )
     //int count = 0;
     //int i, j;
 
-    for ( int j = 0; j < nxChunk; j++ )
+    for ( int j = 0; j < nxChunk; j++)
     {
 // calculate i and j
 #if ( PITTPACKACC )
@@ -4950,9 +4970,18 @@ int PencilDcmp::solveThmBatch( const int index )
             eig = getEigenVal( i, j );
 
             fillInArrayContig( i, j, index, x1 + i * nz );
-
+             
+      //     cout<< RED<<"solveThmBatch" <<RESET<<endl;
+            if(bc[4]!='P')
+            {
             T.thomasLowMem( x2 + i * nz, x1 + nz * i, eig, index );
-
+           //cout<< RED<<"solveThmBatch 0" <<RESET<<endl;
+            }
+            else
+            {
+            T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3+i*nz , eig,-1.0,-1.0, index );
+          // cout<< RED<<"solveThmBatch 0 N" <<RESET<<endl;
+            }
             fillInArrayBack( i, j, index, x1 + nz * i );
         }
     }
@@ -4967,7 +4996,7 @@ int PencilDcmp::solveThmBatch( const int index )
 {
     double eig;
 
-    // cout<< RED<<"multiGrid" <<RESET<<endl;
+ //    cout<< RED<<"solveThmBatch" <<RESET<<endl;
 
     int count = 0;
     int i, j;
@@ -4980,7 +5009,20 @@ int PencilDcmp::solveThmBatch( const int index )
         j = l / nyChunk;
         eig = getEigenVal( i, j );
         fillInArrayContig( i, j, index, x1 + l * nz );
-        T.thomasLowMem( x2 + l * nz, x1 + nz * l, eig, index );
+       // T.thomasLowMem( x2 + l * nz, x1 + nz * l, eig, index );
+      
+//     cout<< RED<<"solveThmBatch" <<RESET<<endl;
+           if(bc[4]!='P')
+            {
+            T.thomasLowMem( x2 + l * nz, x1 + nz * l, eig, index );
+            }
+            else
+            {
+         //  cout<< RED<<"solve full batch N" <<RESET<<endl;
+           T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3+l*nz ,eig, -1.0, -1.0, index );
+            }
+
+
         fillInArrayBack( i, j, index, x1 + nz * l );
     }
 

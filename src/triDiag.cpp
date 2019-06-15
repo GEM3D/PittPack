@@ -1572,7 +1572,8 @@ void TriDiag::thomasLowMemNoBC( double *tmpMG, double *rh, double *diag, int ind
 
     int j    = 1;
     tmpMG[j] = supDiag[j - 1] / bet;
-    bet      = b[1] - subDiag[1] * tmpMG[j];
+// this is not a bug but adjustment in the index as now this value is also zero
+    bet      = b[1] - subDiag[0] * tmpMG[j];
     rh[1]    = ( rh[1] - subDiag[1] * rh[j - 1] ) / bet;
 
 #if ( PITTPACKACC )
@@ -1774,7 +1775,7 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
     bb[2] = b[2] - alpha * beta / gamma;
  
     rh[0]=0.0;
-    rh[N-1]=0.0;
+//    rh[N-1]=0.0;
     
 
     thomasLowMemNoBC(tmpMG,rh,bb,index );

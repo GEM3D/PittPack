@@ -1569,11 +1569,12 @@ void TriDiag::thomasLowMemNoBC( double *tmpMG, double *rh, double *diag, int ind
     b[2] = diag[2];
 
     rh[0] = rh[0] / ( bet = b[0] );
+  
 
     int j    = 1;
     tmpMG[j] = supDiag[j - 1] / bet;
 // this is not a bug but adjustment in the index as now this value is also zero
-    bet      = b[1] - subDiag[0] * tmpMG[j];
+    bet      = b[1] - subDiag[1] * tmpMG[j];
     rh[1]    = ( rh[1] - subDiag[1] * rh[j - 1] ) / bet;
 
 #if ( PITTPACKACC )
@@ -1593,14 +1594,16 @@ void TriDiag::thomasLowMemNoBC( double *tmpMG, double *rh, double *diag, int ind
     rh[j]    = ( rh[j] - subDiag[2] * rh[j - 1] ) / bet;
 
     //  cout << a[2] << " " << b[2] << eNdl;
+  //  cout<<RED<<rh[0]<<RESET<<endl;
 #if ( PITTPACKACC )
 #pragma acc loop seq
 #endif
     for ( int j = ( n - 2 ); j >= 0; j-- )
     {
         rh[j] -= tmpMG[j + 1] * rh[j + 1];
-        // cout << " j " << j << eNdl;
     }
+    
+  // cout<<RED<<rh[0]<<RESET<<endl;
 }
 
 
@@ -1751,6 +1754,16 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
     int n = nChunk * nzChunk;
     int N = n;
 
+// print the input 
+// 
+/*
+    cout<<" before solve "<<endl;
+    for ( int i = 0; i < N; i++ )
+    {
+        cout<<rh[i]<<endl;
+    }
+*/
+
     double b[3];
     double bb[3];
 
@@ -1773,13 +1786,19 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
     bb[1]= b[1];
 
     bb[2] = b[2] - alpha * beta / gamma;
- 
+// enforcing boundary conditions here 
+// note that supdiga[0]=0.0 and rh=0.0 
     rh[0]=0.0;
-//    rh[N-1]=0.0;
-    
+    supDiag[0]=0.0; 
 
     thomasLowMemNoBC(tmpMG,rh,bb,index );
-
+/*
+   cout<<" first solve "<<endl;
+    for ( int i = 0; i < N; i++ )
+    {
+        cout<<rh[i]<<endl;
+    }
+*/
 //  rhs is the new rhs 
     rh1[0]     = gamma;
     rh1[N - 1] = alpha;
@@ -1794,6 +1813,13 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
     }
 
     thomasLowMemNoBC(tmpMG,rh1,bb, index );
+/*
+   cout<<" second solve "<<endl;
+    for ( int i = 0; i < N; i++ )
+    {
+        cout<<rh1[i]<<endl;
+    }
+*/
 
     fact = ( rh[0] + beta * rh[N - 1] / gamma ) / ( 1. + rh1[0] + beta * rh1[N - 1] / gamma );
 #if ( PITTPACKACC )
@@ -1804,6 +1830,21 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
         rh[i] -= fact * rh1[i];
     }
 
+//    cout<<" ends index "<<index<<" eig "<<diag<<" "<<rh[0]<<" "<<rh[N-1]<<endl;
+//    cout<<" ends index "<<index<<" eig "<<diag<<" "<<endl;
+/*
+    cout<<" final solve "<<endl;
+    for ( int i = 0; i < N; i++ )
+    {
+        cout<<rh[i]<<endl;
+    }
+
+  
+  if(fabs(rh[0]-rh[N-1])>1.e-6)
+  {
+   exit(0);
+ }
+*/
 }
 
 // sherman morrisson versions of Thomas to be integrated

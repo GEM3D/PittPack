@@ -141,9 +141,9 @@ int main( int argcs, char *pArgs[] )
 
 #endif
 
-    char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
-  //   char mybc[6] = {'P', 'P', 'P', 'P', 'P', 'P'};
-   //      char mybc[6] = {'N', 'N', 'N', 'N', 'P', 'P'};
+ //  char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
+     char mybc[6] = {'P', 'P', 'P', 'P', 'P', 'P'};
+   //     char mybc[6] = {'N', 'N', 'N', 'N', 'P', 'P'};
     //  char mybc[6] = {'D', 'D', 'D', 'D', 'P', 'P'};
     // ill posed  char mybc[6] = {'P', 'P', 'P', 'P', 'N', 'N'};
     //       char mybc[6] = {'D', 'D', 'D', 'D', 'P', 'P'};
@@ -163,7 +163,8 @@ int main( int argcs, char *pArgs[] )
 
     M.graphCreate();
 
-    double X[6] = {0.0, 1.0, 0.0, 1.0, 0.0, 1.0};
+   // double X[6] = {-1.0, 1.0, -1.0, 1.0, -1.0, 1.0};
+    double X[6] = {0, 1.0, 0, 1.0, 0, 1.0};
 
     M.setBox( X );
     // check IO for dir 0

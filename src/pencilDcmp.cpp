@@ -2095,7 +2095,17 @@ double PencilDcmp::getError()
                  {
                    val=P(i,j,k,0)-cosine( omega[1] * ( x + y + z ) );
                    val1=P(i,j,k,1)-sine( omega[1] * ( x + y + z ) );
+/*
+                  if(((k==0) || k==(Nz-1)) && (i==0 && j==0))
+                   { 
+                   
+                   cout<< "( i, "<<i<<" j, "<<j<<" k "<<k<<") "<<P(i,j,k,0)<<" + "<<P(i,j,k,1)<<endl;
+                   cout<< "( i, "<<i<<" j, "<<j<<" k "<<k<<") "<<cosine( omega[1] * ( x + y + z ) )<<" + "<<sine( omega[1] * ( x + y + z ) )<<endl;
+                   cout<< "( i, "<<i<<" j, "<<j<<" k "<<k<<") "<<x<<" , "<<y <<" y "<<y<< " "<<z <<endl;
+                   }
+*/
                  }
+//                  cout<<"omega "<<omega[1]<<endl;
 
                 // cout<<"val 1 "<<val1<<endl;
                 //   cout << RED << " myRank " << myRank << " x= " << x << " y= " << y << " z= " << z << " P= " << P( i, j, k ) << RESET

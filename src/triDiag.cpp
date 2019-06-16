@@ -1788,8 +1788,10 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
     bb[2] = b[2] - alpha * beta / gamma;
 // enforcing boundary conditions here 
 // note that supdiga[0]=0.0 and rh=0.0 
+/*
     rh[0]=0.0;
     supDiag[0]=0.0; 
+*/
 
     thomasLowMemNoBC(tmpMG,rh,bb,index );
 /*
@@ -1838,10 +1840,11 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
     {
         cout<<rh[i]<<endl;
     }
-
-  
+*/
+  /*
   if(fabs(rh[0]-rh[N-1])>1.e-6)
   {
+   printf(" periodicity screwed up\n ");
    exit(0);
  }
 */

@@ -450,6 +450,7 @@ void PoissonCPU::pittPack()
 
             solveThmBatch( 0 );
 
+
             if ( bc[0] == 'P' || bc[2] == 'P' )
             {
                 solveThmBatch( 1 );
@@ -466,7 +467,6 @@ void PoissonCPU::pittPack()
             //   solveMGC( );
             //        solveCRP(0);
         }
-
             // M.printX( myfile );
             //
 
@@ -645,13 +645,19 @@ void PoissonCPU::pittPack()
     }
     cout << " Running .......  " << endl;
 
-    MPI_Allreduce( &err, &finalErr, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+    if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
+    {
 
+    MPI_Allreduce( &err, &finalErr, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+    finalErr = finalErr / p0 / p0;
+
+    if ( myRank == 0 )
+    {
     // cout << YELLOW << "Error  (" << myRank << ") =" << err << " " << finalErr << RESET << endl;
     cout << YELLOW << "Error Per processor"
-         << " " << finalErr / p0 / p0 << RESET << endl;
-
-    finalErr = finalErr / p0 / p0;
+         << " " << finalErr << RESET << endl;
+     }
+    }
 
 #if ( DEBUG0 )
     myfile.close();

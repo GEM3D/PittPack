@@ -88,6 +88,12 @@ class TriDiag
 #endif
    void shermanMorrisonThomas(double *tmpMG,double *rh, double *rh1, double diag,const double alpha,const double beta, int index );
 
+#if ( PITTPACKACC )
+#pragma acc routine seq
+#endif
+    bool checkRhs( const double *rh,const  int N);
+
+
 
    void assignBC(char* BC);
 

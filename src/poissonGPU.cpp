@@ -379,11 +379,13 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
                 #pragma acc wait( 2 )
                 #pragma acc wait( 3 )
                 */
+
                 if ( bc[0] == 'P' || bc[2] == 'P' )
                 {
 #pragma acc parallel num_gangs( gangTri ) vector_length( 1 )
                     solveThmBatch( 1 );
                 }
+
             }
 
             else if ( SOLUTIONMETHOD == 1 )

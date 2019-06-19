@@ -9,8 +9,7 @@
 #define DEBUG0 0       /*!<mainly turn off IO for debugging  for solverCPU */
 #define DEBUG 0        /*!<mainly turn off IO for debugging  for solverCPU */
 #define COMM_PATTERN 2  /*!< two type of comm_patterns are available, (0) Pairwise exchange (1) Neighorhood collective, don not try comm_pattern with CPU yet */
-#define SHORT_  0 /*!< controls the type for \f$iax, iay, jax, jay\f$ arrays, setting to 1 selects \f$short int\f$  where settingt it to zero will set \
-the type as \f$int\f$ */
+#define SHORT_  0 /*!< controls the type for \f$iax, iay, jax, jay\f$ arrays, setting to 1 selects \f$short int\f$  where settingt it to zero will set the type as \f$int\f$ */
 #define ZSIZE 64 /*! shoud be nzChubk*nChunk, not required if the first 4 letters specifying the boundary are not 'P', also not required in new version of solve  */
 #define MULTIGRIDON 0
 #define NXCHUNK1 256
@@ -39,7 +38,7 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     GPUAW2                      = 1, /*! chunkwise send/recieve for XY rotation */
     MPI_ERROR_DISABLE           = 0, /*! if set to 1 it will reset MPI_ERROR_FATAl to MPI_ERROR_RETURN */
     PITT_ABORT                  = 0, 
-    INCLUDE_ERROE_CAL_IN_TIMING = 0 , /*! uses an expensive allreduce function misleading to be included in profiling, takes 8 % of 512M
+    INCLUDE_ERROE_CAL_IN_TIMING = 0, /*! uses an expensive allreduce function misleading to be included in profiling, takes 8 % of 512M
                                         mesh, suggest truning it off for profiling*/
     SOLUTIONMETHOD = 0 ,                   /*!< (0) solves with Thomas (1) Uses PCR (2) CR-P (4) Multigrid and (5) cuSPARCE (CR and PCR ) 
                                                 the last two are disabled disabled to avoid unnecesary memory usage, 
@@ -56,7 +55,7 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     CUFFT_STREAMS=0,                  /*!< uses different stream for fft transform  */
     MONITOR_MEM=0,                    /*!< set this to 1 to monitor memory usage at each level of solution  */
     PROFILE_COMM=0,                   /*!< Turn it on and it will report the amount of time spent for communication */  
-    NITER=10,                          /*!< Number of iteration for Poisson Solver*/                
+    NITER=1,                          /*!< Number of iteration for Poisson Solver*/                
 
 };
 

@@ -489,6 +489,12 @@ void changeLocationXOverlap();
 #endif
 void changeLocationYOverlap();
 
+#if ( PITTPACKACC )
+#pragma acc routine gang
+#endif
+void clear( double *x );
+
+
     ~PencilDcmp(); /*!< Class destructor*/
 };
 

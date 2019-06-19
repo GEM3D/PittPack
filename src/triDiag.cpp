@@ -1541,6 +1541,28 @@ void TriDiag::pcr( int n, double *a, double *c, double *d )
         //    printf("i+s = %d  i+s =  %d\n",i-s,i+s );
     }
 }
+
+#if ( PITTPACKACC )
+#pragma acc routine seq
+#endif
+bool TriDiag::checkRhs( const double *rh,const  int N)
+{
+bool bl=1;
+double tol=1.e-10;    
+
+    
+    for(int i=0;i<N;i++)
+    {
+     if(rh[i]>tol)
+      {
+        bl=0;
+     break;
+      }   
+    }
+return(bl);
+}
+
+
 //  no boundary version
 #if ( PITTPACKACC )
 #pragma acc routine seq
@@ -1552,9 +1574,8 @@ void TriDiag::thomasLowMemNoBC( double *tmpMG, double *rh, double *diag, int ind
     //   double a[3],c[3];
     double b[3];
 
-    int n = nChunk * nzChunk;
-    int N = n;
-    /*
+    int N = nChunk * nzChunk;
+   /*
     #if(PITTPACKACC)
     #pragma acc loop seq
     #endif
@@ -1567,20 +1588,19 @@ void TriDiag::thomasLowMemNoBC( double *tmpMG, double *rh, double *diag, int ind
     b[0] = diag[0];
     b[1] = diag[1];
     b[2] = diag[2];
-
+  
     rh[0] = rh[0] / ( bet = b[0] );
   
 
     int j    = 1;
     tmpMG[j] = supDiag[j - 1] / bet;
-// this is not a bug but adjustment in the index as now this value is also zero
     bet      = b[1] - subDiag[1] * tmpMG[j];
     rh[1]    = ( rh[1] - subDiag[1] * rh[j - 1] ) / bet;
 
 #if ( PITTPACKACC )
 #pragma acc loop seq
 #endif
-    for ( int j = 2; j < n - 1; j++ )
+    for ( int j = 2; j < N - 1; j++ )
     {
         //       DecompositioN and forward substitution.
         tmpMG[j] = supDiag[1] / bet;
@@ -1598,7 +1618,7 @@ void TriDiag::thomasLowMemNoBC( double *tmpMG, double *rh, double *diag, int ind
 #if ( PITTPACKACC )
 #pragma acc loop seq
 #endif
-    for ( int j = ( n - 2 ); j >= 0; j-- )
+    for ( int j = ( N - 2 ); j >= 0; j-- )
     {
         rh[j] -= tmpMG[j + 1] * rh[j + 1];
     }
@@ -1632,6 +1652,12 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
     b[0] = diag;
     b[1] = diag;
     b[2] = diag;
+
+// this inserted to prevent NN-NN-NN from blowing up
+if(fabs(diag+2.)<1.e-6)
+{
+return;
+}
 
     // for Dirirchlet
     if ( bc[0] == 'D' )
@@ -1751,8 +1777,7 @@ void TriDiag::thomasLowMem( int N, double *a, double *b, double *c, double *r, d
 #endif
 void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, double diag, const double alpha,const double beta, int index)
 {
-    int n = nChunk * nzChunk;
-    int N = n;
+    int N = nChunk * nzChunk;
 
 // print the input 
 // 
@@ -1770,10 +1795,14 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
 // first enforce dirchlet type bc
 // the goal is [1 ...... -1] at first and 
 // [-1 ...........1] at the last row
+#if ( PITTPACKACC )
+#pragma acc loop seq 
+#endif
+{
     b[0]=diag;
     b[1]=diag;
     b[2]=diag;
- 
+} 
     // cout<<diag<<endl;
 
     double fact, gamma;
@@ -1793,25 +1822,39 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
     supDiag[0]=0.0; 
 */
 
-    thomasLowMemNoBC(tmpMG,rh,bb,index );
-/*
-   cout<<" first solve "<<endl;
+// this will remove the singularity for the corner that we set the calue as zero
+
+if(fabs(diag+2.)<1.e-6)
+{
+//   cout<<" first solve "<<endl;
     for ( int i = 0; i < N; i++ )
     {
-        cout<<rh[i]<<endl;
+   //     cout<<rh[i]<<endl;
     }
-*/
+return;
+}
+
+
+    thomasLowMemNoBC(tmpMG,rh,bb,index );
 //  rhs is the new rhs 
+#if ( PITTPACKACC )
+#pragma acc loop seq 
+#endif
+{
+ 
     rh1[0]     = gamma;
     rh1[N - 1] = alpha;
+}
+// no need for this, if already set to zero before calling this routine 
+// inside solveThmBacth since this segment will not scale 
 
-// no need for this, if already set to zero before calling this coutine 
 #if ( PITTPACKACC )
-//#pragma acc loop vector 
+#pragma acc loop seq 
 #endif
     for ( int i = 1; i < N - 1; i++ )
     {
         rh1[i] = 0.0;
+    //    tmpMG[i]=0.0;
     }
 
     thomasLowMemNoBC(tmpMG,rh1,bb, index );
@@ -1823,14 +1866,35 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
     }
 */
 
-    fact = ( rh[0] + beta * rh[N - 1] / gamma ) / ( 1. + rh1[0] + beta * rh1[N - 1] / gamma );
+// move this for gang parallelism
+// in the future
+  double part1 = ( rh[0] + beta * rh[N - 1] / gamma );
+  double part2 = ( 1. + rh1[0] + beta * rh1[N - 1] / gamma );
+/*
+if(fabs(part2<1.e-6))
+{
+ // cout<<" index "<<index <<" "<<diag<<" "<<part2 <<endl;
+}
+*/
 #if ( PITTPACKACC )
-//#pragma acc loop vector 
+#pragma acc loop seq 
+#endif
+{
+   // fact = ( rh[0] + beta * rh[N - 1] / gamma ) / ( 1. + rh1[0] + beta * rh1[N - 1] / gamma );
+    fact = part1/part2 ;
+}
+#if(1)
+#if ( PITTPACKACC )
+#pragma acc loop seq 
 #endif
     for ( int i = 0; i < N; i++ )
     {
         rh[i] -= fact * rh1[i];
+        //rh[i] = rh[i]-  rh1[i]/part2;
+        //rh[i] += rh1[i] ;
     }
+
+#endif
 
 //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<rh[0]<<" "<<rh[N-1]<<endl;
 //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<endl;
@@ -1850,58 +1914,5 @@ void TriDiag::shermanMorrisonThomas(double *tmpMG,  double *rh, double *rh1, dou
 */
 }
 
-// sherman morrisson versions of Thomas to be integrated
-#if ( 0 )
-void Tridiag::shermanMorrisonThomas( double *a, double *b, double *c, const double alpha, const double beta, double *r, double *x )
-{
-    int i;
 
-    double fact, gamma;
 
-    assert( N > 2 );
-
-    double *bb = new double[N];
-    double *u  = new double[N];
-    double *z  = new double[N];
-
-    gamma = -b[0];
-
-    bb[0] = b[0] - gamma;
-
-    bb[N - 1] = b[N - 1] - alpha * beta / gamma;
-
-    for ( int i = 1; i < N - 1; i++ )
-    {
-        bb[i] = b[i];
-    }
-
-    thomas( a, bb, c, r, x );
-
-//   thomasLowMem( int N, double *a, double *b, double *c, double *r, double *gam );
-
-/*
- *  also size N
-    u[0]     = gamma;
-    u[N - 1] = alpha;
-
-    for ( int i = 1; i < N - 1; i++ )
-    {
-        u[i] = 0.0;
-    }
-*/
-    thomas( a, bb, c, u, z );
-
-//   thomasLowMem( int N, double *a, double *b, double *c, double *r, double *gam );
-//
-    fact = ( x[0] + beta * x[N - 1] / gamma ) / ( 1. + z[0] + beta * z[N - 1] / gamma );
-
-    for ( int i = 0; i < N; i++ )
-    {
-        x[i] -= fact * z[i];
-    }
-
-    delete[] bb;
-    delete[] u;
-    delete[] z;
-}
-#endif

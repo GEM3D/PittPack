@@ -2093,9 +2093,11 @@ double PencilDcmp::getError()
 
                  if( bc[0] == 'P' && bc[2] == 'P' && bc[4]=='P')
                  {
-                   val=P(i,j,k,0)-cosine( omega[1] * ( x + y + z ) );
-                   val1=P(i,j,k,1)-sine( omega[1] * ( x + y + z ) );
+                   val  = P(i,j,k,0)-cosine( omega[1] * ( x + y + z ) );
+                   val1 = P(i,j,k,1)-sine( omega[1] * ( x + y + z ) );
 
+#if ( 0 )
+//#if ( DEBUG )
                   if((k==(Nz-1)) && (i==0 && j==0))
                    { 
                    
@@ -2103,7 +2105,7 @@ double PencilDcmp::getError()
                    cout<< "( i, "<<i<<" j, "<<j<<" k "<<k<<") "<<cosine( omega[1] * ( x + y + z ) )<<" + "<<sine( omega[1] * ( x + y + z ) )<<endl;
                    cout<< "( i, "<<i<<" j, "<<j<<" k "<<k<<") "<<x<<" , "<<y <<" y "<<y<< " "<<z <<endl;
                    }
-
+#endif
                  }
 //                  cout<<"omega "<<omega[1]<<endl;
 
@@ -4959,6 +4961,30 @@ void PencilDcmp::runInfo()
     }
 }
 
+// clear the tem x3 vector in agang rather than in the thread inside sheramn morrison
+#if ( PITTPACKACC )
+#pragma acc routine gang
+#endif
+void PencilDcmp::clear( double *x )
+{
+
+#if ( THOM_FULL_BATCH == 1 )
+    int size=nxChunk * nyChunk * nz;
+#else
+    int size = gangTri * nz;
+#endif
+
+#if ( PITTPACKACC )
+#pragma acc loop 
+#endif
+for(int i=0;i<size;i++)
+{
+   x[i]=0.0;
+}
+
+}
+
+
 #if ( THOM_FULL_BATCH == 0 )
 #if ( PITTPACKACC )
 #pragma acc routine gang
@@ -4967,13 +4993,15 @@ int PencilDcmp::solveThmBatch( const int index )
 {
     double eig;
 
-    // cout<< RED<<"multiGrid" <<RESET<<endl;
-
-    //int count = 0;
-    //int i, j;
 
     for ( int j = 0; j < nxChunk; j++)
     {
+/*
+    if(bc[4]=='P')
+    {
+    clear(x3);
+    }
+*/
 // calculate i and j
 #if ( PITTPACKACC )
 #pragma acc loop private( eig )
@@ -5009,7 +5037,16 @@ int PencilDcmp::solveThmBatch( const int index )
 {
     double eig;
 
+/*
+    if(bc[4]=='P')
+    {
+    clear(x3);
+    }
+*/
+
  //    cout<< RED<<"solveThmBatch" <<RESET<<endl;
+
+//    clear(x2);   
 
     int count = 0;
     int i, j;
@@ -5040,7 +5077,6 @@ int PencilDcmp::solveThmBatch( const int index )
 
         fillInArrayBack( i, j, index, x1 + nz * l );
     }
-
     return ( 0 );
 }
 

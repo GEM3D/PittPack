@@ -78,7 +78,7 @@ void SignalProc::postprocessSignalDCT01( ChunkedArray &P, const int size, const 
     // to prevent overwrite we use complex part and then swap real and complex
     // parts
     int upperBound = ( size - 1 ) / 2 + 1;
- //   int istart     = upperBound;
+    //   int istart     = upperBound;
 
 #if ( PITTPACKACC )
 #pragma acc loop vector
@@ -88,7 +88,7 @@ void SignalProc::postprocessSignalDCT01( ChunkedArray &P, const int size, const 
         P( 2 * ( j * size + 2 * i ) + 1 ) = P( 2 * ( j * size + i ) );
     }
 
-   // int idx = size % 2;
+    // int idx = size % 2;
 
 #if ( PITTPACKACC )
 #pragma acc loop vector
@@ -232,9 +232,9 @@ void SignalProc::postprocessSignalDST01( ChunkedArray &P, const int size, const 
     swap( P, size, i, direction );
 }
 
-    // A DST-III  can be computed from a DCT-III or DCT-IV (see discrete cosine transform),
-    // respectively, by reversing the order of the inputs and flipping the sign of every other output,
-    // and vice versa for DST-II from DCT-II, ref : https://en.wikipedia.org/wiki/Discrete_sine_transform
+// A DST-III  can be computed from a DCT-III or DCT-IV (see discrete cosine transform),
+// respectively, by reversing the order of the inputs and flipping the sign of every other output,
+// and vice versa for DST-II from DCT-II, ref : https://en.wikipedia.org/wiki/Discrete_sine_transform
 
 #if ( PITTPACKACC )
 #pragma acc routine vector

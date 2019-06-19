@@ -143,8 +143,8 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
     }
     double err = 0.0;
     finalErr   = 0.0;
-    
-   //double eig;
+
+    // double eig;
 
     double t1_com = 0.0;
     double t2_com = 0.0;
@@ -385,7 +385,6 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 #pragma acc parallel num_gangs( gangTri ) vector_length( 1 )
                     solveThmBatch( 1 );
                 }
-
             }
 
             else if ( SOLUTIONMETHOD == 1 )
@@ -646,18 +645,18 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
     if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
     {
-    MPI_Allreduce( &err, &finalErr, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
-    finalErr = finalErr / p0 / p0;
-     
-    if ( myRank == 0 )
-    {
-    // cout << YELLOW << "Error  (" << myRank << ") =" << err << " " << finalErr << RESET << endl;
-    cout << YELLOW << "Error Per processor"
-         << " " << finalErr << RESET << endl;
-     }
+        MPI_Allreduce( &err, &finalErr, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+        finalErr = finalErr / p0 / p0;
+
+        if ( myRank == 0 )
+        {
+            // cout << YELLOW << "Error  (" << myRank << ") =" << err << " " << finalErr << RESET << endl;
+            cout << YELLOW << "Error Per processor"
+                 << " " << finalErr << RESET << endl;
+        }
     }
 
-     MPI_Reduce( &deT, &runTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+    MPI_Reduce( &deT, &runTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
 
     if ( myRank == 0 )
     {

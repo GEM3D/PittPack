@@ -214,7 +214,7 @@ void MultiGrid::setIter( int iter1, int iter2, int iter3 )
 
 MultiGrid::~MultiGrid()
 {
-// allocate on the device
+    // allocate on the device
 
 #if ( PITTPACKACC )
 #pragma acc exit data delete ( rhs [0:arraySize] )
@@ -292,7 +292,7 @@ void MultiGrid::initialize( double *uIn )
 #if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
-void                MultiGrid::assign( double *uIn )
+void MultiGrid::assign( double *uIn )
 {
 #if ( PITTPACKACC )
 #pragma acc loop gang
@@ -935,7 +935,7 @@ void MultiGrid::weightedJacobiSmoother( int index0, int upperLimit, double d )
         u[index0 + upperLimit] = ( rhs[index0 + upperLimit] * d * d * delx[0] * delx[0] + utmp[index0 + upperLimit - 1] ) * (coeff)*2. / 3.
                                  + 1. / 3. * utmp[index0 + upperLimit];
     }
-        // printf("!!!!!!!!!!!!!!!! index0 = %d  upper =%d  d=%lf  u[%d]=%lf \n",index0, index0+upperLimit, d,farRight,utmp[farRight]);
+    // printf("!!!!!!!!!!!!!!!! index0 = %d  upper =%d  d=%lf  u[%d]=%lf \n",index0, index0+upperLimit, d,farRight,utmp[farRight]);
 
 #if ( PITTPACKACC )
 #pragma acc loop
@@ -1204,8 +1204,8 @@ void MultiGrid::redBlackMono( double onDiag )
         rem = -1;
     }
 
-        //   double onDiag0D=onDiag0[1];
-        //  cout<< " REDBLACK "<<endl;
+    //   double onDiag0D=onDiag0[1];
+    //  cout<< " REDBLACK "<<endl;
 
 #if ( 1 )
 
@@ -1325,30 +1325,30 @@ void MultiGrid::weightedJacobiMono()
     }
 }
 
-    /*
-    void getErr( double *u, int n, double delx[0], double pi )
+/*
+void getErr( double *u, int n, double delx[0], double pi )
+{
+    double error = 0.0;
+
+    for ( int i = 0; i < n; i++ )
     {
-        double error = 0.0;
-
-        for ( int i = 0; i < n; i++ )
-        {
-            error += ( u[i] - sin( OMEGA * i * delx[0] * pi ) ) * ( u[i] - sin( OMEGA * i * delx[0] * pi ) );
-            // error +=(u[i]-sin(i*delx[0]*pi))*(u[i]-sin(i*delx[0]*pi));
-        }
-
-        
-        for(int i=0;i<n;i++)
-        {
-        if(error<fabs(u[i]-sin(OMEGA*i*delx[0]*pi)))
-        {
-         error =fabs(u[i]-sin(OMEGA*i*delx[0]*pi));
-        }
-        }
-
-        printf( "\nError %e delx[0]=%lf \n", error, delx[0] );
-
+        error += ( u[i] - sin( OMEGA * i * delx[0] * pi ) ) * ( u[i] - sin( OMEGA * i * delx[0] * pi ) );
+        // error +=(u[i]-sin(i*delx[0]*pi))*(u[i]-sin(i*delx[0]*pi));
     }
-    */
+
+
+    for(int i=0;i<n;i++)
+    {
+    if(error<fabs(u[i]-sin(OMEGA*i*delx[0]*pi)))
+    {
+     error =fabs(u[i]-sin(OMEGA*i*delx[0]*pi));
+    }
+    }
+
+    printf( "\nError %e delx[0]=%lf \n", error, delx[0] );
+
+}
+*/
 
 #if ( CELL == 1 )
 #if ( PITTPACKACC )
@@ -1613,7 +1613,7 @@ void                MultiGrid::thomasLowMem( double *tmpMG )
 #if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
-void                MultiGrid::thomasLowMem( double *tmpMG, double diag, int index )
+void MultiGrid::thomasLowMem( double *tmpMG, double diag, int index )
 {
     double  bet;
     double *rh[2];
@@ -1700,27 +1700,27 @@ void                MultiGrid::thomasLowMem( double *tmpMG, double diag, int ind
     }
 }
 
-    /*
-    void MultiGrid::thomasCusparse(double *rhs)
-    {
+/*
+void MultiGrid::thomasCusparse(double *rhs)
+{
 
-    #pragma acc host_data use_device(rhs, du, dl, d)
-      {
-        cusparseHandle_t handle = NULL;
-        cusparseCreate(&handle);
-        cusparseDgtsv_nopivot(handle, N, 1, dl, d, du, rhs, N);
-        cusparseDestroy(handle);
-      }
+#pragma acc host_data use_device(rhs, du, dl, d)
+  {
+    cusparseHandle_t handle = NULL;
+    cusparseCreate(&handle);
+    cusparseDgtsv_nopivot(handle, N, 1, dl, d, du, rhs, N);
+    cusparseDestroy(handle);
+  }
 
 
-    }
+}
 
-    */
+*/
 
 #if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
-void                MultiGrid::thomasPutBack( double *tmpMG, int index )
+void MultiGrid::thomasPutBack( double *tmpMG, int index )
 {
     double *rh[2];
 

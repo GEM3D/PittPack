@@ -646,7 +646,7 @@ void MpiCom::checkGraph( int index )
 
 void MpiCom::nbrAllToAllZX() /*!Two different communicators are required due to the presence of stride in X to Y to rotation */
 {
-// for All to allV
+    // for All to allV
 
 #if ( DEBUG5 )
     int *sndCnts = new int[p0];

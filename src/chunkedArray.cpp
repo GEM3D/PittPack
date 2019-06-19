@@ -39,13 +39,13 @@ PittPackResult ChunkedArray::allocate( int *n, int nbl )
                                     array divided by nchunks, this is to get rid of multiplication by two */
 
 #if ( PITTPACKACC )
-#pragma acc enter data create( this [0:1] ) async(2)
-#pragma acc update device( this ) 
-#pragma acc enter data create( P [0:arraySize] ) async(3)
+#pragma acc enter data create( this [0:1] ) async( 2 )
+#pragma acc update device( this )
+#pragma acc enter data create( P [0:arraySize] ) async( 3 )
 #endif
 
 #if ( PITTPACKACC )
-acc_async_wait_all();
+    acc_async_wait_all();
 #endif
 
     if ( P == NULL )
@@ -56,8 +56,6 @@ acc_async_wait_all();
     {
         return ( SUCCESS );
     }
-
-
 }
 
 int  ChunkedArray::getChunkSize() { return ( chunkSize ); }
@@ -90,7 +88,7 @@ void ChunkedArray::setDirection( int dir )
 #if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
-int                 ChunkedArray::size() { return ( arraySize ); }
+int ChunkedArray::size() { return ( arraySize ); }
 
 void ChunkedArray::moveDeviceToHost()
 {
@@ -136,7 +134,6 @@ inline double &ChunkedArray::operator()( int i, int j, int k, int dir, int index
     {
         return ( P[index] );
     }
- 
 }
 #else
 
@@ -152,11 +149,10 @@ double &ChunkedArray::operator()( int i, int j, int k, int dir, int index )
     }
     else
     {
-        cout<<"incorrect index in ChunkedArray operator " <<endl;
-        exit(1);  
+        cout << "incorrect index in ChunkedArray operator " << endl;
+        exit( 1 );
         return ( P[index] );
     }
- 
 }
 
 #endif
@@ -192,12 +188,10 @@ inline double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int
     {
         return ( P[2 * ( chunkId * chunkSize / 2 + k + nz * j + nz * ny * i ) + index] );
     }
-   else
+    else
     {
         return ( P[index] );
     }
- 
-
 }
 #else
 double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int k, int index )
@@ -231,11 +225,10 @@ double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int k, int
     }
     else
     {
-        cout<<"incorrect index in ChunkedArray operator " <<endl;
-        exit(1);  
+        cout << "incorrect index in ChunkedArray operator " << endl;
+        exit( 1 );
         return ( P[index] );
     }
- 
 }
 
 #endif

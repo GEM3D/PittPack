@@ -438,7 +438,7 @@ PittPackResult PencilDcmp::checkInput()
 {
     PittPackResult result = SUCCESS;
 
-   if ( p0 * p0 != comSize )
+    if ( p0 * p0 != comSize )
     {
         result = COMSIZE_FAIL;
     }
@@ -524,7 +524,7 @@ PencilDcmp::~PencilDcmp()
 #pragma acc exit data delete ( freqs )
 #pragma acc exit data delete ( bc )
 #pragma acc exit data delete ( faceTag )
-#if (  USE_SHARED != 1  )
+#if ( USE_SHARED != 1 )
 #pragma acc exit data delete ( tmpX )
 #pragma acc exit data delete ( tmpY )
 #endif
@@ -564,7 +564,7 @@ PencilDcmp::~PencilDcmp()
     delete[] num;
     delete[] denum;
     delete[] faceTag;
-#if (  USE_SHARED != 1  )
+#if ( USE_SHARED != 1 )
     delete[] tmpX;
     delete[] tmpY;
 #endif
@@ -805,8 +805,8 @@ PittPackResult PencilDcmp::constructConnectivity()
     Nbrs[1] = new ( std::nothrow ) int[p0];
 
     int id = myRank / p0;
-    //int id1;
-    //int counter = 0;
+    // int id1;
+    // int counter = 0;
 
     for ( int i = 0; i < p0; i++ )
     {
@@ -871,13 +871,11 @@ void PencilDcmp::changeOwnershipPairwiseExchangeZX()
     cout << " loop= " << ( p0 + 1 ) / 2 << endl;
 #endif
 
-
     int     start = 0;
     int     end   = 0;
     double *ptr   = P.P;
     for ( int j = 1; j < ( p0 ) / 2 + 1; j++ )
     {
-
         start = getPeriodicIndex( i + j ) * P.chunkSize;
         end   = P.chunkSize;
         ptr   = &P( 0 ) + start;
@@ -1228,10 +1226,10 @@ void PencilDcmp::graphCreate() /*!Two different communicators are required due
                                   to the presence of stride in X to Y to
                                   rotation */
 {
-    int indegree  = p0;
+    int indegree = p0;
     // symmetric communications and hence outdegree and indegree are the same
-    //int outdegree = p0;
-    int reorder   = 0;
+    // int outdegree = p0;
+    int reorder = 0;
     int ierr;
 
     ierr = MPI_Dist_graph_create_adjacent( Comm, indegree, Nbrs[0], MPI_UNWEIGHTED, indegree, Nbrs[0], MPI_UNWEIGHTED, MPI_INFO_NULL,
@@ -1260,9 +1258,9 @@ void PencilDcmp::graphCreate() /*!Two different communicators are required due
 
 void PencilDcmp::checkGraph( int index )
 {
-    //int nneighbors = 0;
-    int indegree   = 0;
-    int outdegree  = 0;
+    // int nneighbors = 0;
+    int indegree  = 0;
+    int outdegree = 0;
 
     if ( index > 1 )
     {
@@ -1275,7 +1273,7 @@ void PencilDcmp::checkGraph( int index )
     MPI_Dist_graph_neighbors_count( nbrComm[index], &indegree, &outdegree, &weight );
 
     int *neighbors = new int[indegree];
-    //nneighbors     = indegree;
+    // nneighbors     = indegree;
 
 #if ( DEBUG )
     cout << " nneighbors is = " << nneighbors << endl;
@@ -1423,7 +1421,7 @@ void PencilDcmp::nbrAllToAllZXOverlap()
 
     double *ptr = NULL;
     int     end = P.chunkSize;
-    //int     ierr;
+    // int     ierr;
 
     //
     // post recieves
@@ -1674,7 +1672,7 @@ void PencilDcmp::nbrAllToAllXYOverlap()
 
     double *ptr = NULL;
     int     end = P.chunkSize;
-    //int     ierr;
+    // int     ierr;
 
     // part A
     for ( int i = 0; i < ( p0 ); i++ )
@@ -1934,26 +1932,26 @@ void PencilDcmp::initializeTrigonometric()
                 else
                 {
                     //  For big mesh sizes calling class operator calls problems
-                    P( i, j, k, 0 ) =-( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
-                                        * exactValue( omega[2] * z, tags[2] )
-                                        + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] )
-                                          * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
-                                        + ( omega[2] * omega[2] ) * exactValue( omega[0] * x, tags[0] )
-                                          * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] ) )
+                    P( i, j, k, 0 ) = -( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                                         * exactValue( omega[2] * z, tags[2] )
+                                         + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] )
+                                           * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
+                                         + ( omega[2] * omega[2] ) * exactValue( omega[0] * x, tags[0] )
+                                           * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] ) )
                                       * c3 * c3;
 
                     P( i, j, k, 1 ) = 0.0;
                 }
-//   P(i,j,k,0)=(x*y*z);
-//   P(i,j,k,1)=(x*y*z);
+                //   P(i,j,k,0)=(x*y*z);
+                //   P(i,j,k,1)=(x*y*z);
 
-// all peridic meaning PPPPP
+                // all peridic meaning PPPPP
 
-                 if( bc[0] == 'P' && bc[2] == 'P' && bc[4]=='P')
-                 {
+                if ( bc[0] == 'P' && bc[2] == 'P' && bc[4] == 'P' )
+                {
                     P( i, j, k, 0 ) = -3. * omega[1] * omega[1] * ( cosine( omega[1] * ( x + y + z ) ) ) * c3 * c3;
                     P( i, j, k, 1 ) = -3. * omega[1] * omega[1] * ( sine( omega[1] * ( x + y + z ) ) ) * c3 * c3;
-                 }
+                }
 
 #else
                 //           P(i,j,k,0)=(sin(omega[1]*z)*cos(omega[1]*(x+y)));
@@ -1967,7 +1965,6 @@ void PencilDcmp::initializeTrigonometric()
                 // all periodic
 
 #endif
-                
             }
         }
     }
@@ -2091,29 +2088,29 @@ double PencilDcmp::getError()
                     val1 = 0.0;
                 }
 
-                 if( bc[0] == 'P' && bc[2] == 'P' && bc[4]=='P')
-                 {
-                   val  = P(i,j,k,0)-cosine( omega[1] * ( x + y + z ) );
-                   val1 = P(i,j,k,1)-sine( omega[1] * ( x + y + z ) );
+                if ( bc[0] == 'P' && bc[2] == 'P' && bc[4] == 'P' )
+                {
+                    val  = P( i, j, k, 0 ) - cosine( omega[1] * ( x + y + z ) );
+                    val1 = P( i, j, k, 1 ) - sine( omega[1] * ( x + y + z ) );
 
 #if ( 0 )
-//#if ( DEBUG )
-                  if((k==(Nz-1)) && (i==0 && j==0))
-                   { 
-                   
-                   cout<< "( i, "<<i<<" j, "<<j<<" k "<<k<<") "<<P(i,j,k,0)<<" + "<<P(i,j,k,1)<<endl;
-                   cout<< "( i, "<<i<<" j, "<<j<<" k "<<k<<") "<<cosine( omega[1] * ( x + y + z ) )<<" + "<<sine( omega[1] * ( x + y + z ) )<<endl;
-                   cout<< "( i, "<<i<<" j, "<<j<<" k "<<k<<") "<<x<<" , "<<y <<" y "<<y<< " "<<z <<endl;
-                   }
+                    //#if ( DEBUG )
+                    if ( ( k == ( Nz - 1 ) ) && ( i == 0 && j == 0 ) )
+                    {
+                        cout << "( i, " << i << " j, " << j << " k " << k << ") " << P( i, j, k, 0 ) << " + " << P( i, j, k, 1 ) << endl;
+                        cout << "( i, " << i << " j, " << j << " k " << k << ") " << cosine( omega[1] * ( x + y + z ) ) << " + "
+                             << sine( omega[1] * ( x + y + z ) ) << endl;
+                        cout << "( i, " << i << " j, " << j << " k " << k << ") " << x << " , " << y << " y " << y << " " << z << endl;
+                    }
 #endif
-                 }
-//                  cout<<"omega "<<omega[1]<<endl;
+                }
+                //                  cout<<"omega "<<omega[1]<<endl;
 
                 // cout<<"val 1 "<<val1<<endl;
                 //   cout << RED << " myRank " << myRank << " x= " << x << " y= " << y << " z= " << z << " P= " << P( i, j, k ) << RESET
                 //
- 
-                 P( i, j, k ) = ( val * val + val1 * val1 );
+
+                P( i, j, k ) = ( val * val + val1 * val1 );
 
                 //        << endl;
                 //  P( i, j, k ) = ( exactValue( pi * x, tags[0] ) );
@@ -2122,7 +2119,7 @@ double PencilDcmp::getError()
         }
     }
 
-    double err      = 0.0;
+    double err = 0.0;
 
 #if ( PITTPACKACC )
 #pragma acc loop vector firstprivate( err ) reduction( + : err )
@@ -2634,8 +2631,8 @@ void PencilDcmp::constructShuffleVectorX()
 
     memset( bol, '1', size * sizeof( char ) );
 
-    //sint i0, j0, k0, chunkId0,index0;
-    //sint i1, j1, k1, chunkId1;
+    // sint i0, j0, k0, chunkId0,index0;
+    // sint i1, j1, k1, chunkId1;
     sint id, dest;
 
     // need to save this due to parallelization issue,
@@ -2761,7 +2758,7 @@ void PencilDcmp::setUpShuffleArraysX( vector<shuffle0> &a )
     */
 
     int xSize = 2 * a.size() * nxChunk + 1;
-#if (  USE_SHARED != 1  )
+#if ( USE_SHARED != 1 )
     tmpX = new double[xSize];
 #endif
     cout << " xSize  " << xSize << " iaxSize  " << endl;
@@ -2776,7 +2773,7 @@ void PencilDcmp::setUpShuffleArraysX( vector<shuffle0> &a )
 #pragma acc enter data create( jax [0:jaxSize] )
 #pragma acc update device( jax [0:jaxSize] )
 
-#if (  USE_SHARED != 1  )
+#if ( USE_SHARED != 1 )
 #pragma acc enter data create( tmpX [0:xSize] )
 #pragma acc update device( tmpX [0:xSize] )
 #endif
@@ -2828,9 +2825,9 @@ void PencilDcmp::constructShuffleVectorY()
 
     memset( bol, '1', size * sizeof( char ) );
 
-    //sint i0, j0, k0, chunkId0;
-    //sint i1, j1, k1, chunkId1,index0;
-    sint  id, dest;
+    // sint i0, j0, k0, chunkId0;
+    // sint i1, j1, k1, chunkId1,index0;
+    sint id, dest;
 
     // need to save this due to parallelization issue,
     // might lead to race condition if done on GPU
@@ -2950,7 +2947,7 @@ void PencilDcmp::setUpShuffleArraysY( vector<shuffle0> &a )
 
     // I added one to prvent seg fault for allocation of size 0 while deleting
     int ySize = 2 * a.size() * nyChunk + 1;
-#if (  USE_SHARED != 1  )
+#if ( USE_SHARED != 1 )
     tmpY = new double[ySize];
 #endif
 #if ( PITTPACKACC )
@@ -2963,7 +2960,7 @@ void PencilDcmp::setUpShuffleArraysY( vector<shuffle0> &a )
 #pragma acc enter data create( jay [0:jaySize] )
 #pragma acc update device( jay [0:jaySize] )
 
-#if (  USE_SHARED != 1  )
+#if ( USE_SHARED != 1 )
 #pragma acc enter data create( tmpY [0:ySize] )
 #pragma acc update device( tmpY [0:ySize] )
 #endif
@@ -3063,7 +3060,7 @@ void PencilDcmp::restoreTmp( const sint id, double *tmp, sint dir )
 #endif
 void PencilDcmp::changeLocationX()
 {
-    double *tm=NULL;
+    double *tm = NULL;
 
 #if ( PITTPACKACC )
 //#pragma acc loop worker private( tm[1] )
@@ -3204,7 +3201,7 @@ void PencilDcmp::changeLocationYOverlap()
 #endif
 void PencilDcmp::changeLocationY()
 {
-    double *tm=NULL;
+    double *tm = NULL;
 
 #if ( PITTPACKACC )
 #pragma acc loop gang private( tm[1] )
@@ -3249,7 +3246,7 @@ void PencilDcmp::changeLocationY()
 #endif
 void PencilDcmp::restoreLocationY()
 {
-    double *tm=NULL;
+    double *tm = NULL;
 
 #if ( PITTPACKACC )
 #pragma acc loop gang private( tm[1] )
@@ -3291,14 +3288,14 @@ void PencilDcmp::restoreLocationY()
 
 #endif
 
-#if (  USE_SHARED != 1  )
+#if ( USE_SHARED != 1 )
 #if ( PITTPACKACC )
 #pragma acc routine gang
 //#pragma acc routine vector
 #endif
 void PencilDcmp::restoreLocationX()
 {
-    double *tm=NULL;
+    double *tm = NULL;
 
 #if ( PITTPACKACC )
 #pragma acc loop gang private( tm[1] )
@@ -3568,7 +3565,6 @@ void PencilDcmp::assignBoundary( char *boundary )
     setEigenVal();
     setScale();
 
-
 #if ( PITTPACKACC )
 #pragma acc update device( tags [0:3] )
 #endif
@@ -3676,7 +3672,7 @@ void PencilDcmp::detectTransforms()
 #endif
 int PencilDcmp::thomas( int i, int j, int dir, int index )
 {
-    //double bet;
+    // double bet;
 
     // the enterior is always set according to eigenvalues
     // the two ends decided by BC
@@ -3685,7 +3681,7 @@ int PencilDcmp::thomas( int i, int j, int dir, int index )
     double onDiag[3];
     onDiag[1] = getEigenVal( i, j );
 
-    //int this_rank = 1;
+    // int this_rank = 1;
 
     // assign bc
     // bc 0 >> dirichlet, value known at ghost point
@@ -3774,7 +3770,7 @@ void PencilDcmp::thomasSingleBlock( int i, int j, int dir, int index )
     double onDiag[3];
     onDiag[1] = getEigenVal( i, j );
 
-    //int this_rank = 0;
+    // int this_rank = 0;
 
     // assign bc
     // bc 0 >> dirichlet, value known at ghost point
@@ -3814,17 +3810,17 @@ void PencilDcmp::thomasSingleBlock( int i, int j, int dir, int index )
 #endif
 void PencilDcmp::thomasPeriodic( int i, int j, int dir, int index )
 {
-/*
-    double bet;
+    /*
+        double bet;
 
-    // the enterior is always set according to eigenvalues
-    // the two ends decided by BC
+        // the enterior is always set according to eigenvalues
+        // the two ends decided by BC
 
 
-    int    n;
-    double alpha = 1.0;
-    double beta  = 1.0;
-*/
+        int    n;
+        double alpha = 1.0;
+        double beta  = 1.0;
+    */
     double onDiag[3];
     onDiag[1] = getEigenVal( i, j );
 
@@ -3995,7 +3991,7 @@ void PencilDcmp::solveMG()
     double eig;
     int    index = 0;
     // cout<< RED<<"multiGrid" <<RESET<<endl;
-    //int count = 0;
+    // int count = 0;
 
     int bol = MG.gridSizePowerTwoPlusOne;
 
@@ -4081,9 +4077,9 @@ void PencilDcmp::solveMG()
 void PencilDcmp::solveMGC()
 {
     double eig;
-    //int    count = 0;
-    int    index = 1;
-    int    bol   = MGC.gridSizePowerTwoPlusOne;
+    // int    count = 0;
+    int index = 1;
+    int bol   = MGC.gridSizePowerTwoPlusOne;
 
 #if ( PITTPACKACC )
 #pragma acc loop seq private( eig )
@@ -4189,7 +4185,6 @@ void PencilDcmp::copyAnsFromMG( int index )
 {
     if ( index == 0 )
     {
-
 #if ( PITTPACKACC )
 #pragma acc loop gang
 #endif
@@ -4249,8 +4244,8 @@ int PencilDcmp::solveThm( const int index )
     // not that rhs already scaled for initialization for Thomas so here we need to rescale
     //  back as MultiGrid has its own scaling
 
-    //double diag[3];
-    double eig;
+    // double diag[3];
+    double  eig;
     double *tm[2];
 
     tm[0] = tmpMGReal;
@@ -4258,7 +4253,7 @@ int PencilDcmp::solveThm( const int index )
 
     // cout<< RED<<"multiGrid" <<RESET<<endl;
 
-    //int count = 0;
+    // int count = 0;
 
 #if ( 1 )
 
@@ -4310,9 +4305,9 @@ void PencilDcmp::eigenVal( ofstream &myfile )
 {
     // note that we perform solve when the data is aligned in y direction
 
-    //int    ioffset;
-    //int    joffset;
-    //double onDiag;
+    // int    ioffset;
+    // int    joffset;
+    // double onDiag;
     myfile << endl;
     myfile << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << endl;
 
@@ -4403,7 +4398,7 @@ PittPackResult PoissonGPU::initializeAndBind()
 #if ( PITTPACKACC )
 #pragma acc routine gang
 #endif
-void                PencilDcmp::preprocessSignalAccordingly( const int direction, const int counter )
+void PencilDcmp::preprocessSignalAccordingly( const int direction, const int counter )
 {
     int size;
     int limit0;
@@ -4603,7 +4598,7 @@ void PencilDcmp::modifyRhsDirichlet()
     ;
 #endif
     double omega[3] = {pi, pi, pi};
-    //double val;
+    // double val;
     // z direction, acting on facetags 5 and 6 with Zmin and Zmax
     if ( faceTag[4] == 1 )
     {
@@ -4952,8 +4947,7 @@ void PencilDcmp::runInfo()
         PittOut << "                Wall-Time per Iteration  = " << runTime << " (s) "
                 << "\n"
                 << endl;
-        PittOut << "                Number of Iteration  = " << NITER << "\n"
-                << endl;
+        PittOut << "                Number of Iteration  = " << NITER << "\n" << endl;
 
         PittOut << "---------------------------------------------------------\n" << endl;
         cout << "Grid size= [ " << nxChunk * nChunk << " * " << nyChunk * nChunk << " * " << nzChunk * nChunk << "], error = " << finalErr
@@ -4967,23 +4961,20 @@ void PencilDcmp::runInfo()
 #endif
 void PencilDcmp::clear( double *x )
 {
-
 #if ( THOM_FULL_BATCH == 1 )
-    int size=nxChunk * nyChunk * nz;
+    int size = nxChunk * nyChunk * nz;
 #else
     int size = gangTri * nz;
 #endif
 
 #if ( PITTPACKACC )
-#pragma acc loop 
+#pragma acc loop
 #endif
-for(int i=0;i<size;i++)
-{
-   x[i]=0.0;
+    for ( int i = 0; i < size; i++ )
+    {
+        x[i] = 0.0;
+    }
 }
-
-}
-
 
 #if ( THOM_FULL_BATCH == 0 )
 #if ( PITTPACKACC )
@@ -4993,8 +4984,7 @@ int PencilDcmp::solveThmBatch( const int index )
 {
     double eig;
 
-
-    for ( int j = 0; j < nxChunk; j++)
+    for ( int j = 0; j < nxChunk; j++ )
     {
 /*
     if(bc[4]=='P')
@@ -5011,17 +5001,17 @@ int PencilDcmp::solveThmBatch( const int index )
             eig = getEigenVal( i, j );
 
             fillInArrayContig( i, j, index, x1 + i * nz );
-             
-      //     cout<< RED<<"solveThmBatch" <<RESET<<endl;
-            if(bc[4]!='P')
+
+            //     cout<< RED<<"solveThmBatch" <<RESET<<endl;
+            if ( bc[4] != 'P' )
             {
-            T.thomasLowMem( x2 + i * nz, x1 + nz * i, eig, index );
-           //cout<< RED<<"solveThmBatch 0" <<RESET<<endl;
+                T.thomasLowMem( x2 + i * nz, x1 + nz * i, eig, index );
+                // cout<< RED<<"solveThmBatch 0" <<RESET<<endl;
             }
             else
             {
-            T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3+i*nz , eig, 1.0 , 1.0, index );
-          // cout<< RED<<"solveThmBatch 0 N" <<RESET<<endl;
+                T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
+                // cout<< RED<<"solveThmBatch 0 N" <<RESET<<endl;
             }
             fillInArrayBack( i, j, index, x1 + nz * i );
         }
@@ -5037,16 +5027,16 @@ int PencilDcmp::solveThmBatch( const int index )
 {
     double eig;
 
-/*
-    if(bc[4]=='P')
-    {
-    clear(x3);
-    }
-*/
+    /*
+        if(bc[4]=='P')
+        {
+        clear(x3);
+        }
+    */
 
- //    cout<< RED<<"solveThmBatch" <<RESET<<endl;
+    //    cout<< RED<<"solveThmBatch" <<RESET<<endl;
 
-//    clear(x2);   
+    //    clear(x2);
 
     int count = 0;
     int i, j;
@@ -5059,21 +5049,20 @@ int PencilDcmp::solveThmBatch( const int index )
         j = l / nyChunk;
         eig = getEigenVal( i, j );
         fillInArrayContig( i, j, index, x1 + l * nz );
-       // T.thomasLowMem( x2 + l * nz, x1 + nz * l, eig, index );
-      
-//     cout<< RED<<"solveThmBatch" <<RESET<<endl;
-           if(bc[4]!='P')
-            {
-            T.thomasLowMem( x2 + l * nz, x1 + nz * l, eig, index );
-            }
-            else
-            {
-         //  cout<< RED<<"solve full batch N" <<RESET<<endl;
-         //   this is too strong for enforcing boundries. 
-         //    T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3+l*nz ,eig, 0.0 ,-eig, index );
-             T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3+l*nz ,eig, 1.0 ,1.0, index );
-            }
+        // T.thomasLowMem( x2 + l * nz, x1 + nz * l, eig, index );
 
+        //     cout<< RED<<"solveThmBatch" <<RESET<<endl;
+        if ( bc[4] != 'P' )
+        {
+            T.thomasLowMem( x2 + l * nz, x1 + nz * l, eig, index );
+        }
+        else
+        {
+            //  cout<< RED<<"solve full batch N" <<RESET<<endl;
+            //   this is too strong for enforcing boundries.
+            //    T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3+l*nz ,eig, 0.0 ,-eig, index );
+            T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 1.0, 1.0, index );
+        }
 
         fillInArrayBack( i, j, index, x1 + nz * l );
     }
@@ -5129,7 +5118,7 @@ void PencilDcmp::fillInArrayContig( const int i, const int j, int index, double 
            container[nz-1] =0.0;
         }
     */
- }
+}
 
 #if ( PITTPACKACC )
 #pragma acc routine worker
@@ -5149,11 +5138,11 @@ void PencilDcmp::fillInArrayBack( const int i, const int j, const int index, dou
         {
             if ( index == 0 )
             {
-                P( id, 3, i, j, k, index ) = container[id * nzChunk + k]; 
+                P( id, 3, i, j, k, index ) = container[id * nzChunk + k];
             }
             else
             {
-                P( id, 3, i, j, k, index ) = container[id * nzChunk + k]; 
+                P( id, 3, i, j, k, index ) = container[id * nzChunk + k];
             }
         }
     }
@@ -5165,8 +5154,8 @@ void PencilDcmp::fillInArrayBack( const int i, const int j, const int index, dou
 void PencilDcmp::solvePCR( const int index )
 {
     double eig;
-   // int    count = 0;
-   // int    i, j;
+    // int    count = 0;
+    // int    i, j;
 #if ( PITTPACKACC )
 #pragma acc loop seq
 #endif
@@ -5202,7 +5191,7 @@ void PencilDcmp::solveCRP( const int index )
 {
     double eig;
 
-    //int    count = 0;
+    // int    count = 0;
     double offdiag;
 
     // maximum level is set to log2(16384)+1=15
@@ -5435,7 +5424,7 @@ void PencilDcmp::fillInArrayBack( const int i, const int j, double *container, c
             }
             else
             {
-                P( id, 3, i, j, k, index ) = container[id * nzChunk + k + OFFS]; 
+                P( id, 3, i, j, k, index ) = container[id * nzChunk + k + OFFS];
             }
         }
     }
@@ -5488,7 +5477,7 @@ static int createNodalCommunicator()
 
     MPI_Get_processor_name( pname, &len );
 
-    //long int d;
+    // long int d;
 
     // some stream wizardry to extract node number from the proc name
     stringstream ss;

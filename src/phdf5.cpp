@@ -16,14 +16,14 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
     hsize_t block[4];
     hsize_t offset[4];
     hid_t   plist_id; /* property list identifier */
-   // uint    i, j, k, l;
-    herr_t  status;
+                      // uint    i, j, k, l;
+    herr_t status;
     // int         *data=NULL;
 
     /*
      * MPI variables
      */
-    //int           mpi_size, mpi_rank;
+    // int           mpi_size, mpi_rank;
     PittPackReal *xtemp = NULL;
     PittPackReal *ytemp = NULL;
     PittPackReal *ztemp = NULL;

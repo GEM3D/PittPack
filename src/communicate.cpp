@@ -1,4 +1,4 @@
-#include "communicate.h"
+#include "communicate.hpp"
 #include "datatype.h"
 #include "definitions.h"
 

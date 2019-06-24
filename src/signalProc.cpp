@@ -1,6 +1,6 @@
-#include "signalProc.h"
-#include "chunkedArray.h"
-#include "mathFunction.h"
+#include "signalProc.hpp"
+#include "chunkedArray.hpp"
+#include "mathFunction.hpp"
 #include <cmath>
 
 void SignalProc::copyin()

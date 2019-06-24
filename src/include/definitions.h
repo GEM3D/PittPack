@@ -15,10 +15,10 @@
 #include <time.h>
 #include <vector>
 
-#if(PITTPACKACC)
+#if ( PITTPACKACC )
+#include "cusparse.h"
 #include "math.h"
 #include "openacc.h"
-#include "cusparse.h"
 #include <cublas_v2.h>
 #include <cuda_runtime.h>
 #endif
@@ -26,7 +26,7 @@
 typedef int integer;
 
 typedef unsigned int unit;
-typedef double PittPackReal;
+typedef double       PittPackReal;
 
 using namespace std;
 
@@ -37,12 +37,11 @@ typedef unsigned short sint;
 typedef unsigned long sint;
 #endif
 
-
-template<class T>
-std::string FormatWithCommas(T value)
+template <class T>
+std::string FormatWithCommas( T value )
 {
     std::stringstream ss;
-    ss.imbue(std::locale(""));
+    ss.imbue( std::locale( "" ) );
     ss << std::fixed << value;
     return ss.str();
 }

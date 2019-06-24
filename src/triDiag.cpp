@@ -1,5 +1,5 @@
-#include "triDiag.h"
-#include "mathFunction.h"
+#include "triDiag.hpp"
+#include "mathFunction.hpp"
 #include "params.h"
 
 void TriDiag::setElems( int nCh, int nzCh, double *sub, double *sup )

@@ -1,5 +1,5 @@
 #include "definitions.h"
-#include "pencilDcmp.h"
+#include "pencilDcmp.hpp"
 
 #if ( PITTPACKACC )
 void PoissonGPU::performTransformXdir() /*!< Is called on Host and Runs on GPU*/
@@ -176,11 +176,11 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             {
                 cout << "amount of free memory (0) = " << ( acc_get_free_memory() / 1e9 ) << endl;
             }
-if(INITANALYTIC)
-{
+            if ( INITANALYTIC )
+            {
 #pragma acc parallel num_gangs( 1024 ) vector_length( VECLENGTH )
-            initializeTrigonometric();
-}
+                initializeTrigonometric();
+            }
 
 #if ( POSS )
             if ( MONITOR_MEM )

@@ -1,4 +1,4 @@
-#include "mathFunction.h"
+#include "mathFunction.hpp"
 #include <math.h>
 
 #if ( PITTPACKACC )

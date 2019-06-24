@@ -1,6 +1,6 @@
 #include "definitions.h"
 #include "params.h"
-#include "pencilDcmp.h"
+#include "pencilDcmp.hpp"
 
 void PoissonCPU::writeYLine( int j, fftw_complex *outC )
 {
@@ -245,10 +245,10 @@ void PoissonCPU::pittPack()
     for ( int num = 0; num < NITER; num++ )
     // for(int num=0;num<100;num++)
     {
-if(INITANALYTIC)
-{
-        initializeTrigonometric();
-}
+        if ( INITANALYTIC )
+        {
+            initializeTrigonometric();
+        }
         if ( bc[0] != 'P' && bc[2] != 'P' )
         {
             modifyRhsDirichlet();

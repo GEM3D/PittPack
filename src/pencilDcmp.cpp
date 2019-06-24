@@ -1,6 +1,6 @@
-#include "pencilDcmp.h"
+#include "pencilDcmp.hpp"
 #include "definitions.h"
-#include "mathFunction.h"
+#include "mathFunction.hpp"
 #include "mpi.h"
 #include "params.h"
 #include <cmath>
@@ -1941,8 +1941,8 @@ void PencilDcmp::initializeTrigonometric()
                                       * c3 * c3;
 
                     P( i, j, k, 1 ) = 0.0;
-#if(DEBUG)
-                    cout<<P(i,j,k)<<'\t';
+#if ( DEBUG )
+                    cout << P( i, j, k ) << '\t';
 #endif
                 }
                 //   P(i,j,k,0)=(x*y*z);
@@ -1969,8 +1969,8 @@ void PencilDcmp::initializeTrigonometric()
 
 #endif
             }
-#if(DEBUG)
-                    cout<<endl;
+#if ( DEBUG )
+            cout << endl;
 #endif
         }
     }
@@ -5509,9 +5509,9 @@ static int createNodalCommunicator()
     return ( new_np );
 }
 
-void PencilDcmp::assignRhs(double *rhs)
+void PencilDcmp::assignRhs( double *rhs )
 {
-    double c1,c2,c3;
+    double c1, c2, c3;
     double shift = SHIFT;
 
     int Nx = nxChunk;
@@ -5533,39 +5533,36 @@ void PencilDcmp::assignRhs(double *rhs)
         c2 = dxyz[1];
         c3 = dxyz[2];
     }
- 
 
 #if ( PITTPACKACC )
-#pragma acc data copy(rhs[0:Nx*Ny*Nz])  copyin(Nz,Ny,Nx) present(P.P[0:2*Nx*Ny*Nz])
+#pragma acc data copy( rhs [0:Nx * Ny * Nz] ) copyin( Nz, Ny, Nx ) present( P.P [0:2 * Nx * Ny * Nz] )
 #endif
-{
+    {
 #if ( PITTPACKACC )
 #pragma acc parallel loop gang
 #endif
-    for ( int k = 0; k < Nz; k++ )
-    {
- #if ( PITTPACKACC )
-#pragma acc loop worker 
-#endif
-        for ( int j = 0; j < Ny; j++ )
+        for ( int k = 0; k < Nz; k++ )
         {
+#if ( PITTPACKACC )
+#pragma acc loop worker
+#endif
+            for ( int j = 0; j < Ny; j++ )
+            {
 #if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
-            for ( int i = 0; i < Nx; i++ )
-            {
-                P( i, j, k,0 )= rhs[i + Nx*j + Nx*Ny*k]*c3*c3;
-                P( i, j, k,1 )=0.0;
-               // cout<<"P "<<P(i,j,k)<<endl;;
+                for ( int i = 0; i < Nx; i++ )
+                {
+                    P( i, j, k, 0 ) = rhs[i + Nx * j + Nx * Ny * k] * c3 * c3;
+                    P( i, j, k, 1 ) = 0.0;
+                    // cout<<"P "<<P(i,j,k)<<endl;;
+                }
             }
         }
     }
 }
 
-}
-
-
-void PencilDcmp::fillTrigonometric(double *rhs)
+void PencilDcmp::fillTrigonometric( double *rhs )
 {
     double pi = 4. * arctan( 1.0 );
     double x, y, z;
@@ -5628,15 +5625,13 @@ void PencilDcmp::fillTrigonometric(double *rhs)
                     x = Xa + i * c1 + shift * c1 * .5;
                 }
 
-               rhs[i+j*Nx+Nx*Ny*k] = -( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
-                                         * exactValue( omega[2] * z, tags[2] ) + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] )
-                                           * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
-                                         + ( omega[2] * omega[2] ) * exactValue( omega[0] * x, tags[0] )
-                                           * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] ) );
-
-
-          }
-     
+                rhs[i + j * Nx + Nx * Ny * k] = -( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] )
+                                                   * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
+                                                   + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] )
+                                                     * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
+                                                   + ( omega[2] * omega[2] ) * exactValue( omega[0] * x, tags[0] )
+                                                     * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] ) );
+            }
         }
     }
 }
@@ -5647,17 +5642,17 @@ void PencilDcmp::print()
     int Ny = nyChunk;
     int Nz = nz;
 
-
-cout<<RED<<" inside  "<<RESET<<endl;
-for ( int k = 0; k < Nz; k++ )
+    cout << RED << " inside  " << RESET << endl;
+    for ( int k = 0; k < Nz; k++ )
     {
         for ( int j = 0; j < Ny; j++ )
         {
             for ( int i = 0; i < Nx; i++ )
             {
-                cout<<P(i,j,k)<<'\t';;
+                cout << P( i, j, k ) << '\t';
+                ;
             }
-          cout<<endl;
+            cout << endl;
         }
     }
 }

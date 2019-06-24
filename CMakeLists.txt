@@ -114,7 +114,7 @@ set(EXECUTABLE_OUTPUT_PATH ${dir}/bin)
 # have to hardcode the directories for I/O operations and hence ensure
 # portability
 
-set(HEADER_FILES    "${dir}/src/include/communicate.h"  "${dir}/src/include/pencilDcmp.h"  "${dir}/src/include/definitions.h"  "${dir}/src/include/datatype.h" "${dir}/src/include/chunkedArray.h" "${dir}/src/include/phdf5.h"   "${dir}/src/include/params.h"  "${dir}/src/include/signalProc.h"  "${dir}/src/include/mathFunction.h"  "${dir}/src/include/multiGrid.h" )
+set(HEADER_FILES    "${dir}/src/include/communicate.hpp"  "${dir}/src/include/pencilDcmp.hpp"  "${dir}/src/include/definitions.h"  "${dir}/src/include/datatype.h" "${dir}/src/include/chunkedArray.hpp" "${dir}/src/include/phdf5.hpp"   "${dir}/src/include/params.h"  "${dir}/src/include/signalProc.hpp"  "${dir}/src/include/mathFunction.hpp"  "${dir}/src/include/multiGrid.hpp" )
 
 message("header files" ${HEADER_FILES})
 
@@ -126,7 +126,7 @@ message("GPU" $ENV{GPU1})
 
 if($ENV{GPU1})
 ## for GPU
- SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DOMPI_SKIP_MPICXX -acc -fast -Minfo=accel -Mlarge_arrays -Mcudalib=cufft,cusparse  -ta=tesla:cc70   -std=c++11 -Minform=warn")
+ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DOMPI_SKIP_MPICXX -acc -fast -Minfo=accel -Mlarge_arrays -Mcudalib=cufft,cusparse  -ta=tesla   -std=c++11 -Minform=warn")
  SET(CMAKE_EXEC_LINKER_FLAGS "${CMAKE_EXEC_LINKER_FLAGS} -DOMPI_SKIP_MPICXX -acc -fast -Minfo=accel -Mlarge_arrays  -ta=tesla,gvmode -Mcudalib=cufft,cusparse -std=c++11" )
 else()
 #   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -O3   -Wno-unknown-pragmas  ")

@@ -6,8 +6,8 @@
  *
  *
  */
-#include "multiGrid.h"
-#include "mathFunction.h"
+#include "multiGrid.hpp"
+#include "mathFunction.hpp"
 #include "params.h"
 #include "stdio.h"
 #include <iostream>

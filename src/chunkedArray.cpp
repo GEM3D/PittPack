@@ -1,4 +1,4 @@
-#include "chunkedArray.h"
+#include "chunkedArray.hpp"
 #include "params.h"
 #include <stdio.h>
 #include <stdlib.h>

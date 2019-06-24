@@ -7,7 +7,8 @@
 
 namespace Abstraction
 {
-    typedef enum {
+    typedef enum
+    {
         type_byte,
         type_char,
         type_unsigned_char,

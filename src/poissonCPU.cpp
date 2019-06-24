@@ -245,8 +245,10 @@ void PoissonCPU::pittPack()
     for ( int num = 0; num < NITER; num++ )
     // for(int num=0;num<100;num++)
     {
+if(INITANALYTIC)
+{
         initializeTrigonometric();
-
+}
         if ( bc[0] != 'P' && bc[2] != 'P' )
         {
             modifyRhsDirichlet();

@@ -1649,7 +1649,7 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
     b[2] = diag;
 
     // this inserted to prevent NN-NN-NN from blowing up
-    if ( fabs( diag + 2. ) < 1.e-6 )
+    if ( fabs( diag + 2. ) < 1.e-10 )
     {
         return;
     }
@@ -1819,7 +1819,7 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
 
     // this will remove the singularity for the corner that we set the calue as zero
 
-    if ( fabs( diag + 2. ) < 1.e-6 )
+    if ( fabs( diag + 2. ) < 1.e-10 )
     {
         //   cout<<" first solve "<<endl;
         for ( int i = 0; i < N; i++ )

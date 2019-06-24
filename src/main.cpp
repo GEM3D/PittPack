@@ -141,10 +141,11 @@ int main( int argcs, char *pArgs[] )
 
 #endif
 
-    //   char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
+   //    char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
     //    char mybc[6] = {'P', 'P', 'P', 'P', 'P', 'P'};
-
-    char mybc[6] = {'N', 'N', 'N', 'N', 'N', 'N'};
+    // it is illposed
+    //char mybc[6] = {'N', 'N', 'N', 'N', 'N', 'N'};
+    char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
     // char mybc[6] = {'D', 'D', 'D', 'D', 'P', 'P'};
     // ill posed  char mybc[6] = {'P', 'P', 'P', 'P', 'N', 'N'};
     //       char mybc[6] = {'D', 'D', 'D', 'D', 'P', 'P'};
@@ -235,6 +236,8 @@ int main( int argcs, char *pArgs[] )
 #endif
     // step 1) pencils with n(0,0,1) is converted to pencil with n(1,0,0)
 
+   double *rhs=nullptr;
+
 #if ( 1 )
 #if ( !EXACT )
 #if ( OPENACC )
@@ -242,14 +245,36 @@ int main( int argcs, char *pArgs[] )
     //    for ( int i = 0; i < 10; i++ )
     {
         //        M.initializeTrigonometric();
-
-        M.pittPack();
+    if(INITANALYTIC==0)
+     {     
+        double *rhs=new double[Nx*Ny*Nz];
+        M.fillTrigonometric(rhs);
+        /*
+        for(int i=0;i<Nx*Ny*Nz;i++)
+        {
+        cout<<rhs[i]<<endl;
+        } 
+         */ 
+        M.assignRhs(rhs);
+      }
+       // M.print();
+         M.pittPack();
+      //  delete [] rhs;
     }
 
     cout << "GPU solving" << endl;
 #else
     // M.solver();
-    M.pittPack();
+        
+    if(INITANALYTIC==0)
+    {
+        double *rhs=new double[Nx*Ny*Nz];
+        M.fillTrigonometric(rhs);
+        M.assignRhs(rhs);
+      }
+       // M.print();
+        M.pittPack();
+      //  delete [] rhs;
 #endif
 
 //    M.solver();
@@ -317,6 +342,11 @@ int main( int argcs, char *pArgs[] )
     {
         cout << RED << "Warning : output file show the error not the solution  " << RESET << endl;
     }
+   if(rhs!=nullptr)
+    {
+     delete[] rhs;
+   }
+
     return ( 0 );
 };
 

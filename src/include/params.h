@@ -31,7 +31,7 @@
 
 enum PittPackParams /*!<Parameters to set before compiling  */
 {
-    I_O                         = 1, /*!< set o zero to disable IO */
+    I_O                         = 0, /*!< set o zero to disable IO */
     SHIFT                       = 1, /*!< Set to 0 for no shifts and 1 to shift*/
     This                        = 0, /*!<Junk for debugging, will be removed later */
     GPUAW                       = 1, /*! chunkwise send/recieve for ZX rotation */
@@ -43,6 +43,7 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     SOLUTIONMETHOD = 0 ,                   /*!< (0) solves with Thomas (1) Uses PCR (2) CR-P (4) Multigrid and (5) cuSPARCE (CR and PCR ) 
                                                 the last two are disabled disabled to avoid unnecesary memory usage, 
                                                  need to change the MULTIGRIDON to 1 to enable allocation for multigrid and cuSPARSE */
+    INITANALYTIC                =0, /*! This enables initializeTrigonometric function used for debugging and verification of oder of accuracy*/ 
     PIVOT = 1,                        /*!< This is only used for cuSPARSE, for diagonally dominant matrix pivoting is not required */
     INNERITER= 10,
     OUTERITER =20, 

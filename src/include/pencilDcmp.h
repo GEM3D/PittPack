@@ -494,6 +494,11 @@ void changeLocationYOverlap();
 #endif
 void clear( double *x );
 
+void assignRhs(double *rhs);
+
+void fillTrigonometric(double *rhs);
+
+void print();
 
     ~PencilDcmp(); /*!< Class destructor*/
 };

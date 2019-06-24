@@ -1941,6 +1941,9 @@ void PencilDcmp::initializeTrigonometric()
                                       * c3 * c3;
 
                     P( i, j, k, 1 ) = 0.0;
+#if(DEBUG)
+                    cout<<P(i,j,k)<<'\t';
+#endif
                 }
                 //   P(i,j,k,0)=(x*y*z);
                 //   P(i,j,k,1)=(x*y*z);
@@ -1966,6 +1969,9 @@ void PencilDcmp::initializeTrigonometric()
 
 #endif
             }
+#if(DEBUG)
+                    cout<<endl;
+#endif
         }
     }
     // P.moveHostToDevice();
@@ -5501,4 +5507,158 @@ static int createNodalCommunicator()
     MPI_Comm_free( &nodalComm );
 
     return ( new_np );
+}
+
+void PencilDcmp::assignRhs(double *rhs)
+{
+    double c1,c2,c3;
+    double shift = SHIFT;
+
+    int Nx = nxChunk;
+    int Ny = nyChunk;
+    int Nz = nz;
+
+    if ( !SHIFT )
+    {
+        c1 = ( coords[1] - coords[0] ) / ( Nx + 1. );
+        c2 = ( coords[3] - coords[2] ) / ( Ny + 1. );
+        c3 = ( coords[5] - coords[4] ) / ( Nz + 1. );
+#if ( DEBUG )
+        cout << " c1  " << c1 << " " << c2 << " " << c3 << endl;
+#endif
+    }
+    else
+    {
+        c1 = dxyz[0];
+        c2 = dxyz[1];
+        c3 = dxyz[2];
+    }
+ 
+
+#if ( PITTPACKACC )
+#pragma acc data copy(rhs[0:Nx*Ny*Nz])  copyin(Nz,Ny,Nx) present(P.P[0:2*Nx*Ny*Nz])
+#endif
+{
+{
+#if ( PITTPACKACC )
+#pragma acc parallel loop gang
+#endif
+    for ( int k = 0; k < Nz; k++ )
+    {
+ #if ( PITTPACKACC )
+#pragma acc loop worker 
+#endif
+        for ( int j = 0; j < Ny; j++ )
+        {
+#if ( PITTPACKACC )
+#pragma acc loop vector
+#endif
+            for ( int i = 0; i < Nx; i++ )
+            {
+                P( i, j, k,0 )= rhs[i + Nx*j + Nx*Ny*k]*c3*c3;
+                P( i, j, k,1 )=0.0;
+               // cout<<"P "<<P(i,j,k)<<endl;;
+            }
+        }
+    }
+}
+}
+}
+
+
+void PencilDcmp::fillTrigonometric(double *rhs)
+{
+    double pi = 4. * arctan( 1.0 );
+    double x, y, z;
+
+    double Xa = coords[0];
+    double Ya = coords[2];
+    double Za = coords[4];
+    double c1, c2, c3;
+    double shift = SHIFT;
+
+    int Nx = nxChunk;
+    int Ny = nyChunk;
+    int Nz = nz;
+
+    if ( !SHIFT )
+    {
+        c1 = ( coords[1] - coords[0] ) / ( Nx + 1. );
+        c2 = ( coords[3] - coords[2] ) / ( Ny + 1. );
+        c3 = ( coords[5] - coords[4] ) / ( Nz + 1. );
+    }
+    else
+    {
+        c1 = dxyz[0];
+        c2 = dxyz[1];
+        c3 = dxyz[2];
+    }
+
+    double omega[3] = {COEFF0 * pi, COEFF1 * pi, COEFF2 * pi};
+
+    for ( int k = 0; k < Nz; k++ )
+    {
+        if ( !SHIFT )
+        {
+            z = Za + ( k + 1 ) * c3;
+        }
+        else
+        {
+            z = Za + k * c3 + shift * c3 * 0.5;
+        }
+
+        for ( int j = 0; j < Ny; j++ )
+        {
+            if ( !SHIFT )
+            {
+                y = Ya + ( j + 1 ) * c2;
+            }
+            else
+            {
+                y = Ya + j * c2 + shift * c2 * 0.5;
+            }
+
+            for ( int i = 0; i < Nx; i++ )
+            {
+                if ( !SHIFT )
+                {
+                    x = Xa + ( i + 1 ) * c1;
+                }
+                else
+                {
+                    x = Xa + i * c1 + shift * c1 * .5;
+                }
+
+               rhs[i+j*Nx+Nx*Ny*k] = -( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
+                                         * exactValue( omega[2] * z, tags[2] ) + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] )
+                                           * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
+                                         + ( omega[2] * omega[2] ) * exactValue( omega[0] * x, tags[0] )
+                                           * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] ) );
+
+
+          }
+     
+        }
+    }
+}
+
+void PencilDcmp::print()
+{
+    int Nx = nxChunk;
+    int Ny = nyChunk;
+    int Nz = nz;
+
+
+cout<<RED<<" inside  "<<RESET<<endl;
+for ( int k = 0; k < Nz; k++ )
+    {
+        for ( int j = 0; j < Ny; j++ )
+        {
+            for ( int i = 0; i < Nx; i++ )
+            {
+                cout<<P(i,j,k)<<'\t';;
+            }
+          cout<<endl;
+        }
+    }
 }

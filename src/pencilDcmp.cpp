@@ -5539,7 +5539,6 @@ void PencilDcmp::assignRhs(double *rhs)
 #pragma acc data copy(rhs[0:Nx*Ny*Nz])  copyin(Nz,Ny,Nx) present(P.P[0:2*Nx*Ny*Nz])
 #endif
 {
-{
 #if ( PITTPACKACC )
 #pragma acc parallel loop gang
 #endif
@@ -5562,7 +5561,7 @@ void PencilDcmp::assignRhs(double *rhs)
         }
     }
 }
-}
+
 }
 
 

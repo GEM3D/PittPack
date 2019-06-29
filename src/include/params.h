@@ -36,7 +36,7 @@
 
 enum PittPackParams /*!<Parameters to set before compiling  */
 {
-    I_O                         = 0, /*!< set o zero to disable IO */
+    I_O                         = 1, /*!< set o zero to disable IO */
     SHIFT                       = 1, /*!< Set to 0 for no shifts and 1 to shift*/
     This                        = 0, /*!<Junk for debugging, will be removed later */
     GPUAW                       = 1, /*! chunkwise send/recieve for ZX rotation */
@@ -56,9 +56,9 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     = 10000, /*!< Overrides the default number of gpu blocks (gangs), setting this to a large value will replace this with nyChunk */
     VECLENGTH     = 256, /*!< sets the number of gpu-threads */
     MAXLEVEL      = 20,
-    COEFF0        = 1, /*!< (COEFF0*pi) is the frequency of the exact solution in the x-direction  */
+    COEFF0        = 2, /*!< (COEFF0*pi) is the frequency of the exact solution in the x-direction  */
     COEFF1        = 2, /*!< (COEFF0*pi) is the frequency of the exact solution in the y-direction  */
-    COEFF2        = 3, /*!< (COEFF0*pi) is the frequency of the exact solution in the z-direction  */
+    COEFF2        = 2, /*!< (COEFF0*pi) is the frequency of the exact solution in the z-direction  */
     CUFFT_STREAMS = 0, /*!< uses different stream for fft transform  */
     MONITOR_MEM   = 0, /*!< set this to 1 to monitor memory usage at each level of solution  */
     PROFILE_COMM  = 0, /*!< Turn it on and it will report the amount of time spent for communication */
@@ -103,7 +103,7 @@ const double pi = 3.1415926535897932384;
 #define POSS 1
 #define SOLVE 1
 #define IFFTX 1
-#define IFFTY 1
+#define IFFTY 1 
 #define FFTX 1
 #define FFTY 1
 #define USE_SHARED 0 /*!< set to 0 will use global memory, set to 1 will use shared memory*/

@@ -5016,6 +5016,7 @@ int PencilDcmp::solveThmBatch( const int index )
             }
             else
             {
+               // T.shermanMorrisonThomasV1( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 0.0, 1.0, index );
                 T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
                 // cout<< RED<<"solveThmBatch 0 N" <<RESET<<endl;
             }
@@ -5067,6 +5068,7 @@ int PencilDcmp::solveThmBatch( const int index )
             //  cout<< RED<<"solve full batch N" <<RESET<<endl;
             //   this is too strong for enforcing boundries.
             //    T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3+l*nz ,eig, 0.0 ,-eig, index );
+          //  T.shermanMorrisonThomasV1( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 0.0, 1.0, index );
             T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 1.0, 1.0, index );
         }
 
@@ -5553,9 +5555,9 @@ void PencilDcmp::assignRhs( double *rhs )
 #endif
                 for ( int i = 0; i < Nx; i++ )
                 {
-                    P( i, j, k, 0 ) = rhs[i + Nx * j + Nx * Ny * k] * c3 * c3;
+                    P( i, j, k, 0 ) = rhs[i + Nx * j + Nx * Ny * k]* c3 * c3;
                     P( i, j, k, 1 ) = 0.0;
-                    // cout<<"P "<<P(i,j,k)<<endl;;
+ //                   cout<<P(i,j,k)<<endl;;
                 }
             }
         }
@@ -5625,13 +5627,21 @@ void PencilDcmp::fillTrigonometric( double *rhs )
                     x = Xa + i * c1 + shift * c1 * .5;
                 }
 
-                rhs[i + j * Nx + Nx * Ny * k] = -( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] )
+                rhs[i + j * Nx + Nx * Ny * k] = - 4.*pi*pi*sin(2.*pi*z) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] )
                                                    * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
                                                    + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] )
                                                      * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
                                                    + ( omega[2] * omega[2] ) * exactValue( omega[0] * x, tags[0] )
-                                                     * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] ) );
+                                                     * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] ) )*/;
+/*
+            if(i==0 || i==(Nz-1))
+            {
+              cout<<x<<" "<<rhs[i + j * Nx + Nx * Ny * k]<<endl;
             }
+*/
+
+            }
+
         }
     }
 }

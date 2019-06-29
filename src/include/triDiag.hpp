@@ -72,6 +72,12 @@ class TriDiag
     void thomasLowMemNoBC( double *tmpMG, double *rh, double *diag, int index );
 
 #if ( PITTPACKACC )
+#pragma acc routine seq
+#endif
+    void thomasLowMemNoBCV1( double *tmpMG, double *rh, double *diag, int index );
+
+
+#if ( PITTPACKACC )
 #pragma acc routine vector
 #endif
     void crp( const int n, double offdiag, double *tmpA, double *tmpC, double *tmpRHS, double *ThmA, double *ThmC, double *ThmB,
@@ -86,6 +92,11 @@ class TriDiag
 #pragma acc routine seq
 #endif
     void shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, double diag, const double alpha, const double beta, int index );
+#if ( PITTPACKACC )
+#pragma acc routine seq
+#endif
+    void shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, double diag, const double alpha, const double beta, int index );
+
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
@@ -93,6 +104,11 @@ class TriDiag
     bool checkRhs( const double *rh, const int N );
 
     void assignBC( char *BC );
+#if ( PITTPACKACC )
+#pragma acc routine seq
+#endif
+    void enforceZeroMean( double *tmpMG, double *rh, double *diag, int index );
+
 
     ~TriDiag(); /*!< destructor of the class*/
 };

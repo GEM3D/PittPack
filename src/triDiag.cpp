@@ -1562,6 +1562,72 @@ bool TriDiag::checkRhs( const double *rh, const int N )
 #if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
+void TriDiag::thomasLowMemNoBCV2( double *tmpMG, double *rh, double *diag, int index )
+{
+    double bet;
+
+   
+
+    //   double a[3],c[3];
+    double b[3];
+
+    int N = nChunk * nzChunk;
+    /*
+     #if(PITTPACKACC)
+     #pragma acc loop seq
+     #endif
+         for ( int i = 0; i < 3; i++ )
+         {
+             a[i] = subDiag[i];
+             c[i] = supDiag[i];
+         }
+     */
+    b[0] = diag[0];
+    b[1] = diag[1];
+    b[2] = diag[2];
+
+    rh[0] = rh[0] / ( bet = b[0] );
+
+    int j    = 1;
+    //tmpMG[j] = supDiag[j - 1] / bet;
+    //periodic only, supDiag[0]=0.0
+    tmpMG[j] = 0.0;
+    bet      = b[1] - subDiag[1] * tmpMG[j];
+    rh[1]    = ( rh[1] - subDiag[1] * rh[j - 1] ) / bet;
+
+#if ( PITTPACKACC )
+#pragma acc loop seq
+#endif
+    for ( int j = 2; j < N - 1; j++ )
+    {
+        //       DecompositioN and forward substitution.
+        tmpMG[j] = supDiag[1] / bet;
+        bet      = b[1] - subDiag[1] * tmpMG[j];
+        rh[j]    = ( rh[j] - subDiag[1] * rh[j - 1] ) / bet;
+    }
+
+    j        = N - 1;
+    tmpMG[j] = supDiag[1] / bet;
+    
+    bet      = b[2] -0.0* subDiag[2] * tmpMG[j];
+    rh[j]    = ( rh[j] - 0.*subDiag[2] * rh[j - 1] ) / bet;
+
+    //  cout << a[2] << " " << b[2] << eNdl;
+    //  cout<<RED<<rh[0]<<RESET<<endl;
+#if ( PITTPACKACC )
+#pragma acc loop seq
+#endif
+    for ( int j = ( N - 2 ); j >= 0; j-- )
+    {
+        rh[j] -= tmpMG[j + 1] * rh[j + 1];
+    }
+
+    // cout<<RED<<rh[0]<<RESET<<endl;
+}
+
+#if ( PITTPACKACC )
+#pragma acc routine seq
+#endif
 void TriDiag::thomasLowMemNoBCV1( double *tmpMG, double *rh, double *diag, int index )
 {
     double bet;
@@ -1842,10 +1908,11 @@ void TriDiag::thomasLowMem( int N, double *a, double *b, double *c, double *r, d
 void TriDiag::enforceZeroMean( double *tmpMG, double *rh, double *diag, int index )
 {
 
+    int N = nChunk * nzChunk;
        
         rh[0]=0.0;
-        
-        thomasLowMemNoBCV1( tmpMG, rh, diag, index );
+        rh[N-1]=0.0; 
+        thomasLowMemNoBCV2( tmpMG, rh, diag, index );
 
 }
 

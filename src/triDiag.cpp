@@ -2096,7 +2096,7 @@ void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, d
 #endif
     {
 // this is due to the fact that -1 0 ..... 1 =0 in periodic
-        b[0] = -1.0;
+        b[0] = 1.0;
         b[1] = diag;
         b[2] = diag;
     }
@@ -2116,12 +2116,12 @@ void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, d
     // note that supdiga[0]=0.0 and rh=0.0
     
         rh[0]=0.0;
- /*
+/* 
         supDiag[0]=0.0;
     */
 
     // this will remove the singularity for the corner that we set the calue as zero
-
+#if(0)
     if ( fabs( diag + 2. ) < 1.e-10 )
     {
           cout<<" first solve's diag "<<diag<<endl;
@@ -2131,7 +2131,7 @@ void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, d
         }
   //      return;
     }
-
+#endif
     thomasLowMemNoBCV1( tmpMG, rh, bb, index );
 //  rhs is the new rhs
 #if ( PITTPACKACC )
@@ -2195,15 +2195,13 @@ if(fabs(part2<1.e-6))
 
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<rh[0]<<" "<<rh[N-1]<<endl;
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<endl;
-/*    
+   #if(0) 
         cout<<" final solve "<<endl;
 
         for ( int i = 0; i < N; i++ )
         {
             cout<<rh[i]<<endl;
-        }
-  */  
- #if(1)   
+        } 
     if(fabs(rh[0]-rh[N-1])>1.e-6)
     {
      printf(" periodicity screwed up\n ");

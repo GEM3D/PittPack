@@ -5016,8 +5016,8 @@ int PencilDcmp::solveThmBatch( const int index )
             }
             else
             {
-               // T.shermanMorrisonThomasV1( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 0.0, 1.0, index );
-                T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
+                T.shermanMorrisonThomasV1( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 0.0, 1.0, index );
+               // T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
                 // cout<< RED<<"solveThmBatch 0 N" <<RESET<<endl;
             }
             fillInArrayBack( i, j, index, x1 + nz * i );

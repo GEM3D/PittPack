@@ -1974,7 +1974,7 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
 
     // this will remove the singularity for the corner that we set the calue as zero
 int counter=0;
-
+#if(0)
     if ( fabs( diag + 2. ) < 1.e-10 )
     {
       //    cout<<" first solve's diag "<<diag<<endl;
@@ -1987,7 +1987,7 @@ cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
       counter++;
   return;
     }
-
+#endif
     thomasLowMemNoBC( tmpMG, rh, bb, index );
 //  rhs is the new rhs
 #if ( PITTPACKACC )
@@ -2114,9 +2114,10 @@ void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, d
     bb[2] = b[2] - alpha * beta / gamma;
     // enforcing boundary conditions here
     // note that supdiga[0]=0.0 and rh=0.0
-    
+
+/*    
         rh[0]=0.0;
-/* 
+ 
         supDiag[0]=0.0;
     */
 

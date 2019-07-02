@@ -1974,16 +1974,19 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
 
     // this will remove the singularity for the corner that we set the calue as zero
 int counter=0;
-#if(0)
+#if(1)
     if ( fabs( diag + 2. ) < 1.e-10 )
     {
       //    cout<<" first solve's diag "<<diag<<endl;
-  enforceZeroMean( tmpMG, rh, b, index );      
-        for ( int i = 0; i < N; i++ )
-        {
-                cout<<rh[i]<<endl;
-        }
-cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
+      // enforceZeroMean( tmpMG, rh, b, index );      
+      //  for ( int i = 0; i < N; i++ )
+      //  {
+      //          cout<<rh[i]<<endl;
+      //  }
+//cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
+// only when there is singularity remove it
+      shermanMorrisonThomasV1( tmpMG, rh, rh1, diag, 1.0, 1.0, index );
+
       counter++;
   return;
     }
@@ -2115,7 +2118,7 @@ void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, d
     // enforcing boundary conditions here
     // note that supdiga[0]=0.0 and rh=0.0
 
-/*    
+   /* 
         rh[0]=0.0;
  
         supDiag[0]=0.0;
@@ -2123,9 +2126,10 @@ void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, d
 
     // this will remove the singularity for the corner that we set the calue as zero
 #if(0)
+
     if ( fabs( diag + 2. ) < 1.e-10 )
     {
-          cout<<" first solve's diag "<<diag<<endl;
+          cout<<"rhs before first solve's "<<diag<<endl;
         for ( int i = 0; i < N; i++ )
         {
                 cout<<rh[i]<<endl;

@@ -142,7 +142,6 @@ fi
 
 
 if [ $cluster == "crc" ]; then
-
      module purge
      module load intel/2018.2.199
      module load intel-mpi/2018.2.199
@@ -150,8 +149,7 @@ if [ $cluster == "crc" ]; then
      module load hdf5/1.10.0
      module load fftw/3.3.8
      module load  cmake/3.7.1
-
-
+     module load googletest/1.8.1
 
     if [ $GPU -lt 1 ]; then
         export CC=$I_MPI_ROOT/intel64/bin/mpicc
@@ -164,7 +162,7 @@ if [ $cluster == "crc" ]; then
         module load pgi/18.10
         export CC=/ihome/crc/install/pgi/18.10/linux86-64/18.10/mpi/openmpi-2.1.2/bin/mpicc
         export CXX=/ihome/crc/install/pgi/18.10/linux86-64/18.10/mpi/openmpi-2.1.2/bin/mpiCC
-    fi
+fi
 
 fi
 

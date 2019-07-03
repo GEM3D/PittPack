@@ -1785,25 +1785,32 @@ void PencilDcmp::IO( int app, int dir, int aligndir )
 #if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
-static double exactValue( double x, int tg )
+static double exactValue(double omega, double x, int tg )
 {
     double ans = 0.0;
 
+    if(fabs(omega)<1.0e-6)
+    {
+    return(1.0);
+    }
+    
+
     if ( tg == 0 )
     {
-        ans = ( sine( x ) );
+        ans = ( sine( omega*x ) );
     }
     else if ( tg == 1 )
     {
-        ans = ( cosine( x ) );
+        ans = ( cosine( omega*x ) );
     }
     else if ( tg == -1 )
     {
-        ans = ( sine( x ) );
+        ans = ( sine( omega*x ) );
     }
     else if ( tg == -2 )
     {
-        ans = ( cosine( x ) );
+        //ans = ( cosine( omega*x ) );
+        ans = ( sine( omega*x ) );
     }
 
     // cout<< "exact value "<<tg <<endl;
@@ -1908,14 +1915,14 @@ void PencilDcmp::initializeTrigonometric()
                 //                    P( i, j, k )=(i+1)*(i+1);
                 /*
                                     P( i, j, k )
-                                    = ( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
-                                        * exactValue( omega[2] * z, tags[2] ) + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0]
+                                    = ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] )
+                                        * exactValue( omega[2] , z, tags[2] ) + ( omega[1] * omega[1] ) * exactValue( omega[0] , x, tags[0]
                    )
                                                                                 * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2]
-                   * z, tags[2] )
-                                        + ( omega[2] * omega[2] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1]
+                   , z, tags[2] )
+                                        + ( omega[2] * omega[2] ) * exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1]
                    )
-                                          * exactValue( omega[2] * z, tags[2] ) ) * c3 * c3;
+                                          * exactValue( omega[2] , z, tags[2] ) ) * c3 * c3;
 
                                     P( i, j, k, 1 ) = 0.0;
                 */
@@ -1932,12 +1939,12 @@ void PencilDcmp::initializeTrigonometric()
                 else
                 {
                     //  For big mesh sizes calling class operator calls problems
-                    P( i, j, k, 0 ) = -( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] )
-                                         * exactValue( omega[2] * z, tags[2] )
-                                         + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] )
-                                           * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
-                                         + ( omega[2] * omega[2] ) * exactValue( omega[0] * x, tags[0] )
-                                           * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] ) )
+                    P( i, j, k, 0 ) = -( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] )
+                                         * exactValue( omega[2] , z, tags[2] )
+                                         + ( omega[1] * omega[1] ) * exactValue( omega[0] , x, tags[0] )
+                                           * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )
+                                         + ( omega[2] * omega[2] ) * exactValue( omega[0] , x, tags[0] )
+                                           * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] ) )
                                       * c3 * c3;
 
                     P( i, j, k, 1 ) = 0.0;
@@ -1963,7 +1970,8 @@ void PencilDcmp::initializeTrigonometric()
                 //                  P( i, j, k, 0 ) = cos( omega[1] * ( x + y + z ) );
                 //                  P( i, j, k, 1 ) = sin( omega[1] * ( x + y + z ) );
                 P( i, j, k )
-                = -exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                = -exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] );
+
 
                 // all periodic
 
@@ -1977,13 +1985,6 @@ void PencilDcmp::initializeTrigonometric()
     // P.moveHostToDevice();
 
 #endif
-    /*
-        if ( bc[0] != 'P' && bc[2] != 'P' )
-        {
-           // cout << RED << " enforcing Dirichlet " << endl;
-         //   modifyRhsDirichlet();
-        }
-    */
 }
 
 #if ( PITTPACKACC )
@@ -2073,7 +2074,7 @@ double PencilDcmp::getError()
                     x = Xa + i * c1 + shift * c1 * .5;
                 }
 
-                // Sn( i, j, k ) = - exactValue( omega[0] * x,tags[0] ) * exactValue( omega[1] * y,tags[1] ) * exactValue( omega[2] *
+                // Sn( i, j, k ) = - exactValue( omega[0] , x,tags[0] ) * exactValue( omega[1] , y,tags[1] ) * exactValue( omega[2] ,
                 // z,tags[2] );
 
                 /*
@@ -2081,6 +2082,7 @@ double PencilDcmp::getError()
                                                  val1=P(i,j,k,1)-(sin(omega[1]*z)*sin(omega[1]*(x+y)));
                   */
                 // P(i,j,k)+=omega[1]*omega[1]*(sin(omega[1]*z)*sin(omega[1]*(x+y)));
+ #if(0)
                 if ( bc[0] == 'P' || bc[2] == 'P' )
                 {
                     val  = P( i, j, k, 0 ) - ( sine( omega[1] * z ) * cosine( omega[1] * ( x + y ) ) );
@@ -2089,7 +2091,7 @@ double PencilDcmp::getError()
                 else
                 {
                     val = P( i, j, k )
-                          - exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                          - exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] );
 
                     val1 = 0.0;
                 }
@@ -2110,6 +2112,10 @@ double PencilDcmp::getError()
                     }
 #endif
                 }
+#endif
+                                 
+                    val  = P( i, j, k, 0 ) - ( sine( 2.*pi* z ) );
+                    val1=0.0;
                 //                  cout<<"omega "<<omega[1]<<endl;
 
                 // cout<<"val 1 "<<val1<<endl;
@@ -2119,8 +2125,8 @@ double PencilDcmp::getError()
                 P( i, j, k ) = ( val * val + val1 * val1 );
 
                 //        << endl;
-                //  P( i, j, k ) = ( exactValue( pi * x, tags[0] ) );
-                //   cout<<" P "<<( exactValue( pi * x, tags[0] ) )<<endl;
+                //  P( i, j, k ) = ( exactValue( pi , x, tags[0] ) );
+                //   cout<<" P "<<( exactValue( pi , x, tags[0] ) )<<endl;
             }
         }
     }
@@ -3702,7 +3708,7 @@ int PencilDcmp::thomas( int i, int j, int dir, int index )
     }
     else if ( bc[4] == 'P' )
     {
-        // peroiodic thomas (sherman-morrison) is implemented as a stand alone function
+        // peroiodic thomas (Sherman-morrison) is implemented as a stand alone function
     }
 
     if ( bc[5] == 'D' )
@@ -3716,7 +3722,7 @@ int PencilDcmp::thomas( int i, int j, int dir, int index )
     }
     else if ( bc[5] == 'P' )
     {
-        // peroiodic thomas (sherman-morrison) is implemented as a stand alone function
+        // peroiodic thomas (Sherman-morrison) is implemented as a stand alone function
     }
     /*
        cout<<" onDiag  " << onDiag[0]<<" "<<onDiag[1]<<" "<<onDiag[2]<< endl;
@@ -4603,8 +4609,20 @@ void PencilDcmp::modifyRhsDirichlet()
     cout << "xmin = " << Xa + 0 * c1 + shift * c1 * .5 << " xmax " << Xa + ( Nx - 1 ) * c1 + shift * c1 * .5 << endl;
     ;
 #endif
-    double omega[3] = {pi, pi, pi};
+    //double omega[3] = {pi*COEFF0, pi*COEFF1, pi*COEFF2};
+    double omega[3] = {COEFF0 * pi, COEFF1 * pi, COEFF2 * pi};
     // double val;
+    
+     for(int i=0;i<5;i++)
+     {  
+     cout<<" fcetag "<<faceTag[i]<<endl;
+     }
+ 
+     for(int i=0;i<3;i++)
+     {  
+     cout<<" omega = "<<omega[i]<<endl;
+     }
+
     // z direction, acting on facetags 5 and 6 with Zmin and Zmax
     if ( faceTag[4] == 1 )
     {
@@ -4626,7 +4644,9 @@ void PencilDcmp::modifyRhsDirichlet()
 
                 P( i, j, k )
                 = P( i, j, k )
-                  + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                  - 2. * exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] );
+               
+//                  cout<< 2. * exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )<<endl;
             }
         }
     }
@@ -4653,7 +4673,7 @@ void PencilDcmp::modifyRhsDirichlet()
 
                 P( i, j, k )
                 = P( i, j, k )
-                  + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                  - 2 * exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] );
             }
         }
     }
@@ -4678,7 +4698,9 @@ void PencilDcmp::modifyRhsDirichlet()
 
                 P( i, j, k )
                 = P( i, j, k )
-                  + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                  - 2. * exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] );
+                 //cout<<" first " <<2. * exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )<<endl;
+                 //cout<< " second "<<2. * exactValue( omega[0] , x, tags[0] )<<endl;
             }
         }
     }
@@ -4703,7 +4725,9 @@ void PencilDcmp::modifyRhsDirichlet()
                 y = Ya + j * c2 + shift * c2 * 0.5;
                 P( i, j, k )
                 = P( i, j, k )
-                  + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                  - 2. * exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] );
+               
+               
             }
         }
     }
@@ -4728,7 +4752,7 @@ void PencilDcmp::modifyRhsDirichlet()
                 x = Xa + i * c1 + shift * c1 * 0.5;
                 P( i, j, k )
                 = P( i, j, k )
-                  + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                  - 2. * exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] );
             }
         }
     }
@@ -4752,7 +4776,7 @@ void PencilDcmp::modifyRhsDirichlet()
                 x = Xa + i * c1 + shift * c1 * 0.5;
                 P( i, j, k )
                 = P( i, j, k )
-                  + 2 * exactValue( omega[0] * x, tags[0] ) * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] );
+                  - 2. * exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] );
             }
         }
     }
@@ -5007,8 +5031,8 @@ int PencilDcmp::solveThmBatch( const int index )
             eig = getEigenVal( i, j );
 
             fillInArrayContig( i, j, index, x1 + i * nz );
+            //     cout<< RED<<"solve half Batch" <<RESET<<endl;
 
-            //     cout<< RED<<"solveThmBatch" <<RESET<<endl;
             if ( bc[4] != 'P' )
             {
                 T.thomasLowMem( x2 + i * nz, x1 + nz * i, eig, index );
@@ -5016,9 +5040,9 @@ int PencilDcmp::solveThmBatch( const int index )
             }
             else
             {
-//                T.shermanMorrisonThomasV1( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 0.0, 1.0, index );
+               // T.shermanMorrisonThomasV1( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
                 T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
-                // cout<< RED<<"solveThmBatch 0 N" <<RESET<<endl;
+               // cout<< RED<<"solveThmBatch 0 N" <<RESET<<endl;
             }
             fillInArrayBack( i, j, index, x1 + nz * i );
         }
@@ -5065,11 +5089,11 @@ int PencilDcmp::solveThmBatch( const int index )
         }
         else
         {
-            //  cout<< RED<<"solve full batch N" <<RESET<<endl;
+              cout<< RED<<"solve full batch N" <<RESET<<endl;
             //   this is too strong for enforcing boundries.
             //    T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3+l*nz ,eig, 0.0 ,-eig, index );
-           // T.shermanMorrisonThomasV1( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 0.0, 1.0, index );
-             T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 1.0, 1.0, index );
+            T.shermanMorrisonThomasV1( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 0.0, 1.0, index );
+           //T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 1.0, 1.0, index );
         }
 
         fillInArrayBack( i, j, index, x1 + nz * l );
@@ -5627,12 +5651,12 @@ void PencilDcmp::fillTrigonometric( double *rhs )
                     x = Xa + i * c1 + shift * c1 * .5;
                 }
 
-                rhs[i + j * Nx + Nx * Ny * k] = - 4.*pi*pi*sin(2.*pi*x) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] * x, tags[0] )
-                                                   * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
-                                                   + ( omega[1] * omega[1] ) * exactValue( omega[0] * x, tags[0] )
-                                                     * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] )
-                                                   + ( omega[2] * omega[2] ) * exactValue( omega[0] * x, tags[0] )
-                                                     * exactValue( omega[1] * y, tags[1] ) * exactValue( omega[2] * z, tags[2] ) )*/;
+                rhs[i + j * Nx + Nx * Ny * k] =  -4.*pi*pi*sin(2.*pi*z) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
+                                                   * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )
+                                                   + ( omega[1] * omega[1] ) * exactValue( omega[0] , x, tags[0] )
+                                                     * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )
+                                                   + ( omega[2] * omega[2] ) * exactValue( omega[0] , x, tags[0] )
+                                                     * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] ) )*/;
 /*
             if(i==0 || i==(Nz-1))
             {

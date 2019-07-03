@@ -1718,11 +1718,19 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
     b[2] = diag;
 
     // this inserted to prevent NN-NN-NN from blowing up
+
+ //   cout<<"bc_0 "<<bc[0]<<" bc_1 "<<bc[1]<<endl;
+// will revisit this condition soon 
+/*
     if ( fabs( diag + 2. ) < 1.e-10 )
-    {
-        return;
+    { 
+        cout<<RED<< "diag issue"<<RESET<<endl;
+//       exit(0);
+
+//        return;
     }
 
+*/
     // for Dirirchlet
     if ( bc[0] == 'D' )
     {
@@ -1732,6 +1740,8 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
     {
         b[2] = b[1] - 1.;
     }
+    
+
     // for Neumann, all modifications are done on the stencil
 
     if ( bc[0] == 'N' )

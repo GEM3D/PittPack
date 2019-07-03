@@ -249,10 +249,10 @@ void PoissonCPU::pittPack()
         {
             initializeTrigonometric();
         }
-        if ( bc[0] != 'P' && bc[2] != 'P' )
-        {
+     //   if ( bc[0] != 'P' && bc[2] != 'P' )
+      # if ( SOLVE!=0 )
             modifyRhsDirichlet();
-        }
+      #endif
 
         t1 = MPI_Wtime();
 

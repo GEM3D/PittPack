@@ -87,6 +87,14 @@ message( "${Red} HDF5 Library Found: ${ColourReset}" ${HDF5_INCLUDE_DIRS})
 message("${Green} 2. HDF5 Library : Found ${ColourReset}")
 endif()
 
+find_package(GOOGLETEST ${GOOGLETEST_MIN_VERSION} REQUIRED)
+if(GOOGLETEST_FOUND)
+include_directories(${GOOGLETEST_INCLUDE_DIRS})
+message( "${Red} Google Test Library Found: ${ColourReset}" ${GOOGLETEST_INCLUDE_DIRS})
+message("${Green} 2. Google Test Library : Found ${ColourReset}")
+endif()
+
+
 ###########################################################################
 #
 #                    SECTION: BUILD AND INSTALL

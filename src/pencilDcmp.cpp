@@ -2082,7 +2082,7 @@ double PencilDcmp::getError()
                                                  val1=P(i,j,k,1)-(sin(omega[1]*z)*sin(omega[1]*(x+y)));
                   */
                 // P(i,j,k)+=omega[1]*omega[1]*(sin(omega[1]*z)*sin(omega[1]*(x+y)));
- #if(0)
+ #if(INITANALYTIC==1)
                 if ( bc[0] == 'P' || bc[2] == 'P' )
                 {
                     val  = P( i, j, k, 0 ) - ( sine( omega[1] * z ) * cosine( omega[1] * ( x + y ) ) );
@@ -2112,10 +2112,11 @@ double PencilDcmp::getError()
                     }
 #endif
                 }
-#endif
+#else
                                  
                     val  = P( i, j, k, 0 ) - ( sine( 2.*pi* z ) );
                     val1=0.0;
+#endif
                 //                  cout<<"omega "<<omega[1]<<endl;
 
                 // cout<<"val 1 "<<val1<<endl;
@@ -4612,7 +4613,8 @@ void PencilDcmp::modifyRhsDirichlet()
     //double omega[3] = {pi*COEFF0, pi*COEFF1, pi*COEFF2};
     double omega[3] = {COEFF0 * pi, COEFF1 * pi, COEFF2 * pi};
     // double val;
-    
+   
+#if(DEBUG) 
      for(int i=0;i<5;i++)
      {  
      cout<<" fcetag "<<faceTag[i]<<endl;
@@ -4623,6 +4625,7 @@ void PencilDcmp::modifyRhsDirichlet()
      cout<<" omega = "<<omega[i]<<endl;
      }
 
+#endif
     // z direction, acting on facetags 5 and 6 with Zmin and Zmax
     if ( faceTag[4] == 1 )
     {
@@ -5089,7 +5092,7 @@ int PencilDcmp::solveThmBatch( const int index )
         }
         else
         {
-              cout<< RED<<"solve full batch N" <<RESET<<endl;
+              //cout<< RED<<"solve full batch N" <<RESET<<endl;
             //   this is too strong for enforcing boundries.
             //    T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3+l*nz ,eig, 0.0 ,-eig, index );
             T.shermanMorrisonThomasV1( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 0.0, 1.0, index );
@@ -5651,7 +5654,7 @@ void PencilDcmp::fillTrigonometric( double *rhs )
                     x = Xa + i * c1 + shift * c1 * .5;
                 }
 
-                rhs[i + j * Nx + Nx * Ny * k] =  -4.*pi*pi*sin(2.*pi*z) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
+                rhs[i + j * Nx + Nx * Ny * k] =  - 4.*pi*pi*sin(2.*pi*z) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
                                                    * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )
                                                    + ( omega[1] * omega[1] ) * exactValue( omega[0] , x, tags[0] )
                                                      * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )

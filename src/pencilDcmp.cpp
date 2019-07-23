@@ -2114,7 +2114,7 @@ double PencilDcmp::getError()
                 }
 #else
                                  
-                    val  = P( i, j, k, 0 ) - ( sine( 2.*pi* z ) );
+                    val  = P( i, j, k, 0 ) - ( cosine( 2.*pi* z ) );
                     val1=0.0;
 #endif
                 //                  cout<<"omega "<<omega[1]<<endl;
@@ -5563,6 +5563,8 @@ void PencilDcmp::assignRhs( double *rhs )
         c3 = dxyz[2];
     }
 
+//double sum=0.0;
+
 #if ( PITTPACKACC )
 #pragma acc data copy( rhs [0:Nx * Ny * Nz] ) copyin( Nz, Ny, Nx ) present( P.P [0:2 * Nx * Ny * Nz] )
 #endif
@@ -5583,13 +5585,61 @@ void PencilDcmp::assignRhs( double *rhs )
                 for ( int i = 0; i < Nx; i++ )
                 {
                     P( i, j, k, 0 ) = rhs[i + Nx * j + Nx * Ny * k]* c3 * c3;
+//                   P( i, j, k, 0 ) = rhs[i + Nx * j + Nx * Ny * k];
+//                   sum=sum+rhs[i + Nx * j + Nx * Ny * k];                   
                     P( i, j, k, 1 ) = 0.0;
  //                   cout<<P(i,j,k)<<endl;;
                 }
             }
         }
     }
+//cout<<" mean = "<<sum<<endl;
 }
+
+
+
+void PencilDcmp::subtractMeanValue( )
+{
+    int Nx = nxChunk;
+    int Ny = nyChunk;
+    int Nz = nz;
+    double sum=0.0;
+        for ( int k = 0; k < Nz; k++ )
+        {
+
+            for ( int j = 0; j < Ny; j++ )
+           {     
+		for ( int i = 0; i < Nx; i++ )
+                {
+                  sum=sum+P( i, j, k, 0 );
+                }
+           }
+
+        }
+mean=0.0;
+ 
+MPI_Allreduce( &sum, &mean, 1, MPI_DOUBLE, MPI_SUM,  MPI_COMM_WORLD);
+
+mean=mean/nxChunk/nyChunk/nzChunk/nChunk/nChunk/nChunk;
+
+ cout<<"mean value "<<mean<<endl;
+
+        for ( int k = 0; k < Nz; k++ )
+        {
+
+            for ( int j = 0; j < Ny; j++ )
+           {     
+		for ( int i = 0; i < Nx; i++ )
+                {
+                  P( i, j, k, 0 )-=mean;
+                }
+           }
+
+        }
+
+
+}
+
 
 void PencilDcmp::fillTrigonometric( double *rhs )
 {
@@ -5654,7 +5704,7 @@ void PencilDcmp::fillTrigonometric( double *rhs )
                     x = Xa + i * c1 + shift * c1 * .5;
                 }
 
-                rhs[i + j * Nx + Nx * Ny * k] =  - 4.*pi*pi*sin(2.*pi*z) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
+                rhs[i + j * Nx + Nx * Ny * k] =  - 4.*pi*pi*cos(2.*pi*z) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
                                                    * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )
                                                    + ( omega[1] * omega[1] ) * exactValue( omega[0] , x, tags[0] )
                                                      * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )

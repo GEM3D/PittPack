@@ -1717,20 +1717,24 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
     b[1] = diag;
     b[2] = diag;
 
+
     // this inserted to prevent NN-NN-NN from blowing up
+
 
  //   cout<<"bc_0 "<<bc[0]<<" bc_1 "<<bc[1]<<endl;
 // will revisit this condition soon 
+
 /*
     if ( fabs( diag + 2. ) < 1.e-10 )
     { 
         cout<<RED<< "diag issue"<<RESET<<endl;
 //       exit(0);
 
-//        return;
+        return;
     }
 
 */
+
     // for Dirirchlet
     if ( bc[0] == 'D' )
     {
@@ -1752,6 +1756,35 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
     {
         b[2] = b[1] + 1.0;
     }
+
+    if ( fabs( diag + 2. ) < 1.e-10 )
+    {
+/*
+  for ( int j =0; j < n; j++ )
+    {
+         cout  << rh[j] << endl;
+    }
+    cout  << b[0]<<" "<<b[1]<<" "<<b[2] << endl;
+*/
+    b[0]=1.0;
+   // rh[N-1]=0.0;
+    thomasLowMemNoBCV1( tmpMG, rh, b, index );
+/*
+    //  printf("singularity\n");
+    // exit(0);
+        cout  << " ============== " << endl;
+
+   for ( int j =0; j < n; j++ )
+    {
+         cout  << rh[j] << endl;
+    }
+  */   
+      return;
+    }
+
+   // cout  << " ============== " << endl;
+   // cout  << b[0]<<" "<<b[1]<<" "<<b[2] << endl;
+   // cout  << [0]<<" "<<b[1]<<" "<<b[2] << endl;
 
     rh[0] = rh[0] / ( bet = b[0] );
 
@@ -1784,7 +1817,16 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
     {
         rh[j] -= tmpMG[j + 1] * rh[j + 1];
         // cout << " j " << j << eNdl;
+    } 
+
+/*
+   cout  << " ============== " << endl;
+   for ( int j =0; j < n; j++ )
+    {
+         cout  << rh[j] << endl;
     }
+*/
+
 }
 
 
@@ -2128,9 +2170,10 @@ void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, d
     // enforcing boundary conditions here
     // note that supdiga[0]=0.0 and rh=0.0
 
-   /* 
-        rh[0]=0.0;
- 
+ // here we assume that due to the cyclic nature the value at the face is the average of the values at both ends
+ //
+        rh[0]=(rh[0]+rh[N-1])*0.5;
+/* 
         supDiag[0]=0.0;
     */
 
@@ -2208,20 +2251,22 @@ if(fabs(part2<1.e-6))
 
 #endif
 
-    //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<rh[0]<<" "<<rh[N-1]<<endl;
-    //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<endl;
    #if(0) 
+    //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<rh[0]<<" "<<rh[N-1]<<endl;
+        cout<<" ends index "<<index<<" eig "<<diag<<" "<<endl;
         cout<<" final solve "<<endl;
 
         for ( int i = 0; i < N; i++ )
         {
             cout<<rh[i]<<endl;
         } 
+/*
     if(fabs(rh[0]-rh[N-1])>1.e-6)
     {
      printf(" periodicity screwed up\n ");
      exit(0);
    }
+*/
 #endif
   
 }

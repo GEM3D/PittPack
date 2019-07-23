@@ -671,6 +671,11 @@ void PoissonCPU::pittPack()
             printf( "change ownership time =%lf percent of solution and take %lf seconds \n", t2_com / deT * 100., t2_com );
         }
     }
+
+if(ZERO_MEAN)
+{
+   subtractMeanValue( );
+}
 }
 
 /* absolute value version

@@ -11,9 +11,9 @@ Due to the FFT it limits the boundary conditions in the x and y directions to on
 
 ## Features
   * Hybrid MPI/OpenACC parallelization
-  * chunked Pencil Decomposition
-  * low-memory communication pattern via pairwise exchange
-  * User friendly interface   
+  * Chunked-Pencil Decomposition
+  * Low-memory communication pattern option via pairwise-exchange method
+  * User-friendly interface   
  
 
 ## Configuration 
@@ -39,7 +39,7 @@ PittPack requires the following libraries
   * ParaView (or VisIt) for visualization of the result
 
 ##  Build  
-PittPack uses CMakeLists.txt and CMakeModules folder to detect the library paths. <br/>
+PittPack uses *CMakeLists.txt* and *CMakeModules* folder to detect the library paths. <br/>
 These two components are crucial for complilation of PittPack.
 Perform the following steps
 ```
@@ -47,7 +47,7 @@ Perform the following steps
   cmake ..
   make -j 4
 ```
-the executable will be placed in /bin
+The executable will be placed in /bin folder
 
 
 ## Run
@@ -124,7 +124,7 @@ For complete documentation visit www.pittpack.com
 
 ## Notes 
 We welcome any feedbacks by the users and developers <br/>
-please read the LICENSE file for how to use this software
+Please read the LICENSE file for how to use this software
 
 ## Acknowledgements
 **PittPack** is developed as part of the GEM3D project funded by NSF at University of Pittsburgh, PA, USA. 

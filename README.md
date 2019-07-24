@@ -7,7 +7,7 @@ Automatically configures the code for Stampede2 (https://www.tacc.utexas.edu/sys
 
 ## Linux 
 ```
-source config.sh <br/> 
+source config.sh 
 ```
 When prompted respond by entering 0 or 1    
 * (0) : will configure PittPack for CPU clusters 

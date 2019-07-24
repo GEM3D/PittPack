@@ -42,7 +42,7 @@ mpirun -np NumberofProcs ./bin/PittPack nx ny nz
   * ny: Number of elements in Y-direction
   * nz: Number of elements in Z-direction
  
-## Directory
+## Directory structure
 ```
 PittPack
 │   README.md
@@ -51,11 +51,11 @@ PittPack
 │   config.sh
 │
 └─── CMakeModules
-│   │   FindPGI.cmake 
-│   │   FindMYMPI.cmake
-│   │   FindMYHDF5.cmake
-│   │   FindGOOGLETEST.cmake
-│   │   FindFFTW.cmake
+│   │   FindPGI.cmake: cmake script to find PGI 
+│   │   FindMYMPI.cmake: cmake script to find MPI
+│   │   FindMYHDF5.cmake: cmake script to find HDF5
+│   │   FindGOOGLETEST.cmake: cmake script to find Google Test
+│   │   FindFFTW.cmake: cmake script to find FFTW
 │
 └─── src
 │   │   chunkedArray.cpp 

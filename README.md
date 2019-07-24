@@ -6,10 +6,10 @@ It is developed as part of the GEM3D project funded by NSF at University of Pitt
 automatically configures the code for Stampede2 (TACC), Comet (SD) and Bridges (PSC) clusters 
 
 ## On the Linux Terminal do:
-### source config.sh 
-## When prompted respond by entering 0 or 1    
-###  0 will configure PittPack for CPU clusters 
-###  1 will configure PittPack for GPU clusters
+source config.sh <br/> 
+When prompted respond by entering 0 or 1    
+* 0 : will configure PittPack for CPU clusters 
+* 1 : will configure PittPack for GPU clusters
 
 
 

@@ -3,10 +3,7 @@ PittPack is an Open-Source Poisson’s Equation Solver for Extreme-Scale Computi
 It is developed as part of the GEM3D project funded by NSF at University of Pittsburgh, PA, USA. 
 
 # Configuration 
-## source config.sh 
 automatically configures the code for Stampede2 (TACC), Comet (SD) and Bridges (PSC) clusters 
-
-
 
 ## On the Linux Terminal do:
 ### source config.sh 
@@ -15,15 +12,14 @@ automatically configures the code for Stampede2 (TACC), Comet (SD) and Bridges (
 ###  1 will configure PittPack for GPU clusters
 
 
-for complete documentation visit www.pittpack.com
 
-
-## List of Required Libraries
-### cmake 
-### FFTW3 
-### PGI 
-### HDF5
-### MPI 
+# Installation
+PittPack requires the following libraries
+  * cmake 
+  * FFTW3 
+  * PGI 
+  * HDF5
+  * MPI 
 
 ## To Build 
 ### run ./config.sh
@@ -35,3 +31,4 @@ for complete documentation visit www.pittpack.com
 ## To run
 ### mpirun -np numberofProcs ./bin/PittPack nx ny nz 
  
+for complete documentation visit www.pittpack.com

@@ -6,7 +6,9 @@ It is developed as part of the GEM3D project funded by NSF at University of Pitt
 Automatically configures the code for Stampede2 (https://www.tacc.utexas.edu/systems/stampede2), Comet (https://www.sdsc.edu/services/hpc/hpc_systems.html) and Bridges (https://www.psc.edu/resources/computing/bridges) clusters 
 
 ## Linux 
+```
 source config.sh <br/> 
+```
 When prompted respond by entering 0 or 1    
 * (0) : will configure PittPack for CPU clusters 
 * (1) : will configure PittPack for GPU clusters

@@ -1,8 +1,11 @@
 # PittPack
-PittPack is an Open-Source Poisson’s Equation Solver for Extreme-Scale Computing with Accelerators
-It is developed at University of Pittsburgh as part of the GEM3D project funded by NSF
+PittPack is an Open-Source Poisson’s Equation Solver for Extreme-Scale Computing with Accelerators <br/>
+It is developed as part of the GEM3D project funded by NSF at University of Pittsburgh, PA, USA. 
 
-# Automatically configures the code to run on Stampede2 (TACC), Comet (SD) and Bridges (PSC)  
+## Configuration 
+# source config.sh 
+## automatically configures the code for Stampede2 (TACC), Comet (SD) and Bridges (PSC) clusters 
+
 
 
 ## On the Linux Terminal do:

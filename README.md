@@ -47,7 +47,7 @@ Perform the following steps
   cmake ..
   make -j 4
 ```
-The executable will be placed in /bin folder
+The executable will be placed in the /bin folder
 
 
 ## Run

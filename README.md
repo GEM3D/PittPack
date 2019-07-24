@@ -51,7 +51,9 @@ the executable will be placed in /bin
 
 
 ## Run
+```
 mpirun -np NumberofProcs ./bin/PittPack nx ny nz 
+```
   * nx: Number of elements in X-direction
   * ny: Number of elements in Y-direction
   * nz: Number of elements in Z-direction

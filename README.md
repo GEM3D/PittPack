@@ -58,17 +58,17 @@ PittPack
 │   │   FindFFTW.cmake: cmake script to find FFTW
 │
 └─── src
-│   │   chunkedArray.cpp 
-│   │   communicate.cpp
-│   │   mathFunction.cpp
-│   │   signalProc.cpp
-│   │   poissonCPU.cpp
-│   │   poissonGPU.cpp
-│   │   pencilDcmp.cpp
-│   │   triDiag.cpp    
-│   │   phdf5.cpp
+│   │   chunkedArray.cpp:  Abstracts access patterns 
+│   │   communicate.cpp:   MPI communications
+│   │   mathFunction.cpp:  Defines math functions for kernel generation by PGI
+│   │   signalProc.cpp:    Performs FFT transforms
+│   │   poissonCPU.cpp:    Inherits from class PencilDcmp and specialized for CPU
+│   │   poissonGPU.cpp:    Inherits from class PencilDcmp and specialized for GPU
+│   │   pencilDcmp.cpp:    Incorporates Decomposition strategy and communication patterns
+│   │   triDiag.cpp:       Class for tridiagonal solvers      
+│   │   phdf5.cpp:         Class for handling IO with hdf5     
 │   │  
-│   └─── include
+│   └─── include (headers)
 │       │   chunkedArray.hpp
 │       │   communicate.hpp  
 │       │   mathFunction.hpp
@@ -86,7 +86,7 @@ PittPack
 │  
 │
 └─── build   
-│       populated by cmake   
+│       Will be populated by cmake   
 │  
 │
 └─── soln 

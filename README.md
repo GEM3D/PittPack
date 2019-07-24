@@ -42,5 +42,25 @@ mpirun -np NumberofProcs ./bin/PittPack nx ny nz
   * ny: Number of elements in Y-direction
   * nz: Number of elements in Z-direction
  
+## Directory
+```
+PittPack
+│   README.md
+│   CmakeLists.txt    
+│
+└─── src
+│   │   file011.txt
+│   │   file012.txt
+│   │
+│   └─── include
+│       │   file111.txt
+│       │   file112.txt
+│       │   ...
+│   
+└─── bin
+    │   PittaPack (executable)
+    │   file022.txt
+```
+
 ## Detailed usage
 For complete documentation visit www.pittpack.com

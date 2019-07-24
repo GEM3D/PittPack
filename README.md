@@ -12,7 +12,7 @@ Due to the FFT it limits the boundary conditions in the x and y directions to on
 ## Features
   * Hybrid MPI/OpenACC parallelization
   * Chunked-Pencil Decomposition
-  * Low-memory communication pattern option via pairwise-exchange method
+  * Low-memory communication pattern option via pairwise-exchange algorithm
   * User-friendly interface   
  
 

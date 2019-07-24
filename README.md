@@ -22,7 +22,7 @@ PittPack requires the following libraries
   * FFTW3 
   * PGI  
   * HDF5 with Parallel IO
-
+  * ParaView (or VisIt) for visualization of the result
 
 ##  Build  
 PittPack uses CMakeLists.txt and CMakeModules folder to detect the library paths. <br/>
@@ -90,8 +90,8 @@ PittPack
 │  
 │
 └─── soln 
-│   │   Pxdmf3d1.h5 
-│   │   Pxdmf3d1.xmf
+│   │   Pxdmf3d1.h5: outputs the file in hdf5 format 
+│   │   Pxdmf3d1.xmf: meta data to be used by ParaView
 │   
 └─── archives
  

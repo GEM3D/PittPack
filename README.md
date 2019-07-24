@@ -119,14 +119,14 @@ PittPack
  
 ```
 
-## Detailed usage
+## Details
 For complete documentation visit www.pittpack.com
 
 ## Notes 
 We welcome any feedbacks by the users and developers <br/>
 please read the LICENSE file for how to use this software
 
-## Acknowlegements
+## Acknowledgements
 **PittPack** is developed as part of the GEM3D project funded by NSF at University of Pittsburgh, PA, USA. 
 
 

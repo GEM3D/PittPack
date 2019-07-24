@@ -29,7 +29,6 @@ PittPack uses CMakeLists.txt and CMakeModules folder to detect the library paths
 These two components are crucial for complilation of PittPack.
 Perform the following steps
 ```
-  source config.sh
   cd build
   cmake ..
   make -j 4

@@ -1,6 +1,5 @@
 # Synopsis
 **PittPack** is an Open-Source Poisson’s Equation Solver for Extreme-Scale Computing with Accelerators <br/>
-**PittPack** is developed as part of the GEM3D project funded by NSF at University of Pittsburgh, PA, USA. 
 The main goal is to solve the Poisson's equation with second order accuracy on uniform cartesian gird for conventional
 as well as accelerated clusters. It uses two FFT transforms in x and y directions along with the tridiagonal solve in z direction.
 Due to the FFT it limits the boundary conditions in the x and y directions to one of the following combinations
@@ -9,7 +8,6 @@ Due to the FFT it limits the boundary conditions in the x and y directions to on
   * Neumann-Dirichlet
   * Dirichlet-Dirichlet
  
-
 
 ## Features
   * Hybrid MPI/OpenACC parallelization
@@ -125,6 +123,10 @@ For complete documentation visit www.pittpack.com
 ## Notes 
 We welcome any feedbacks by the users and developers <br/>
 please read the LICENSE file for how to use this software
+
+## Acknowlegements
+**PittPack** is developed as part of the GEM3D project funded by NSF at University of Pittsburgh, PA, USA. 
+
 
 ## Contributors
   * Jaber J. Hasbestan (jaber@pitt.edu)

@@ -21,8 +21,8 @@ PittPack requires the following libraries
   * HDF5
   * MPI 
 
-## To Build 
-### run ./config.sh
+#  Build 
+### source config.sh
 ### cd build
 ### cmake ..
 ### make -j 4
@@ -31,4 +31,5 @@ PittPack requires the following libraries
 ## To run
 ### mpirun -np numberofProcs ./bin/PittPack nx ny nz 
  
+# Detaled usage
 for complete documentation visit www.pittpack.com

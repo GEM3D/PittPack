@@ -46,28 +46,54 @@ mpirun -np NumberofProcs ./bin/PittPack nx ny nz
 ```
 PittPack
 │   README.md
-│   CmakeLists.txt    
+│   CMakeLists.txt    
 │   LICENSE
 │   config.sh
 │
+└─── CMakeModules
+│   │   FindPGI.cmake 
+│   │   FindMYMPI.cmake
+│   │   FindMYHDF5.cmake
+│   │   FindGOOGLETEST.cmake
+│   │   FindFFTW.cmake
+│
 └─── src
-│   │   file011.txt
-│   │   file012.txt
-│   │   
-│   │
-│   │
+│   │   chunkedArray.cpp 
+│   │   communicate.cpp
+│   │   mathFunction.cpp
+│   │   signalProc.cpp
+│   │   poissonCPU.cpp
+│   │   poissonGPU.cpp
+│   │   pencilDcmp.cpp
+│   │   triDiag.cpp    
+│   │   phdf5.cpp
+│   │  
 │   └─── include
-│       │   file111.txt
-│       │   file112.txt
-│       │   ...
+│       │   chunkedArray.hpp
+│       │   communicate.hpp  
+│       │   mathFunction.hpp
+│       │   signalProc.hpp
+│       │   poissonCPU.hpp
+│       │   poissonGPU.hpp
+│       │   pencilDcmp.hpp
+│       │   triDiag.hpp 
+│       │   phdf5.hpp
+│       │   params.h 
+│       │   definitions.h 
 │   
 └─── bin
 │       PittPack (executable)  
 │  
 │
-└───   
-
-
+└─── build   
+│       populated by cmake   
+│  
+│
+└─── soln 
+│   │   Pxdmf3d1.h5 
+│   │   Pxdmf3d1.xmf
+│   
+└─── archives
  
 ```
 

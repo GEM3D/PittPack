@@ -45,15 +45,16 @@ Perform the following steps
 ```
   cd build
   cmake ..
-  make -j 4
+  make 
 ```
 The executable will be placed in the /bin folder
 
 
 ## Run
 ```
-mpirun -np NumberofProcs ./bin/PittPack nx ny nz 
+mpirun -np N ./bin/PittPack nx ny nz 
 ```
+  * N: Number of processes (squared integer)
   * nx: Number of elements in X-direction
   * ny: Number of elements in Y-direction
   * nz: Number of elements in Z-direction

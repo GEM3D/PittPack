@@ -2,6 +2,14 @@
 PittPack is an Open-Source Poisson’s Equation Solver for Extreme-Scale Computing with Accelerators <br/>
 It is developed as part of the GEM3D project funded by NSF at University of Pittsburgh, PA, USA. 
 
+
+# Features
+  * Hybrid MPI/OpenACC parallelization
+  * chunked Pencil Decomposition
+  * low-memory communication pattern via pairwise exchange
+  * User friendly interface   
+ 
+
 ## Configuration 
 Automatically configures the code for Stampede2 (https://www.tacc.utexas.edu/systems/stampede2), Comet (https://www.sdsc.edu/services/hpc/hpc_systems.html) and Bridges (https://www.psc.edu/resources/computing/bridges) clusters 
 
@@ -42,6 +50,12 @@ mpirun -np NumberofProcs ./bin/PittPack nx ny nz
   * ny: Number of elements in Y-direction
   * nz: Number of elements in Z-direction
  
+## Visualization
+  * The output is written to the /soln folder 
+  * Paraview should be used to visualize the solution
+  * Simply open the file ending with xmf in soln/ 
+
+
 ## Directory structure
 ```
 PittPack
@@ -99,3 +113,12 @@ PittPack
 
 ## Detailed usage
 For complete documentation visit www.pittpack.com
+
+## Notes 
+We welcome any feedbacks by the users and developers <br/>
+please read the LICENSE file for how to use this software
+
+## Contributors
+  * Jaber J. Hasbestan (jaber@pitt.edu)
+  * Inanc Senocak (senocak@pitt.edu)
+

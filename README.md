@@ -3,7 +3,7 @@ PittPack is an Open-Source Poisson’s Equation Solver for Extreme-Scale Computi
 It is developed as part of the GEM3D project funded by NSF at University of Pittsburgh, PA, USA. 
 
 
-# Features
+## Features
   * Hybrid MPI/OpenACC parallelization
   * chunked Pencil Decomposition
   * low-memory communication pattern via pairwise exchange

@@ -128,7 +128,8 @@ We welcome any feedbacks by the users and developers <br/>
 Please read the LICENSE file for how to use this software
 
 ## Acknowledgements
-**PittPack** is developed as part of the NSF-GEM3D Award No. 1440638 developed at Department of Mechanical Engineering at University Pittsburgh, PA, USA. 
+**PittPack** is developed as part of the NSF-GEM3D Award No. 1440638. <br/>
+It is developed at the Department of Mechanical Engineering at University Pittsburgh, PA, USA. 
 
 
 ## Contributors

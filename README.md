@@ -47,10 +47,14 @@ mpirun -np NumberofProcs ./bin/PittPack nx ny nz
 PittPack
 │   README.md
 │   CmakeLists.txt    
+│   LICENSE
+│   config.sh
 │
 └─── src
 │   │   file011.txt
 │   │   file012.txt
+│   │   
+│   │
 │   │
 │   └─── include
 │       │   file111.txt
@@ -58,8 +62,13 @@ PittPack
 │       │   ...
 │   
 └─── bin
-    │   PittaPack (executable)
-    │   file022.txt
+│       PittPack (executable)  
+│  
+│
+└───   
+
+
+ 
 ```
 
 ## Detailed usage

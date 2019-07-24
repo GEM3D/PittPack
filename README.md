@@ -2,7 +2,7 @@
 PittPack is an Open-Source Poisson’s Equation Solver for Extreme-Scale Computing with Accelerators <br/>
 It is developed as part of the GEM3D project funded by NSF at University of Pittsburgh, PA, USA. 
 
-# Configuration 
+## Configuration 
 Automatically configures the code for Stampede2 (https://www.tacc.utexas.edu/systems/stampede2), Comet (https://www.sdsc.edu/services/hpc/hpc_systems.html) and Bridges (https://www.psc.edu/resources/computing/bridges) clusters 
 
 ## Linux 
@@ -13,7 +13,7 @@ When prompted respond by entering 0 or 1
 
 
 
-# Installation
+## Installation
 PittPack requires the following libraries
   * cmake 
   * MPI 
@@ -22,7 +22,7 @@ PittPack requires the following libraries
   * HDF5 with Parallel IO
 
 
-#  Build  
+##  Build  
 PittPack uses CMakeLists.txt and CMakeModules folder to detect the library paths. <br/>
 These two components are crucial for complilation of PittPack.
 Perform the following steps
@@ -33,11 +33,11 @@ Perform the following steps
 the executable will be placed in /bin
 
 
-# Run
+## Run
 mpirun -np NumberofProcs ./bin/PittPack nx ny nz 
   * nx: Number of elements in X-direction
   * ny: Number of elements in Y-direction
   * nz: Number of elements in Z-direction
  
-# Detailed usage
+## Detailed usage
 For complete documentation visit www.pittpack.com

@@ -1566,8 +1566,6 @@ void TriDiag::thomasLowMemNoBCV2( double *tmpMG, double *rh, double *diag, int i
 {
     double bet;
 
-   
-
     //   double a[3],c[3];
     double b[3];
 
@@ -1588,9 +1586,9 @@ void TriDiag::thomasLowMemNoBCV2( double *tmpMG, double *rh, double *diag, int i
 
     rh[0] = rh[0] / ( bet = b[0] );
 
-    int j    = 1;
-    //tmpMG[j] = supDiag[j - 1] / bet;
-    //periodic only, supDiag[0]=0.0
+    int j = 1;
+    // tmpMG[j] = supDiag[j - 1] / bet;
+    // periodic only, supDiag[0]=0.0
     tmpMG[j] = 0.0;
     bet      = b[1] - subDiag[1] * tmpMG[j];
     rh[1]    = ( rh[1] - subDiag[1] * rh[j - 1] ) / bet;
@@ -1608,9 +1606,9 @@ void TriDiag::thomasLowMemNoBCV2( double *tmpMG, double *rh, double *diag, int i
 
     j        = N - 1;
     tmpMG[j] = supDiag[1] / bet;
-    
-    bet      = b[2] -0.0* subDiag[2] * tmpMG[j];
-    rh[j]    = ( rh[j] - 0.*subDiag[2] * rh[j - 1] ) / bet;
+
+    bet   = b[2] - 0.0 * subDiag[2] * tmpMG[j];
+    rh[j] = ( rh[j] - 0. * subDiag[2] * rh[j - 1] ) / bet;
 
     //  cout << a[2] << " " << b[2] << eNdl;
     //  cout<<RED<<rh[0]<<RESET<<endl;
@@ -1632,8 +1630,6 @@ void TriDiag::thomasLowMemNoBCV1( double *tmpMG, double *rh, double *diag, int i
 {
     double bet;
 
-   
-
     //   double a[3],c[3];
     double b[3];
 
@@ -1654,9 +1650,9 @@ void TriDiag::thomasLowMemNoBCV1( double *tmpMG, double *rh, double *diag, int i
 
     rh[0] = rh[0] / ( bet = b[0] );
 
-    int j    = 1;
-    //tmpMG[j] = supDiag[j - 1] / bet;
-    //periodic only, supDiag[0]=0.0
+    int j = 1;
+    // tmpMG[j] = supDiag[j - 1] / bet;
+    // periodic only, supDiag[0]=0.0
     tmpMG[j] = 0.0;
     bet      = b[1] - subDiag[1] * tmpMG[j];
     rh[1]    = ( rh[1] - subDiag[1] * rh[j - 1] ) / bet;
@@ -1717,23 +1713,21 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
     b[1] = diag;
     b[2] = diag;
 
-
     // this inserted to prevent NN-NN-NN from blowing up
 
+    //   cout<<"bc_0 "<<bc[0]<<" bc_1 "<<bc[1]<<endl;
+    // will revisit this condition soon
 
- //   cout<<"bc_0 "<<bc[0]<<" bc_1 "<<bc[1]<<endl;
-// will revisit this condition soon 
+    /*
+        if ( fabs( diag + 2. ) < 1.e-10 )
+        {
+            cout<<RED<< "diag issue"<<RESET<<endl;
+    //       exit(0);
 
-/*
-    if ( fabs( diag + 2. ) < 1.e-10 )
-    { 
-        cout<<RED<< "diag issue"<<RESET<<endl;
-//       exit(0);
+            return;
+        }
 
-        return;
-    }
-
-*/
+    */
 
     // for Dirirchlet
     if ( bc[0] == 'D' )
@@ -1744,7 +1738,6 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
     {
         b[2] = b[1] - 1.;
     }
-    
 
     // for Neumann, all modifications are done on the stencil
 
@@ -1759,32 +1752,32 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
 
     if ( fabs( diag + 2. ) < 1.e-10 )
     {
-/*
-  for ( int j =0; j < n; j++ )
-    {
-         cout  << rh[j] << endl;
-    }
-    cout  << b[0]<<" "<<b[1]<<" "<<b[2] << endl;
-*/
-    b[0]=1.0;
-   // rh[N-1]=0.0;
-    thomasLowMemNoBCV1( tmpMG, rh, b, index );
-/*
-    //  printf("singularity\n");
-    // exit(0);
-        cout  << " ============== " << endl;
+        /*
+          for ( int j =0; j < n; j++ )
+            {
+                 cout  << rh[j] << endl;
+            }
+            cout  << b[0]<<" "<<b[1]<<" "<<b[2] << endl;
+        */
+        b[0] = 1.0;
+        // rh[N-1]=0.0;
+        thomasLowMemNoBCV1( tmpMG, rh, b, index );
+        /*
+            //  printf("singularity\n");
+            // exit(0);
+                cout  << " ============== " << endl;
 
-   for ( int j =0; j < n; j++ )
-    {
-         cout  << rh[j] << endl;
-    }
-  */   
-      return;
+           for ( int j =0; j < n; j++ )
+            {
+                 cout  << rh[j] << endl;
+            }
+          */
+        return;
     }
 
-   // cout  << " ============== " << endl;
-   // cout  << b[0]<<" "<<b[1]<<" "<<b[2] << endl;
-   // cout  << [0]<<" "<<b[1]<<" "<<b[2] << endl;
+    // cout  << " ============== " << endl;
+    // cout  << b[0]<<" "<<b[1]<<" "<<b[2] << endl;
+    // cout  << [0]<<" "<<b[1]<<" "<<b[2] << endl;
 
     rh[0] = rh[0] / ( bet = b[0] );
 
@@ -1817,18 +1810,16 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
     {
         rh[j] -= tmpMG[j + 1] * rh[j + 1];
         // cout << " j " << j << eNdl;
-    } 
-
-/*
-   cout  << " ============== " << endl;
-   for ( int j =0; j < n; j++ )
-    {
-         cout  << rh[j] << endl;
     }
-*/
 
+    /*
+       cout  << " ============== " << endl;
+       for ( int j =0; j < n; j++ )
+        {
+             cout  << rh[j] << endl;
+        }
+    */
 }
-
 
 //  no boundary version
 #if ( PITTPACKACC )
@@ -1837,8 +1828,6 @@ void TriDiag::thomasLowMem( double *tmpMG, double *rh, double diag, int index )
 void TriDiag::thomasLowMemNoBC( double *tmpMG, double *rh, double *diag, int index )
 {
     double bet;
-
-   
 
     //   double a[3],c[3];
     double b[3];
@@ -1862,10 +1851,10 @@ void TriDiag::thomasLowMemNoBC( double *tmpMG, double *rh, double *diag, int ind
 
     int j    = 1;
     tmpMG[j] = supDiag[j - 1] / bet;
-    //periodic only, supDiag[0]=0.0
-    //tmpMG[j] = 0.0;
-    bet      = b[1] - subDiag[1] * tmpMG[j];
-    rh[1]    = ( rh[1] - subDiag[1] * rh[j - 1] ) / bet;
+    // periodic only, supDiag[0]=0.0
+    // tmpMG[j] = 0.0;
+    bet   = b[1] - subDiag[1] * tmpMG[j];
+    rh[1] = ( rh[1] - subDiag[1] * rh[j - 1] ) / bet;
 
 #if ( PITTPACKACC )
 #pragma acc loop seq
@@ -1959,17 +1948,12 @@ void TriDiag::thomasLowMem( int N, double *a, double *b, double *c, double *r, d
 #endif
 void TriDiag::enforceZeroMean( double *tmpMG, double *rh, double *diag, int index )
 {
-
     int N = nChunk * nzChunk;
-       
-        rh[0]=0.0;
-        rh[N-1]=0.0; 
-        thomasLowMemNoBCV2( tmpMG, rh, diag, index );
 
+    rh[0]     = 0.0;
+    rh[N - 1] = 0.0;
+    thomasLowMemNoBCV2( tmpMG, rh, diag, index );
 }
-
-
-
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
@@ -1998,7 +1982,7 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
 #pragma acc loop seq
 #endif
     {
-// this is due to the fact that -1 0 ..... 1 =0 in periodic
+        // this is due to the fact that -1 0 ..... 1 =0 in periodic
         b[0] = diag;
         b[1] = diag;
         b[2] = diag;
@@ -2018,29 +2002,29 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
     // enforcing boundary conditions here
     // note that supdiga[0]=0.0 and rh=0.0
 
-/*    
-        rh[0]=0.0;
+    /*
+            rh[0]=0.0;
 
-        supDiag[0]=0.0;
-    */
+            supDiag[0]=0.0;
+        */
 
     // this will remove the singularity for the corner that we set the calue as zero
-int counter=0;
-#if(1)
+    int counter = 0;
+#if ( 1 )
     if ( fabs( diag + 2. ) < 1.e-10 )
     {
-      //    cout<<" first solve's diag "<<diag<<endl;
-      // enforceZeroMean( tmpMG, rh, b, index );      
-      //  for ( int i = 0; i < N; i++ )
-      //  {
-      //          cout<<rh[i]<<endl;
-      //  }
-//cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
-// only when there is singularity remove it
-      shermanMorrisonThomasV1( tmpMG, rh, rh1, diag, 1.0, 1.0, index );
+        //    cout<<" first solve's diag "<<diag<<endl;
+        // enforceZeroMean( tmpMG, rh, b, index );
+        //  for ( int i = 0; i < N; i++ )
+        //  {
+        //          cout<<rh[i]<<endl;
+        //  }
+        // cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
+        // only when there is singularity remove it
+        shermanMorrisonThomasV1( tmpMG, rh, rh1, diag, 1.0, 1.0, index );
 
-      counter++;
-  return;
+        counter++;
+        return;
     }
 #endif
     thomasLowMemNoBC( tmpMG, rh, bb, index );
@@ -2065,14 +2049,14 @@ int counter=0;
     }
 
     thomasLowMemNoBC( tmpMG, rh1, bb, index );
-    
-/*
-       cout<<" second solve "<<endl;
-        for ( int i = 0; i < N; i++ )
-        {
-            cout<<rh1[i]<<endl;
-        }
-  */  
+
+    /*
+           cout<<" second solve "<<endl;
+            for ( int i = 0; i < N; i++ )
+            {
+                cout<<rh1[i]<<endl;
+            }
+      */
 
     // move this for gang parallelism
     // in the future
@@ -2106,27 +2090,27 @@ if(fabs(part2<1.e-6))
 
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<rh[0]<<" "<<rh[N-1]<<endl;
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<endl;
-/*    
-        cout<<" final solve "<<endl;
+    /*
+            cout<<" final solve "<<endl;
 
-        for ( int i = 0; i < N; i++ )
-        {
-            cout<<rh[i]<<endl;
-        }
-  */  
- #if(0)   
-    if(fabs(rh[0]-rh[N-1])>1.e-6)
+            for ( int i = 0; i < N; i++ )
+            {
+                cout<<rh[i]<<endl;
+            }
+      */
+#if ( 0 )
+    if ( fabs( rh[0] - rh[N - 1] ) > 1.e-6 )
     {
-     printf(" periodicity screwed up\n ");
-     exit(0);
-   }
+        printf( " periodicity screwed up\n " );
+        exit( 0 );
+    }
 #endif
-  
 }
 #if ( PITTPACKACC )
 #pragma acc routine seq
 #endif
-void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, double diag, const double alpha, const double beta, int index )
+void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, double diag, const double alpha, const double beta,
+                                       int index )
 {
     int N = nChunk * nzChunk;
 
@@ -2150,7 +2134,7 @@ void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, d
 #pragma acc loop seq
 #endif
     {
-// this is due to the fact that -1 0 ..... 1 =0 in periodic
+        // this is due to the fact that -1 0 ..... 1 =0 in periodic
         b[0] = 1.0;
         b[1] = diag;
         b[2] = diag;
@@ -2170,24 +2154,24 @@ void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, d
     // enforcing boundary conditions here
     // note that supdiga[0]=0.0 and rh=0.0
 
- // here we assume that due to the cyclic nature the value at the face is the average of the values at both ends
- //
-        rh[0]=(rh[0]+rh[N-1])*0.5;
-/* 
-        supDiag[0]=0.0;
-    */
+    // here we assume that due to the cyclic nature the value at the face is the average of the values at both ends
+    //
+    rh[0] = ( rh[0] + rh[N - 1] ) * 0.5;
+    /*
+            supDiag[0]=0.0;
+        */
 
     // this will remove the singularity for the corner that we set the calue as zero
-#if(0)
+#if ( 0 )
 
     if ( fabs( diag + 2. ) < 1.e-10 )
     {
-          cout<<"rhs before first solve's "<<diag<<endl;
+        cout << "rhs before first solve's " << diag << endl;
         for ( int i = 0; i < N; i++ )
         {
-                cout<<rh[i]<<endl;
+            cout << rh[i] << endl;
         }
-  //      return;
+        //      return;
     }
 #endif
     thomasLowMemNoBCV1( tmpMG, rh, bb, index );
@@ -2212,14 +2196,14 @@ void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, d
     }
 
     thomasLowMemNoBCV1( tmpMG, rh1, bb, index );
-    
-/*
-       cout<<" second solve "<<endl;
-        for ( int i = 0; i < N; i++ )
-        {
-            cout<<rh1[i]<<endl;
-        }
-  */  
+
+    /*
+           cout<<" second solve "<<endl;
+            for ( int i = 0; i < N; i++ )
+            {
+                cout<<rh1[i]<<endl;
+            }
+      */
 
     // move this for gang parallelism
     // in the future
@@ -2251,15 +2235,15 @@ if(fabs(part2<1.e-6))
 
 #endif
 
-   #if(0) 
+#if ( 0 )
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<rh[0]<<" "<<rh[N-1]<<endl;
-        cout<<" ends index "<<index<<" eig "<<diag<<" "<<endl;
-        cout<<" final solve "<<endl;
+    cout << " ends index " << index << " eig " << diag << " " << endl;
+    cout << " final solve " << endl;
 
-        for ( int i = 0; i < N; i++ )
-        {
-            cout<<rh[i]<<endl;
-        } 
+    for ( int i = 0; i < N; i++ )
+    {
+        cout << rh[i] << endl;
+    }
 /*
     if(fabs(rh[0]-rh[N-1])>1.e-6)
     {
@@ -2268,5 +2252,4 @@ if(fabs(part2<1.e-6))
    }
 */
 #endif
-  
 }

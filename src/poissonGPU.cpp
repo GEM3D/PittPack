@@ -187,7 +187,7 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
             {
                 cout << "amount of free memory after init = " << acc_get_free_memory() / 1e9 << endl;
             }
-         //   if ( bc[0] != 'P' && bc[2] != 'P' )
+            //   if ( bc[0] != 'P' && bc[2] != 'P' )
             {
 #pragma acc parallel num_gangs( 1024 ) vector_length( VECLENGTH )
                 modifyRhsDirichlet();
@@ -685,11 +685,10 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 
     P.moveDeviceToHost();
 
-if(ZERO_MEAN)
-{
-   subtractMeanValue( );
-}
-
+    if ( ZERO_MEAN )
+    {
+        subtractMeanValue();
+    }
 
 #if ( DEBUG2 )
     printX( myfile );

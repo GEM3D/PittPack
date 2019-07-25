@@ -249,10 +249,10 @@ void PoissonCPU::pittPack()
         {
             initializeTrigonometric();
         }
-     //   if ( bc[0] != 'P' && bc[2] != 'P' )
-      # if ( SOLVE!=0 )
-            modifyRhsDirichlet();
-      #endif
+        //   if ( bc[0] != 'P' && bc[2] != 'P' )
+#if ( SOLVE != 0 )
+        modifyRhsDirichlet();
+#endif
 
         t1 = MPI_Wtime();
 
@@ -672,10 +672,10 @@ void PoissonCPU::pittPack()
         }
     }
 
-if(ZERO_MEAN)
-{
-   subtractMeanValue( );
-}
+    if ( ZERO_MEAN )
+    {
+        subtractMeanValue();
+    }
 }
 
 /* absolute value version

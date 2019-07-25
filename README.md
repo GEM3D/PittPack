@@ -92,6 +92,7 @@ PittPack
 │   │   phdf5.cpp:         Class for handling IO with hdf5     
 │   │  
 │   └─── include (headers)
+│       │   pittpack.h     
 │       │   chunkedArray.hpp
 │       │   communicate.hpp  
 │       │   mathFunction.hpp

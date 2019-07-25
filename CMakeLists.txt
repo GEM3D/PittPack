@@ -122,7 +122,7 @@ set(EXECUTABLE_OUTPUT_PATH ${dir}/bin)
 # have to hardcode the directories for I/O operations and hence ensure
 # portability
 
-set(HEADER_FILES    "${dir}/src/include/communicate.hpp"  "${dir}/src/include/pencilDcmp.hpp"  "${dir}/src/include/definitions.h"  "${dir}/src/include/datatype.h" "${dir}/src/include/chunkedArray.hpp" "${dir}/src/include/phdf5.hpp"   "${dir}/src/include/params.h"  "${dir}/src/include/signalProc.hpp"  "${dir}/src/include/mathFunction.hpp"  "${dir}/src/include/multiGrid.hpp" )
+set(HEADER_FILES    "${dir}/src/include/communicate.hpp"  "${dir}/src/include/pencilDcmp.hpp"  "${dir}/src/include/definitions.h"  "${dir}/src/include/datatype.h" "${dir}/src/include/chunkedArray.hpp" "${dir}/src/include/phdf5.hpp"   "${dir}/src/include/params.h"  "${dir}/src/include/signalProc.hpp"  "${dir}/src/include/mathFunction.hpp"  "${dir}/src/include/multiGrid.hpp"   "${dir}/src/include/pittpack.h")
 
 message("header files" ${HEADER_FILES})
 

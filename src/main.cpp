@@ -1,11 +1,4 @@
-#include "mpi.h"
-#include "params.h"
-#include "pencilDcmp.hpp"
-#include "phdf5.hpp"
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include "gtest/gtest.h"
+#include "pittpack.h"
 
 /*!  \mainpage
  *

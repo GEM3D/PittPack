@@ -54,7 +54,7 @@ The executable will be placed in the /bin folder
 ```
 mpirun -np N ./bin/PittPack nx ny nz 
 ```
-  * N: Number of processes (squared integer)
+  * N: Number of processes (squared number)
   * nx: Number of elements in X-direction
   * ny: Number of elements in Y-direction
   * nz: Number of elements in Z-direction

@@ -1,20 +1,18 @@
 # Synopsis
-**PittPack** is an Open-Source Poisson’s Equation Solver for Extreme-Scale Computing with Accelerators <br/>
-The main goal is to solve the Poisson's equation with second order accuracy on directionally uniform Cartesian gird for conventional
-as well as accelerated clusters. It uses two FFT transforms in x and y directions along with the tridiagonal solve in z direction.
-Due to the FFT it limits the boundary conditions in the x and y directions to one of the following combinations
+**PittPack** is an open-source Poisson’s equation solver for extreme-scale computing with accelerators <br/>
+The main goal is to solve the Poisson's equation with second order accuracy on a directionally uniform Cartesian grid on CPU or GPU 
+clusters. PittPack uses two FFT transforms in x and y directions along with a tridiagonal solve in the z direction.
+Due to FFT, it limits the boundary conditions in the x and y directions to one of the following combinations
   * Periodic
   * Neumann-Neumann
   * Neumann-Dirichlet
   * Dirichlet-Dirichlet
- 
 
 ## Features
   * Hybrid MPI/OpenACC parallelization
   * Chunked-Pencil Decomposition
   * Low-memory communication pattern option via pairwise-exchange algorithm
   * User-friendly interface   
- 
 
 ## Configuration 
 PittPack provides config.sh which can be used to automatically configure the code for Stampede2 (https://www.tacc.utexas.edu/systems/stampede2), Comet (https://www.sdsc.edu/services/hpc/hpc_systems.html) and Bridges (https://www.psc.edu/resources/computing/bridges) clusters 
@@ -61,8 +59,8 @@ mpirun -np N ./bin/PittPack nx ny nz
  
 ## Visualization
   * The output is written to the /soln folder 
-  * Paraview should be used to visualize the solution
-  * Simply open the file ending with xmf in soln/ 
+  * Paraview can be used to visualize the solution
+  * Simply open the file ending with xdmf in soln/ 
 
 
 ## Directory structure

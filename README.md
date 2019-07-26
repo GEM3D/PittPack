@@ -1,5 +1,5 @@
 # Synopsis
-**PittPack** is an open-source Poisson’s equation solver for extreme-scale computing with accelerators <br/>
+**PittPack** is an open-source Poisson’s equation solver for extreme-scale computing with accelerators. <br/>
 The main goal is to solve the Poisson's equation with second order accuracy on a directionally uniform Cartesian grid on CPU or GPU 
 clusters. PittPack uses two FFT transforms in x and y directions along with a tridiagonal solve in the z direction.
 Due to FFT, it limits the boundary conditions in the x and y directions to one of the following combinations

@@ -31,10 +31,10 @@ When prompted respond by entering 0 or 1
 PittPack requires the following libraries
   * cmake 
   * MPI 
-  * FFTW3 
-  * PGI  
+  * FFTW3
+  * cuFFT
+  * OpenACC (available through the PGI C++ compiler)  
   * HDF5 with Parallel IO
-  * ParaView (or VisIt) for visualization of the result
 
 ##  Build  
 PittPack uses *CMakeLists.txt* and *CMakeModules* folder to detect the library paths. <br/>

@@ -54,6 +54,9 @@ void PoissonCPU::performTransformYdir()
 
     fftw_free( out );
     fftw_free( in );
+    fftw_destroy_plan(pl);
+    fftw_cleanup();
+
 }
 
 void PoissonCPU::performInverseTransformYdir()
@@ -77,6 +80,10 @@ void PoissonCPU::performInverseTransformYdir()
 
     fftw_free( out );
     fftw_free( in );
+    fftw_destroy_plan(pl);
+    fftw_cleanup();
+
+
 }
 
 void PoissonCPU::readXLine( int j, fftw_complex *out )
@@ -165,6 +172,10 @@ void PoissonCPU::performInverseTransformXdir()
 
     fftw_free( out );
     fftw_free( in );
+    fftw_destroy_plan(pl);
+    fftw_cleanup();
+
+
 }
 
 void PoissonCPU::performTransformXdir()
@@ -215,6 +226,10 @@ void PoissonCPU::performTransformXdir()
     // cout<<RED<<nChunk << " "<<nxChunk<<RESET<<endl;
     fftw_free( out );
     fftw_free( in );
+    fftw_destroy_plan(pl);
+    fftw_cleanup();
+
+
 }
 void PoissonCPU::pittPack()
 {
@@ -924,6 +939,9 @@ void PoissonCPU::testDST01()
 
         }
     */
+ fftw_destroy_plan(pl);
+    fftw_cleanup();
+
 
     cout << "complex transform" << endl;
 
@@ -1014,5 +1032,9 @@ void PoissonCPU::testDST10()
         //       cout << outC[i][0] <<"+ "<<outC[i][1]<<"i "<< endl;
         cout << out[i] << endl;
     }
+ fftw_destroy_plan(pl);
+    fftw_cleanup();
+
+
 }
 #endif

@@ -49,13 +49,16 @@ void PoissonCPU::performTransformYdir()
         pl = fftw_plan_dft_1d( nyChunk * nChunk, in, out, FFTW_FORWARD, FFTW_ESTIMATE );
 
         fftw_execute( pl );
+        
+        fftw_destroy_plan(pl);
+        fftw_cleanup();
         writeYLine( j, out );
     }
 
     fftw_free( out );
     fftw_free( in );
-    fftw_destroy_plan(pl);
-    fftw_cleanup();
+//    fftw_destroy_plan(pl);
+//    fftw_cleanup();
 
 }
 
@@ -75,15 +78,15 @@ void PoissonCPU::performInverseTransformYdir()
         pl = fftw_plan_dft_1d( nyChunk * nChunk, in, out, FFTW_BACKWARD, FFTW_ESTIMATE );
 
         fftw_execute( pl );
-        writeYLine( j, out );
+       fftw_destroy_plan(pl);
+       fftw_cleanup();
+
+       writeYLine( j, out );
     }
 
     
     fftw_free( out );
     fftw_free( in );
-    fftw_destroy_plan(pl);
-    fftw_cleanup();
-
 
 }
 
@@ -168,15 +171,16 @@ void PoissonCPU::performInverseTransformXdir()
         pl = fftw_plan_dft_1d( nxChunk * nChunk, in, out, FFTW_BACKWARD, FFTW_ESTIMATE );
 
         fftw_execute( pl );
+   fftw_destroy_plan(pl);
+    fftw_cleanup();
+
+
         writeXLine( j, out );
     }
 
     fftw_free( out );
     fftw_free( in );
-    fftw_destroy_plan(pl);
-    fftw_cleanup();
-
-
+ 
 }
 
 void PoissonCPU::performTransformXdir()
@@ -219,6 +223,9 @@ void PoissonCPU::performTransformXdir()
 #endif
 
         fftw_execute( pl );
+    fftw_destroy_plan(pl);
+    fftw_cleanup();
+
 
         writeXLine( j, out );
     }
@@ -227,9 +234,6 @@ void PoissonCPU::performTransformXdir()
     // cout<<RED<<nChunk << " "<<nxChunk<<RESET<<endl;
     fftw_free( out );
     fftw_free( in );
-    fftw_destroy_plan(pl);
-    fftw_cleanup();
-
 
 }
 void PoissonCPU::pittPack()

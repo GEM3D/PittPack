@@ -66,7 +66,7 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     MONITOR_MEM   = 0, /*!< set this to 1 to monitor memory usage at each level of solution  */
     PROFILE_COMM  = 0, /*!< Turn it on and it will report the amount of time spent for communication */
     NITER         = 10, /*!< Number of iteration for Poisson Solver*/
-    RUNINFO       =1, /* set this to one to write the report for the run*/
+    RUNINFO       =0, /* set this to one to write the report for the run*/
     ZERO_MEAN     = 0, /*!< To enforce the solution to have zero mean */ 
 
 };

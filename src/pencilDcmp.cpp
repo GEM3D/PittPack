@@ -193,11 +193,19 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
     MG.construct( ( nz + SIZEMG ), INNERITER, INNERITER, OUTERITER, subDiag, supDiag );
     MGC.construct( ( nz + SIZEMG ), INNERITER, INNERITER, OUTERITER, subDiag, supDiag );
 
+/*
     send_request = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
     send_status  = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
 
     recv_request = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
     recv_status  = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
+*/
+
+    send_request =new MPI_Request[p0];
+    send_status  =new MPI_Status[p0];
+
+    recv_request =new MPI_Request[p0];
+    recv_status  =new MPI_Status[p0];
 
 #if ( DEBUG )
     cout << "iaxsize " << iaxSize << endl;
@@ -390,11 +398,19 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
     MGC.construct( ( nz + SIZEMG ), INNERITER, INNERITER, OUTERITER, subDiag, supDiag );
 
     //    acc_map_data(P.P,P.P,2*nxChunk*nyChunk*nz*sizeof(double) );
-    send_request = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
+/*  
+  // avoid using free, use delete instead 
+  send_request = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
     send_status  = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
 
     recv_request = (MPI_Request *)malloc( sizeof( MPI_Request ) * ( p0 ) );
     recv_status  = (MPI_Status *)malloc( sizeof( MPI_Status ) * ( p0 ) );
+*/
+    send_request =new MPI_Request[p0];
+    send_status  =new MPI_Status[p0];
+
+    recv_request =new MPI_Request[p0];
+    recv_status  =new MPI_Status[p0];
 
 #if ( DEBUG )
     cout << "iaxsize " << iaxSize << endl;
@@ -601,11 +617,22 @@ PencilDcmp::~PencilDcmp()
             exit( 1 );
         }
     }
+
     delete[] send_request;
     delete[] send_status;
 
     delete[] recv_request;
     delete[] recv_status;
+
+    delete[] bc;
+    delete[] freqs;
+/*
+   free(send_request);
+    free(send_status);
+
+    free(recv_request);
+    free(recv_status);
+*/
 }
 
 //
@@ -2080,7 +2107,8 @@ double PencilDcmp::getError()
                                                  val1=P(i,j,k,1)-(sin(omega[1]*z)*sin(omega[1]*(x+y)));
                   */
                 // P(i,j,k)+=omega[1]*omega[1]*(sin(omega[1]*z)*sin(omega[1]*(x+y)));
-#if ( INITANALYTIC == 1 )
+if ( INITANALYTIC == 1 )
+{
                 if ( bc[0] == 'P' || bc[2] == 'P' )
                 {
                     val  = P( i, j, k, 0 ) - ( sine( omega[1] * z ) * cosine( omega[1] * ( x + y ) ) );
@@ -2110,11 +2138,13 @@ double PencilDcmp::getError()
                     }
 #endif
                 }
-#else
+}
+else
+{
 
                 val  = P( i, j, k, 0 ) - ( cosine( 2. * pi * z ) );
                 val1 = 0.0;
-#endif
+}
                 //                  cout<<"omega "<<omega[1]<<endl;
 
                 // cout<<"val 1 "<<val1<<endl;
@@ -4982,6 +5012,7 @@ void PencilDcmp::runInfo()
         PittOut << "---------------------------------------------------------\n" << endl;
         cout << "Grid size= [ " << nxChunk * nChunk << " * " << nyChunk * nChunk << " * " << nzChunk * nChunk << "], error = " << finalErr
              << ", time = " << runTime << " (s) " << endl;
+        PittOut.close(  );
     }
 }
 

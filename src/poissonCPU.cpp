@@ -37,10 +37,10 @@ void PoissonCPU::performTransformYdir()
     fftw_plan pl;
 
     fftw_complex *in;
-    in = (fftw_complex *)malloc( nChunk * nyChunk * sizeof( fftw_complex ) );
+    in = (fftw_complex *)fftw_malloc( nChunk * nyChunk * sizeof( fftw_complex ) );
 
     fftw_complex *out;
-    out = (fftw_complex *)malloc( nChunk * nyChunk * sizeof( fftw_complex ) );
+    out = (fftw_complex *)fftw_malloc( nChunk * nyChunk * sizeof( fftw_complex ) );
 
     for ( int j = 0; j < nxChunk * nzChunk; j++ )
     {
@@ -63,10 +63,10 @@ void PoissonCPU::performInverseTransformYdir()
 {
     fftw_plan     pl;
     fftw_complex *in;
-    in = (fftw_complex *)malloc( nChunk * nyChunk * sizeof( fftw_complex ) );
+    in = (fftw_complex *)fftw_malloc( nChunk * nyChunk * sizeof( fftw_complex ) );
 
     fftw_complex *out;
-    out = (fftw_complex *)malloc( nChunk * nyChunk * sizeof( fftw_complex ) );
+    out = (fftw_complex *)fftw_malloc( nChunk * nyChunk * sizeof( fftw_complex ) );
 
     for ( int j = 0; j < nxChunk * nzChunk; j++ )
     {
@@ -78,6 +78,7 @@ void PoissonCPU::performInverseTransformYdir()
         writeYLine( j, out );
     }
 
+    
     fftw_free( out );
     fftw_free( in );
     fftw_destroy_plan(pl);
@@ -155,10 +156,10 @@ void PoissonCPU::performInverseTransformXdir()
 {
     fftw_plan     pl;
     fftw_complex *in;
-    in = (fftw_complex *)malloc( nChunk * nxChunk * sizeof( fftw_complex ) );
+    in = (fftw_complex *)fftw_malloc( nChunk * nxChunk * sizeof( fftw_complex ) );
 
     fftw_complex *out;
-    out = (fftw_complex *)malloc( nChunk * nxChunk * sizeof( fftw_complex ) );
+    out = (fftw_complex *)fftw_malloc( nChunk * nxChunk * sizeof( fftw_complex ) );
 
     for ( int j = 0; j < nyChunk * nzChunk; j++ )
     {
@@ -183,7 +184,7 @@ void PoissonCPU::performTransformXdir()
     fftw_plan pl;
 
     fftw_complex *in;
-    in = (fftw_complex *)malloc( nChunk * nxChunk * sizeof( fftw_complex ) );
+    in = (fftw_complex *)fftw_malloc( nChunk * nxChunk * sizeof( fftw_complex ) );
 
     if ( in == NULL )
     {
@@ -191,7 +192,7 @@ void PoissonCPU::performTransformXdir()
     }
 
     fftw_complex *out;
-    out = (fftw_complex *)malloc( nChunk * nxChunk * sizeof( fftw_complex ) );
+    out = (fftw_complex *)fftw_malloc( nChunk * nxChunk * sizeof( fftw_complex ) );
 
     if ( out == NULL )
     {
@@ -680,7 +681,10 @@ void PoissonCPU::pittPack()
     if ( myRank == 0 )
     {
         runTime = runTime / (double)NITER;
+        if(RUNINFO)
+        {
         runInfo();
+        }
         if ( PROFILE_COMM )
         {
             printf( "change ownership time =%lf percent of solution and take %lf seconds \n", t2_com / deT * 100., t2_com );

@@ -61,16 +61,16 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
     CommCollective<uint> comc( nullptr, 1 );
     comc.getTotalNumber( &offset1, &partialforestsize, &totalvalue );
 
-    cout << " partial size " << partialforestsize << endl;
+    //cout << " partial size " << partialforestsize << endl;
 
     hsize_t myoffset = offset1;
     //  total_size=totalvalue;
 
     totalnumber = totalvalue;
 
-    cout << YELLOW "offsettttttttttttttt " << offset1 << RESET << endl;
-    cout << YELLOW "L,M N " << L1 << " " << M1 << " " << N1 << RESET << endl;
-    cout << YELLOW "totalvalue " << totalvalue << RESET << endl;
+    //cout << YELLOW "offsettttttttttttttt " << offset1 << RESET << endl;
+   // cout << YELLOW "L,M N " << L1 << " " << M1 << " " << N1 << RESET << endl;
+   // cout << YELLOW "totalvalue " << totalvalue << RESET << endl;
 
     /*
      * Set up file access property list with parallel I/O access
@@ -185,7 +185,7 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
 
         offset[3] = myoffset + co;
 
-        printf( "offset=%llu\n", offset[3] );
+        //printf( "offset=%llu\n", offset[3] );
         // status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL,
         // count, block);
         H5Sselect_hyperslab( filespace, H5S_SELECT_SET, offset, NULL, count, block );
@@ -560,7 +560,7 @@ void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, u
         exit( 0 );
     }
 
-    cout << ncube_total << endl;
+  //  cout << ncube_total << endl;
     uint co = 0;
     // a counts the offset for header whic is only written by process rank 0 and
     // and b the hyperslab part for each cube
@@ -912,7 +912,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
     CommCollective<uint> comc( nullptr, 1 );
     comc.getTotalNumber( &offset1, &partialforestsize, &totalvalue );
 
-    cout << " partial size " << partialforestsize << endl;
+   // cout << " partial size " << partialforestsize << endl;
 
     hsize_t myoffset = offset1;
     //  total_size=totalvalue;
@@ -1034,7 +1034,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx )
 
         offset[3] = myoffset + co;
 
-        printf( "offset=%d\n", offset[3] );
+        //printf( "offset=%d\n", offset[3] );
         // status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL,
         // count, block);
         H5Sselect_hyperslab( filespace, H5S_SELECT_SET, offset, NULL, count, block );
@@ -1351,7 +1351,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
     CommCollective<uint> comc( nullptr, 1 );
     comc.getTotalNumber( &offset1, &partialforestsize, &totalvalue );
 
-    cout << " partial size " << partialforestsize << endl;
+   // cout << " partial size " << partialforestsize << endl;
 
     hsize_t myoffset = offset1;
     //  total_size=totalvalue;
@@ -1506,7 +1506,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
 
         offset[3] = myoffset + co;
 
-        printf( "offset=%llu\n", offset[3] );
+        //printf( "offset=%llu\n", offset[3] );
         // status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL,
         // count, block);
         H5Sselect_hyperslab( filespace, H5S_SELECT_SET, offset, NULL, count, block );
@@ -1831,7 +1831,7 @@ void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer 
     int offset1 = 2005;
     //  const int offset1 = 1992;
 
-    cout << "size str" << strlen( strname ) << endl;
+    //cout << "size str" << strlen( strname ) << endl;
 
     MPI_File_open( MPI_COMM_WORLD, strname, MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fp );
 
@@ -2421,7 +2421,7 @@ void Phdf5::getZcoord( int *L, const double Za, const double Zh, const int align
         exit( 0 );
     }
 
-    cout << " ============================= " << endl;
+  //  cout << " ============================= " << endl;
 }
 
 void Phdf5::getQ( ChunkedArray &F, const int chunkId, int *L, const int aligndir, double *qtemp )

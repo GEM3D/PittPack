@@ -663,7 +663,10 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
     if ( myRank == 0 )
     {
         runTime = runTime / (double)NITER;
+        if(RUNINFO)
+        {
         runInfo();
+        }
         if ( PROFILE_COMM )
         {
             printf( "change ownership time =%lf percent of solution and take %lf seconds \n", t2_com / deT * 100., t2_com );

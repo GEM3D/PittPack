@@ -32,6 +32,7 @@
  */
 
 void checkCudaSupport();
+void parse();
 
 int main( int argcs, char *pArgs[] )
 {
@@ -60,7 +61,7 @@ int main( int argcs, char *pArgs[] )
     int my_rank, com_size;
     MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
     MPI_Comm_size( MPI_COMM_WORLD, &com_size );
-
+/*
     // always check for compatibility of the Class on GPU
     if ( my_rank == 0 )
     {
@@ -74,6 +75,7 @@ int main( int argcs, char *pArgs[] )
             return 1;
         }
     }
+*/
     // PencilDcmp N(argcs, pArgs, 10,10,10 );
 
 #if ( OPENACC )
@@ -379,3 +381,6 @@ void checkCudaSupport()
 
     // cout<<b  <<endl;
 }
+
+
+

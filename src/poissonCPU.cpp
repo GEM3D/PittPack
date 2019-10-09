@@ -4,6 +4,8 @@
 
 void PoissonCPU::writeYLine( int j, fftw_complex *outC )
 {
+#if(!PITTPACKACC)
+
     for ( int i = 0; i < nChunk * nyChunk; i++ )
     {
         PencilDcmp::P( 2 * nyChunk * nChunk * j + 2 * i )     = outC[i][0];
@@ -15,10 +17,12 @@ void PoissonCPU::writeYLine( int j, fftw_complex *outC )
 #if ( DEBUG0 )
     cout << endl;
 #endif
+#endif
 }
 
 void PoissonCPU::readYLine( int j, fftw_complex *out )
 {
+#if(!PITTPACKACC)
     for ( int i = 0; i < nChunk * nyChunk; i++ )
     {
         out[i][0] = PencilDcmp::P( 2 * ( nChunk * nyChunk ) * j + 2 * i );
@@ -30,10 +34,13 @@ void PoissonCPU::readYLine( int j, fftw_complex *out )
 #if ( DEBUG0 )
     cout << endl;
 #endif
+#endif
 }
 
 void PoissonCPU::performTransformYdir()
 {
+//cout<<" cpu version "<<endl;
+#if(!PITTPACKACC)
     fftw_plan pl;
 
     fftw_complex *in;
@@ -57,6 +64,7 @@ void PoissonCPU::performTransformYdir()
 
     fftw_free( out );
     fftw_free( in );
+#endif
 //    fftw_destroy_plan(pl);
 //    fftw_cleanup();
 
@@ -64,6 +72,7 @@ void PoissonCPU::performTransformYdir()
 
 void PoissonCPU::performInverseTransformYdir()
 {
+#if(!PITTPACKACC)
     fftw_plan     pl;
     fftw_complex *in;
     in = (fftw_complex *)fftw_malloc( nChunk * nyChunk * sizeof( fftw_complex ) );
@@ -87,11 +96,13 @@ void PoissonCPU::performInverseTransformYdir()
     
     fftw_free( out );
     fftw_free( in );
+#endif
 
 }
 
 void PoissonCPU::readXLine( int j, fftw_complex *out )
 {
+#if(!PITTPACKACC)
     for ( int i = 0; i < nChunk * nxChunk; i++ )
     {
         out[i][0] = PencilDcmp::P( 2 * ( nChunk * nxChunk ) * j + 2 * i );
@@ -107,34 +118,12 @@ void PoissonCPU::readXLine( int j, fftw_complex *out )
 #if ( DEBUG0 )
     cout << RESET << endl;
 #endif
+#endif
 }
-
-/*
-void PoissonCPU::readXLine( int j, double *out )
-{
-
-    for ( int i = 0; i < 2* nChunk * nxChunk; i++ )
-    {
-        out[i] = PencilDcmp::P( 2 * ( nChunk * nxChunk ) * j +  i );
-    }
-
-}
-
-
-void PoissonCPU::writeXLine( int j, double *out )
-{
-
-    for ( int i = 0; i < 2* nChunk * nxChunk; i++ )
-    {
-         P( 2 * ( nChunk * nxChunk ) * j +  i )=out[i];
-
-    }
-
-}
-*/
 
 void PoissonCPU::writeXLine( int j, fftw_complex *outC )
 {
+#if(!PITTPACKACC)
     for ( int i = 0; i < nChunk * nxChunk; i++ )
     {
         PencilDcmp::P( 2 * nxChunk * nChunk * j + 2 * i )     = outC[i][0];
@@ -153,10 +142,12 @@ void PoissonCPU::writeXLine( int j, fftw_complex *outC )
         cout << RESET << endl;
     }
 #endif
+#endif
 }
 
 void PoissonCPU::performInverseTransformXdir()
 {
+#if(!PITTPACKACC)
     fftw_plan     pl;
     fftw_complex *in;
     in = (fftw_complex *)fftw_malloc( nChunk * nxChunk * sizeof( fftw_complex ) );
@@ -181,10 +172,13 @@ void PoissonCPU::performInverseTransformXdir()
     fftw_free( out );
     fftw_free( in );
  
+#endif
 }
 
 void PoissonCPU::performTransformXdir()
 {
+//cout <<" here "<<endl;
+#if(!PITTPACKACC)
     fftw_plan pl;
 
     fftw_complex *in;
@@ -235,7 +229,11 @@ void PoissonCPU::performTransformXdir()
     fftw_free( out );
     fftw_free( in );
 
+#endif
+//  cout<< " poisson is calling "<<endl;
 }
+
+#if 0
 void PoissonCPU::pittPack()
 {
 #if ( DEBUG0 )
@@ -701,6 +699,7 @@ void PoissonCPU::pittPack()
     }
 }
 
+#endif
 /* absolute value version
 void PoissonCPU::testDST10()
 {
@@ -873,7 +872,7 @@ void PoissonCPU::testDST01()
 
 }
 */
-#if ( 0 )
+#if 0 
 // It is possible to calculate the DST01 from DCT01 and yes DCT01, there are no Typos :-)
 
 void PoissonCPU::testDST01()

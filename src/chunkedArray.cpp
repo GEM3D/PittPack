@@ -120,7 +120,7 @@ double &ChunkedArray::operator()( int i, int j, int k ) { return P[2 * ( i + nx 
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
-inline double &ChunkedArray::operator()( int i, int j, int k, int dir, int index )
+inline  double &ChunkedArray::operator()( int i, int j, int k, int dir, int index )
 {
     if ( dir == 0 )
     {

@@ -1,9 +1,10 @@
 #include "definitions.h"
 #include "pencilDcmp.hpp"
 
-#if ( PITTPACKACC )
+//#if ( PITTPACKACC )
 void PoissonGPU::performTransformXdir() /*!< Is called on Host and Runs on GPU*/
 {
+#if ( PITTPACKACC )
     cufftHandle plan = NULL;
     double *    ptr  = P.P;
 
@@ -22,10 +23,12 @@ void PoissonGPU::performTransformXdir() /*!< Is called on Host and Runs on GPU*/
         }
         cufftDestroy( plan );
     }
+#endif
 }
 
 void PoissonGPU::performInverseTransformXdir() /*!< Called on Host and Ran on GPU*/
 {
+#if ( PITTPACKACC )
     cufftHandle plan = NULL;
     double *    ptr  = P.P;
 
@@ -44,9 +47,11 @@ void PoissonGPU::performInverseTransformXdir() /*!< Called on Host and Ran on GP
         }
         cufftDestroy( plan );
     }
+#endif
 }
 void PoissonGPU::performTransformYdir() /*!< Called on Host and Ran on GPU*/
 {
+#if ( PITTPACKACC )
     cufftHandle plan = NULL;
     double *    ptr  = P.P;
 
@@ -65,10 +70,12 @@ void PoissonGPU::performTransformYdir() /*!< Called on Host and Ran on GPU*/
         }
         cufftDestroy( plan );
     }
+#endif
 }
 
 void PoissonGPU::performInverseTransformYdir() /*!< Called on Host and Ran on GPU*/
 {
+#if ( PITTPACKACC )
     cufftHandle plan = NULL;
     double *    ptr  = P.P;
 
@@ -87,12 +94,14 @@ void PoissonGPU::performInverseTransformYdir() /*!< Called on Host and Ran on GP
         }
         cufftDestroy( plan );
     }
+#endif
 }
 
 void PoissonGPU::triDiagCusparse( double *dl, double *ds, double *du, double *rhs )
 {
     // cout<< " size of nz" <<nz<<endl;
 
+#if ( PITTPACKACC )
     cusparseHandle_t handle = NULL;
 
 #pragma acc host_data use_device( rhs, du, dl, ds )
@@ -109,10 +118,11 @@ void PoissonGPU::triDiagCusparse( double *dl, double *ds, double *du, double *rh
     }
 
     cusparseDestroy( handle );
+#endif
 }
 
 // const std::string currentDateTime() ;
-
+#if 0
 void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 {
     double t1 = 0.0;
@@ -716,4 +726,8 @@ void PoissonGPU::pittPack() /*!<called on CPU runs on GPU */
 #endif
 }
 
+}
+
 #endif
+
+//#endif

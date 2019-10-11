@@ -31,7 +31,6 @@
  *  \image html sample_poisson.png
  */
 
-std::unique_ptr<PencilDcmp>make_Poisson(int argcs, char *pArgs[], int nx, int ny, int nz );
 void checkCudaSupport();
 void parse();
 
@@ -77,7 +76,6 @@ int main( int argcs, char *pArgs[] )
         }
     }
 */
-    // PencilDcmp N(argcs, pArgs, 10,10,10 );
 
 #if ( OPENACC )
     //    #if ( 0 )

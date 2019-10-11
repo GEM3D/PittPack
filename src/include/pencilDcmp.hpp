@@ -15,7 +15,7 @@
 #include "signalProc.hpp"
 #include "triDiag.hpp"
 #include <memory>
-//#define restrict __restrict__
+
 
 /*!    \class PencilDcmp
  *     \brief  This Class performs pencil decomposition and encapsulates all the necessary communications required for FFT transformation
@@ -519,4 +519,5 @@ private:
 
 };
 
+std::unique_ptr<PencilDcmp>make_Poisson(int argcs, char *pArgs[], int nx, int ny, int nz );/*! factory to make poisson class */
 #endif

@@ -6400,3 +6400,14 @@ void PencilDcmp::pittPack() /*!<called on CPU runs on GPU */
 //#endif
 }
 
+std::unique_ptr<PencilDcmp>make_Poisson(int argcs, char *pArgs[], int nx, int ny, int nz )
+{
+#if(PITTPACKACC)
+        return std::unique_ptr<PencilDcmp>(new PoissonGPU(argcs,pArgs, nx,ny,nz ));
+#else
+        //cout<<"HERE cpu "<<endl;
+        return std::unique_ptr<PencilDcmp>(new PoissonCPU(argcs,pArgs, nx,ny,nz ));
+#endif
+}
+
+

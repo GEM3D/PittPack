@@ -14,7 +14,7 @@
 #include "multiGrid.hpp"
 #include "signalProc.hpp"
 #include "triDiag.hpp"
-
+#include <memory>
 //#define restrict __restrict__
 
 /*!    \class PencilDcmp

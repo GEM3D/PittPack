@@ -1464,7 +1464,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
         cout << YELLOW << "Xh " << ( F.Xb - F.Xa ) / double( L1 - 1. ) << RESET << endl;
         cout << YELLOW << "F.nChunk " << F.nChunk << " Dx " << Dx << RESET << endl;
     */
-    int L[3] = {L1, M1, N1};
+    int L[3] = {static_cast<int>(L1), static_cast<int>(M1), static_cast<int>(N1)};
 
     for ( auto it = 0; it < F.nChunk; it++ )
     {

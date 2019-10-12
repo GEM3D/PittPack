@@ -462,7 +462,7 @@ private:
     friend class VTK;                          /*!< for small problems VTK is also provided */
 
         // rearrnages in z- direction
-    ~PencilDcmp(); /*!< Class destructor*/
+    virtual ~PencilDcmp(); /*!< Class destructor*/
 };
 
 /*!    \class PoissonCPU

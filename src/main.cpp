@@ -31,7 +31,6 @@
  *  \image html sample_poisson.png
  */
 
-void checkCudaSupport();
 void parse();
 
 int main( int argcs, char *pArgs[] )
@@ -61,32 +60,15 @@ int main( int argcs, char *pArgs[] )
     int my_rank, com_size;
     MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
     MPI_Comm_size( MPI_COMM_WORLD, &com_size );
-/*
-    // always check for compatibility of the Class on GPU
-    if ( my_rank == 0 )
-    {
-        if ( __has_trivial_copy( PoissonGPU ) == true )
-        {
-            std::cout << "Congrat! myClass will work with OpenACC copy operations " << std::endl;
-        }
-        else
-        {
-            std::cout << "OOPS! myClass will NOT work with OpenACC copy operations " << std::endl;
-            return 1;
-        }
-    }
-*/
 
 #if ( OPENACC )
     //    #if ( 0 )
     if ( my_rank == 0 )
     {
         cout << " ====================================== " << endl;
-        cout << " ====================================== " << endl;
         cout << " OPENACC is defined "
                 "============"
              << endl;
-        cout << " ====================================== " << endl;
         cout << " ====================================== " << endl;
     }
     PittPackResult result;
@@ -157,19 +139,7 @@ int main( int argcs, char *pArgs[] )
 
     M->setBox( X );
 
-    // check IO for dir 0
-
-#if ( DEBUG1 )
-    ofstream myfile;
-
-    std::string filename = "data";
-    filename.append( to_string( my_rank ) );
-    //  ofstream myfile;
-    myfile.open( filename );
-#endif
-    // if(my_rank==0)
-    // debugging for single block first
-    int dir = 2;
+   int dir = 2;
 
     cout << "xxxxxxxxxxxxx set coords xxxxxxxxxxxxxxxxxxxxx" << endl;
     M->setCoords( dir );
@@ -191,28 +161,13 @@ int main( int argcs, char *pArgs[] )
 #if ( !EXACT )
 //#if ( OPENACC )
 
-    //    for ( int i = 0; i < 10; i++ )
-    {
-        //        M.initializeTrigonometric();
         if ( INITANALYTIC == 0 )
         {
             double *rhs = new double[Nx * Ny * Nz];
-            //M.fillTrigonometric( rhs );
             M->fillTrigonometric( rhs );
-            /*
-            for(int i=0;i<Nx*Ny*Nz;i++)
-            {
-            cout<<rhs[i]<<endl;
-            }
-             */
-            //M.assignRhs( rhs );
-            M->assignRhs( rhs );
+                M->assignRhs( rhs );
         }
-        // M.print();
-        //M.pittPack();
         M->pittPack();
-        //  delete [] rhs;
-    }
 
 #endif
 // final write should be in the dir=2 as we transform all the data back to its original situation
@@ -226,27 +181,16 @@ int main( int argcs, char *pArgs[] )
 
 #if ( 1 )
     cout << " for writing out" << endl;
-    //M.setCoords( dir );
     M->setCoords( dir );
     if ( I_O == 1 )
     {
-        //  M.changeOwnershipPairwiseExchangeZX();
-        //  M.changeOwnershipPairwiseExchangeXY();
-        //M.IO( 1, dir, 0 );
         M->IO( 1, dir, 0 );
     }
 
-//   M.eigenVal( myfile );
-#if ( DEBUG1 )
-    myfile.close();
-#endif
-    if ( INCLUDE_ERROE_CAL_IN_TIMING == 0 )
+   if ( INCLUDE_ERROE_CAL_IN_TIMING == 0 )
     {
-        //cout << RED << " err = " << M.getError() << RESET << endl;
         cout << RED << " err = " << M->getError() << RESET << endl;
-
     }
-//    M.runInfo();
 #endif
 
     #endif
@@ -261,36 +205,4 @@ int main( int argcs, char *pArgs[] )
 
     return ( 0 );
 };
-
-void checkCudaSupport()
-{
-    printf( "Compile time check:\n" );
-#if defined( MPIX_CUDA_AWARE_SUPPORT ) && MPIX_CUDA_AWARE_SUPPORT
-    printf( "This MPI library has CUDA-aware support.\n", MPIX_CUDA_AWARE_SUPPORT );
-#elif defined( MPIX_CUDA_AWARE_SUPPORT ) && !MPIX_CUDA_AWARE_SUPPORT
-    printf( "This MPI library does not have CUDA-aware support.\n" );
-#else
-    printf( "This MPI library cannot determine if there is CUDA-aware support.\n" );
-#endif /* MPIX_CUDA_AWARE_SUPPORT */
-
-    printf( "Run time check:\n" );
-#if defined( MPIX_CUDA_AWARE_SUPPORT )
-    if ( 1 == MPIX_Query_cuda_support() )
-    {
-        printf( "This MPI library has CUDA-aware support.\n" );
-    }
-    else
-    {
-        printf( "This MPI library does not have CUDA-aware support.\n" );
-    }
-#else  /* !defined(MPIX_CUDA_AWARE_SUPPORT) */
-    printf( "This MPI library cannot determine if there is CUDA-aware support.\n" );
-#endif /* MPIX_CUDA_AWARE_SUPPORT */
-
-    //#pragma acc update self(a,b)
-
-    // cout<<b  <<endl;
-}
-
-
 

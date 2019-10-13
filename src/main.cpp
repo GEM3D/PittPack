@@ -62,15 +62,6 @@ int main( int argcs, char *pArgs[] )
     MPI_Comm_size( MPI_COMM_WORLD, &com_size );
 
 #if ( OPENACC )
-    //    #if ( 0 )
-    if ( my_rank == 0 )
-    {
-        cout << " ====================================== " << endl;
-        cout << " OPENACC is defined "
-                "============"
-             << endl;
-        cout << " ====================================== " << endl;
-    }
     PittPackResult result;
     result = OPENACC_Init( my_rank, com_size );
 
@@ -82,7 +73,6 @@ int main( int argcs, char *pArgs[] )
     }
 
 #endif
-    // HostToDeviceAssign(my_rank,com_size);
 
     int p0 = sqrt( com_size );
     int p1 = p0;
@@ -93,17 +83,7 @@ int main( int argcs, char *pArgs[] )
     int Ny = NYCHUNK * p0;
     int Nz = NZCHUNK * p0;
 
-#if ( OPENACC )
-    cout << " GPU solving " << endl;
      auto M=make_Poisson( argcs, pArgs, Nx, Ny, Nz );
-
-#else
-    cout << " CPU solving "
-         << " Nx " << Nx << " " << Ny << " " << Nz << " p0 " << p0 << endl;
-    cout << RED << " Make Sure -ta=pinned is turned-off " << RESET << endl;
-     auto M=make_Poisson( argcs, pArgs, Nx, Ny, Nz );
-#endif
-
      // char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
     // char mybc[6] = {'D', 'D', 'P', 'P', 'P', 'P'};
     //  char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
@@ -119,12 +99,9 @@ int main( int argcs, char *pArgs[] )
     //        char mybc[6] = {'D', 'D', 'D', 'D', 'N', 'N'};
     // char mybc[6] = {'N', 'N', 'N', 'N', 'N', 'N'};
     std::cout << mybc[0] << " " << mybc[1] << " " << mybc[2] << " " << mybc[3] << " " << mybc[4] << " " << mybc[5] << std::endl;
-    //M.assignBoundary( mybc );
     M->assignBoundary( mybc );
-    // testMpiClass(MPI_COMM_WORLD);
 
     double a[3] = {0, 0, 0};
-    //      M.modifyEigForDirichlet(0,0,a);
     cout << RED << " myRank " << my_rank << " a[3]= " << a[0] << " " << a[1] << RESET << endl;
 
     cout << "============================ " << endl;
@@ -144,16 +121,7 @@ int main( int argcs, char *pArgs[] )
     cout << "xxxxxxxxxxxxx set coords xxxxxxxxxxxxxxxxxxxxx" << endl;
     M->setCoords( dir );
 
-#if ( DEBUG1 )
-    myfile << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << endl;
-    myfile << "     Start" << endl;
-
-    //    if ( my_rank == this_rank )
-    {
-        M.printX( myfile );
-    }
-#endif
-    // step 1) pencils with n(0,0,1) is converted to pencil with n(1,0,0)
+   // step 1) pencils with n(0,0,1) is converted to pencil with n(1,0,0)
 
     double *rhs = nullptr;
 
@@ -172,12 +140,6 @@ int main( int argcs, char *pArgs[] )
 #endif
 // final write should be in the dir=2 as we transform all the data back to its original situation
 // if you dont call poisson, if you do set it equal to dir=0
-#if ( EXACT )
-    dir = 2;
-#else
-    // used to be 1
-    dir = 2;
-#endif
 
 #if ( 1 )
     cout << " for writing out" << endl;

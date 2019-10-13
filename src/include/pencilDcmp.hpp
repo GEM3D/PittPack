@@ -502,7 +502,7 @@ class PoissonGPU : public PencilDcmp
 public:
     PoissonGPU( int nx, int ny, int nz, int p0 ) : PencilDcmp( nx, ny, nz, p0, p0 ){}; /*!< constructor */
     PoissonGPU( int argcs, char *pArgs[], int nx, int ny, int nz )
-    : PencilDcmp( argcs, pArgs, nx, ny, nz ){}; /*!< Alternative Class constructor */
+    : PencilDcmp( argcs, pArgs, nx, ny, nz ){ }; /*!< Alternative Class constructor */
     //    PoissonGPU( int nx, int ny, int nz, int p0 );  /*!< constructor */
     PittPackResult initializeAndBind(); /*was giving strange errors, tried to encapsulate with the constructor but it did not*/
 

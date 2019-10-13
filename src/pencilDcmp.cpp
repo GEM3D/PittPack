@@ -46,6 +46,18 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
 
     MPIStartUp();
 
+#if(PITTPACKACC)
+    PittPackResult result;
+    result = OPENACC_Init( myRank, comSize );
+
+    if ( SUCCESS != result )
+    {
+        cout << RED << " Rank(" << myRank << ") > Exit Code : " << result << RESET << endl;
+        cout << BLUE << PittPackGetErrorEnum( result ) << RESET << endl;
+        exit( 1 );
+    }
+#endif
+
     p0 = sqrt( comSize );
 
     p1 = p0;
@@ -250,6 +262,18 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
     }
 
     MPIStartUp();
+
+#if(PITTPACKACC)
+    PittPackResult result;
+    result = OPENACC_Init( myRank, comSize );
+
+    if ( SUCCESS != result )
+    {
+        cout << RED << " Rank(" << myRank << ") > Exit Code : " << result << RESET << endl;
+        cout << BLUE << PittPackGetErrorEnum( result ) << RESET << endl;
+        exit( 1 );
+    }
+#endif
 
     p0 = sqrt( comSize );
 

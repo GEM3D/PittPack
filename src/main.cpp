@@ -61,19 +61,6 @@ int main( int argcs, char *pArgs[] )
     MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
     MPI_Comm_size( MPI_COMM_WORLD, &com_size );
 
-#if ( OPENACC )
-    PittPackResult result;
-    result = OPENACC_Init( my_rank, com_size );
-
-    if ( SUCCESS != result )
-    {
-        cout << RED << " Rank(" << my_rank << ") > Exit Code : " << result << RESET << endl;
-        cout << BLUE << PittPackGetErrorEnum( result ) << RESET << endl;
-        exit( 1 );
-    }
-
-#endif
-
     int p0 = sqrt( com_size );
     int p1 = p0;
 
@@ -102,7 +89,7 @@ int main( int argcs, char *pArgs[] )
     M->assignBoundary( mybc );
 
     double a[3] = {0, 0, 0};
-    cout << RED << " myRank " << my_rank << " a[3]= " << a[0] << " " << a[1] << RESET << endl;
+//    cout << RED << " myRank " << my_rank << " a[3]= " << a[0] << " " << a[1] << RESET << endl;
 
     cout << "============================ " << endl;
 

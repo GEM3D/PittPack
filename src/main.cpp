@@ -91,13 +91,6 @@ int main( int argcs, char *pArgs[] )
     double a[3] = {0, 0, 0};
 //    cout << RED << " myRank " << my_rank << " a[3]= " << a[0] << " " << a[1] << RESET << endl;
 
-    cout << "============================ " << endl;
-
-    // This is only for neighbrhood collectives
-    M->constructConnectivity();
-
-    M->graphCreate();
-
     // double X[6] = {-1.0, 1.0, -1.0, 1.0, -1.0, 1.0};
     double X[6] = {0, 1.0, 0, 1.0, 0, 1.0};
 

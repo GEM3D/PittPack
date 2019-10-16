@@ -441,6 +441,11 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
     cout << "iaysize " << iaySize << endl;
 #endif
 
+#if(COMM_PATTERN==2)
+constructConnectivity();
+graphCreate();
+#endif
+
 #if ( PITTPACKACC )
     acc_async_wait_all();
 #endif

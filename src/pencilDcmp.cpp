@@ -1469,7 +1469,7 @@ void PencilDcmp::nbrAllToAllZXOverlap()
     // for All to allV
 
     double *ptr = NULL;
-    int     end = P.chunkSize;
+    //int     end = P.chunkSize;
     // int     ierr;
 
     //
@@ -1720,7 +1720,7 @@ void PencilDcmp::nbrAllToAllXYOverlap()
 #if ( 1 )
 
     double *ptr = NULL;
-    int     end = P.chunkSize;
+    //int     end = P.chunkSize;
     // int     ierr;
 
     // part A
@@ -3067,7 +3067,7 @@ inline void PencilDcmp::decomposeOldIndexY( const sint id, sint &chunkId, sint &
 #endif
 void PencilDcmp::saveToTmp( const sint id, double *tmp, sint dir )
 {
-    int N;
+    int N=0;
     if ( dir == 0 )
     {
         N = nxChunk;
@@ -3076,11 +3076,13 @@ void PencilDcmp::saveToTmp( const sint id, double *tmp, sint dir )
     {
         N = nyChunk;
     }
-    else if ( dir == 2 )
+//    else ( dir == 2 )
+    else
     {
         N = nzChunk;
     }
-#if ( PITTPACKACC )
+
+ #if ( PITTPACKACC )
 #pragma acc loop vector
 #endif
     for ( int i = 0; i < 2 * N; i++ )
@@ -3094,7 +3096,7 @@ void PencilDcmp::saveToTmp( const sint id, double *tmp, sint dir )
 #endif
 void PencilDcmp::restoreTmp( const sint id, double *tmp, sint dir )
 {
-    int N;
+    int N=0;
     if ( dir == 0 )
     {
         N = nxChunk;
@@ -3103,7 +3105,9 @@ void PencilDcmp::restoreTmp( const sint id, double *tmp, sint dir )
     {
         N = nyChunk;
     }
-    else if ( dir == 2 )
+    // the default direction is in z direction and hence is 2
+    //else if ( dir == 2 )
+    else 
     {
         N = nzChunk;
     }
@@ -3406,7 +3410,7 @@ void PencilDcmp::restoreLocationX()
 #endif
 void PencilDcmp::saveToDest( const sint source, const sint dest, sint dir )
 {
-    int N;
+    int N=0;
 
     if ( dir == 0 )
     {
@@ -3416,7 +3420,8 @@ void PencilDcmp::saveToDest( const sint source, const sint dest, sint dir )
     {
         N = nyChunk;
     }
-    else if ( dir == 2 )
+    //else if ( dir == 2 )
+    else 
     {
         N = nzChunk;
     }
@@ -3444,7 +3449,8 @@ void PencilDcmp::saveTmpToDest( const double *tmp, const sint dest, sint dir )
     {
         N = nyChunk;
     }
-    else if ( dir == 2 )
+    //else if ( dir == 2 )
+    else
     {
         N = nzChunk;
     }
@@ -4907,6 +4913,13 @@ const char *PittPackGetErrorEnum( PittPackResult error )
             return ( "\n   CUFFT failed in inverse X-transform  \n " );
         case CUFFT_FAIL_INV_Y:
             return ( "\n   CUFFT failed in inverse Y-transform \n " );
+        case MESH_DIVISIBLE:
+            return ( "\n   Mesh is not divisible by Number of Chunks  \n " );
+        case MPI_DIST_GTAPH_FAIL_X:
+            return ( "\n   MPI distributed graph failure in X direction \n " );
+        case MPI_DIST_GTAPH_FAIL_Y:
+            return ( "\n   MPI distributed graph failure in Y direction \n " );
+
     }
 
     return "<unknown>";
@@ -5597,7 +5610,7 @@ void PencilDcmp::assignRhs( double *rhs )
     int Ny = nyChunk;
     int Nz = nz;
 
-    if ( !SHIFT )
+    if ( shift )
     {
         c1 = ( coords[1] - coords[0] ) / ( Nx + 1. );
         c2 = ( coords[3] - coords[2] ) / ( Ny + 1. );

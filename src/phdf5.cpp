@@ -16,14 +16,7 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
     hsize_t block[4];
     hsize_t offset[4];
     hid_t   plist_id; /* property list identifier */
-                      // uint    i, j, k, l;
-    herr_t status;
-    // int         *data=NULL;
-
-    /*
-     * MPI variables
-     */
-    // int           mpi_size, mpi_rank;
+  
     PittPackReal *xtemp = NULL;
     PittPackReal *ytemp = NULL;
     PittPackReal *ztemp = NULL;
@@ -143,24 +136,12 @@ void Phdf5::writeMultiBlock( ChunkedArray &F, uint appx )
 
     filespace = H5Dget_space( dset_id );
 
-    unsigned int level, coord_index;
 
-    PittPackReal dx, dy, dz;
-    PittPackReal denum;
-    PittPackReal XYZ[6];
-    //  morton<N> key;
     hsize_t co = 0;
 
     PittPackReal Xh, Yh, Zh;
     PittPackReal hx, hy, hz;
     int          index;
-    /*
-        cout << YELLOW << "Xa " << F.Xa << " Xb " << F.Xb << RESET << endl;
-        cout << YELLOW << "Ya " << F.Ya << " Yb " << F.Yb << RESET << endl;
-        cout << YELLOW << "Za " << F.Za << " Zb " << F.Zb << RESET << endl;
-        cout << YELLOW << "Xh " << ( F.Xb - F.Xa ) / double( L1 - 1. ) << RESET << endl;
-        cout << YELLOW << "F.nChunk " << F.nChunk << RESET << endl;
-    */
     for ( int it = 0; it < F.nChunk; it++ )
     {
         Xa = F.Xa;
@@ -468,9 +449,7 @@ static void integer_string( char *strin, int i )
 void Phdf5::xdmfMultiBlock( ChunkedArray &F, integer comsize, integer my_rank, uint offset, uint appx )
 {
     MPI_File     fp;
-    int          buf[1000], np = comsize;
-    MPI_Request  request;
-    unsigned int i;
+    int          np = comsize;
     int          j;
 
     MPI_Status  status;
@@ -1306,14 +1285,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
     hsize_t block[4];
     hsize_t offset[4];
     hid_t   plist_id; /* property list identifier */
-    uint    i, j, k, l;
-    herr_t  status;
-    // int         *data=NULL;
 
-    /*
-     * MPI variables
-     */
-    int           mpi_size, mpi_rank;
     PittPackReal *xtemp = NULL;
     PittPackReal *ytemp = NULL;
     PittPackReal *ztemp = NULL;
@@ -1442,12 +1414,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
 
     filespace = H5Dget_space( dset_id );
 
-    unsigned int level, coord_index;
 
-    PittPackReal dx, dy, dz;
-    PittPackReal denum;
-    PittPackReal XYZ[6];
-    //  morton<N> key;
     hsize_t co = 0;
 
     PittPackReal Xh, Yh, Zh;
@@ -1741,7 +1708,7 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
 
     // need to fix the offset for cell-center approach
 
-    int my_rank, comsize;
+    int my_rank;
     MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
 
     co = 0;
@@ -1809,9 +1776,8 @@ void Phdf5::writeMultiBlockCellCenter( ChunkedArray &F, uint appx, int dir, int 
 void Phdf5::xdmfMultiBlockCellCenter( ChunkedArray &F, integer comsize, integer my_rank, uint offset, uint appx )
 {
     MPI_File     fp;
-    int          buf[1000], np = comsize;
+    int          np = comsize;
     MPI_Request  request;
-    unsigned int i;
     int          j;
 
     MPI_Status  status;

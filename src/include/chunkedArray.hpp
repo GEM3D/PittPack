@@ -73,7 +73,7 @@ class ChunkedArray
     friend class PoissonGPU;
     friend class SignalProc;
     friend class TriDiag;
-    friend class MpiCom;
+    friend struct MpiCom;
 
     friend class MultiGrid;
 

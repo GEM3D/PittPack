@@ -1425,7 +1425,7 @@ void TriDiag::crp( const int n, double offdiag, double *tmpA, double *tmpC, doub
 
         // m = 2 * ((level) - i + 1) + 1;
 
-        div = 1 << ( level - i + 1 ) + 1;
+        div = (1 << ( level - i + 1 )) + 1;
 
         //    m = div/2 + 1;
         m = div - 1;

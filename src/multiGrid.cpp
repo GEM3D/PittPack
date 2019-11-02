@@ -325,7 +325,7 @@ void MultiGrid::getRequiredSize()
 
     for ( int i = 0; i < maxLevel; i++ )
     {
-        size += ( ( 1 << i + 1 ) - 1 );
+        size += ( ( 1 << (i + 1) ) - 1 );
     }
     arraySize = size;
     printf( "maxlevel =%d the required size %d  \n ", maxLevel, size );
@@ -859,7 +859,6 @@ void MultiGrid::smooth( int level, int iter )
 #endif
 void MultiGrid::smooth( int level, int iter )
 {
-    int n          = N;
     int d          = 1 << level;
     int upperLimit = ( N ) / d - 1;
 
@@ -915,7 +914,7 @@ void MultiGrid::weightedJacobiSmoother( int index0, int upperLimit, double d )
 #endif
 void MultiGrid::weightedJacobiSmoother( int index0, int upperLimit, double d )
 {
-    int farRight = index0 + upperLimit;
+    //int farRight = index0 + upperLimit;
 
 // printf(" smoother %d tmpArraySize= %d farRight = %d d=%lf \n",selectSmoother,tmpArraySize,farRight,d);
 #if ( PITTPACKACC )
@@ -1106,20 +1105,20 @@ void MultiGrid::solveMono( double onDiag )
 {
 #if ( 1 )
     int level      = 0;
-    int d          = 1 << level;
-    int n          = N;
-    int upperLimit = N;
-    int index0     = 0.0;
+    //int d          = 1 << level;
+    //int n          = N;
+    //int upperLimit = N;
+    //int index0     = 0.0;
 
     //  printf("start =%d upperLimit= %d \n",index0,upperLimit );
     // printf("\n inside res start =%d upperLimit= %d delx[0]=%lf \n",index0,upperLimit, d*delx[0] );
 
     double resTot = 1.0;
-    int    count  = 0;
+   // int    count  = 0;
 
     //    printf( "Mono solving" );
 
-    double val = 0.0;
+    //double val = 0.0;
     residual( 0 );
 
     resTot = l2Norm();
@@ -1420,7 +1419,7 @@ void MultiGrid::solveMulti( double *out )
     // printf("Multigrid Solving\n ");
     //   printf("delx inside multigrid= %lf ", delx[0]);
 
-    int bol = 1;
+    //int bol = 1;
 
     residual( 0 );
 

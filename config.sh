@@ -31,7 +31,7 @@ printf "${RED}\n \n       System is =  $cluster ${RESET}\n \n"
 read -p "To Configure for GPU press 1 else enter 0:  " GPU
 echo $GPU
 
-if [ $cluster == "bridges" ]; then
+if [[ $cluster == "bridges" ]]; then
 
     #module purge
     export HDF5_ROOT=/pylon5/ac561fp/hasbesta/packages/hdf5-1.8.17/
@@ -60,7 +60,7 @@ if [ $cluster == "bridges" ]; then
 fi
 
 
-if [ $cluster == "comet" ]; then
+if [[ $cluster == "comet" ]]; then
     module purge
     export MODULEPATH=/opt/modulefiles/applications/.gnu:/opt/modulefiles/mpi/.gnu:/opt/modulefiles/mpi:/opt/modulefiles/compilers:/opt/modulefiles/applications:/usr/share/Modules/modulefiles:/etc/modulefiles:/share/apps/compute/modulefiles/mpi:
 
@@ -119,7 +119,7 @@ fi
 
 
 
-if [ $cluster == "stampede" ]; then
+if [[ $cluster == "stampede" ]]; then
 
     module load intel/18.0.2  impi/18.0.2
     module load phdf5/1.8.16
@@ -141,7 +141,7 @@ if [ $cluster == "stampede" ]; then
 fi
 
 
-if [ $cluster == "crc" ]; then
+if [[ $cluster == "crc" ]]; then
      module purge
      module load intel/2018.2.199
      module load intel-mpi/2018.2.199
@@ -167,7 +167,7 @@ fi
 fi
 
 
-if [ $cluster == "titan" ]; then
+if [[ $cluster == "titan" ]]; then
 
     #system needs
     module load cmake3

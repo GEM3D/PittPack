@@ -2215,11 +2215,11 @@ void Phdf5::getXcoord( int *L, const double Xa, const double Xh, const int align
     // cout<< " ============================= "<< " aligndir "<< aligndir  <<endl;
     if ( aligndir == 0 )
     {
-        for ( uint k = 0; k < N1; k++ )
+        for ( int k = 0; k < N1; k++ )
         {
-            for ( uint j = 0; j < M1; j++ )
+            for ( int j = 0; j < M1; j++ )
             {
-                for ( uint i = 0; i < L1; i++ )
+                for ( int i = 0; i < L1; i++ )
                 {
                     xtemp[index] = Xa + Xh * i;
                     // cout<< " xtemp "<<xtemp[index]<<endl;
@@ -2230,11 +2230,11 @@ void Phdf5::getXcoord( int *L, const double Xa, const double Xh, const int align
     }
     else if ( aligndir == 1 )
     {
-        for ( uint k = 0; k < N1; k++ )
+        for ( int k = 0; k < N1; k++ )
         {
-            for ( uint i = 0; i < L1; i++ )
+            for ( int i = 0; i < L1; i++ )
             {
-                for ( uint j = 0; j < M1; j++ )
+                for ( int j = 0; j < M1; j++ )
                 {
                     {
                         xtemp[index] = Xa + Xh * i;
@@ -2246,12 +2246,12 @@ void Phdf5::getXcoord( int *L, const double Xa, const double Xh, const int align
     }
     else if ( aligndir == 2 )
     {
-        for ( uint i = 0; i < N1; i++ )
+        for ( int i = 0; i < N1; i++ )
 
         {
-            for ( uint j = 0; j < M1; j++ )
+            for ( int j = 0; j < M1; j++ )
             {
-                for ( uint k = 0; k < L1; k++ )
+                for ( int k = 0; k < L1; k++ )
                 {
                     xtemp[index] = Xa + Xh * i;
                     index++;
@@ -2276,11 +2276,11 @@ void Phdf5::getYcoord( int *L, const double Ya, const double Yh, const int align
 
     if ( aligndir == 0 )
     {
-        for ( uint k = 0; k < N1; k++ )
+        for ( int k = 0; k < N1; k++ )
         {
-            for ( uint j = 0; j < M1; j++ )
+            for ( int j = 0; j < M1; j++ )
             {
-                for ( uint i = 0; i < L1; i++ )
+                for ( int i = 0; i < L1; i++ )
                 {
                     ytemp[index] = Ya + Yh * j;
                     //  cout<< " ytemp "<<ytemp[index]<<endl;
@@ -2291,11 +2291,11 @@ void Phdf5::getYcoord( int *L, const double Ya, const double Yh, const int align
     }
     else if ( aligndir == 1 )
     {
-        for ( uint k = 0; k < N1; k++ )
+        for ( int k = 0; k < N1; k++ )
         {
-            for ( uint i = 0; i < L1; i++ )
+            for ( int i = 0; i < L1; i++ )
             {
-                for ( uint j = 0; j < M1; j++ )
+                for ( int j = 0; j < M1; j++ )
 
                 {
                     ytemp[index] = Ya + Yh * j;
@@ -2306,12 +2306,12 @@ void Phdf5::getYcoord( int *L, const double Ya, const double Yh, const int align
     }
     else if ( aligndir == 2 )
     {
-        for ( uint i = 0; i < L1; i++ )
+        for ( int i = 0; i < L1; i++ )
         {
-            for ( uint j = 0; j < M1; j++ )
+            for ( int j = 0; j < M1; j++ )
 
             {
-                for ( uint k = 0; k < N1; k++ )
+                for ( int k = 0; k < N1; k++ )
                 {
                     ytemp[index] = Ya + Yh * j;
                     index++;
@@ -2338,11 +2338,11 @@ void Phdf5::getZcoord( int *L, const double Za, const double Zh, const int align
 
     if ( aligndir == 0 )
     {
-        for ( uint k = 0; k < N1; k++ )
+        for ( int k = 0; k < N1; k++ )
         {
-            for ( uint j = 0; j < M1; j++ )
+            for ( int j = 0; j < M1; j++ )
             {
-                for ( uint i = 0; i < L1; i++ )
+                for ( int i = 0; i < L1; i++ )
                 {
                     ztemp[index] = Za + Zh * k;
                     //  cout<< " ztemp "<<ztemp[index]<<endl;
@@ -2353,11 +2353,11 @@ void Phdf5::getZcoord( int *L, const double Za, const double Zh, const int align
     }
     else if ( aligndir == 1 )
     {
-        for ( uint k = 0; k < N1; k++ )
+        for ( int k = 0; k < N1; k++ )
         {
-            for ( uint i = 0; i < L1; i++ )
+            for ( int i = 0; i < L1; i++ )
             {
-                for ( uint j = 0; j < M1; j++ )
+                for ( int j = 0; j < M1; j++ )
 
                 {
                     ztemp[index] = Za + Zh * k;
@@ -2368,12 +2368,12 @@ void Phdf5::getZcoord( int *L, const double Za, const double Zh, const int align
     }
     else if ( aligndir == 2 )
     {
-        for ( uint i = 0; i < L1; i++ )
+        for ( int i = 0; i < L1; i++ )
         {
-            for ( uint j = 0; j < M1; j++ )
+            for ( int j = 0; j < M1; j++ )
 
             {
-                for ( uint k = 0; k < N1; k++ )
+                for ( int k = 0; k < N1; k++ )
                 {
                     ztemp[index] = Za + Zh * k;
                     index++;
@@ -2405,11 +2405,11 @@ void Phdf5::getQ( ChunkedArray &F, const int chunkId, int *L, const int aligndir
     //         << " aligndir " << aligndir << endl;
     if ( aligndir == 0 )
     {
-        for ( uint k = 0; k < N1; k++ )
+        for ( int k = 0; k < N1; k++ )
         {
-            for ( uint j = 0; j < M1; j++ )
+            for ( int j = 0; j < M1; j++ )
             {
-                for ( uint i = 0; i < L1; i++ )
+                for ( int i = 0; i < L1; i++ )
                 {
                     qtemp[index] = F( chunkId, aligndir, i, j, k, 0 );
                     //    cout<< " qtemp "<<qtemp[index]<<endl;
@@ -2421,11 +2421,11 @@ void Phdf5::getQ( ChunkedArray &F, const int chunkId, int *L, const int aligndir
 
     else if ( aligndir == 1 )
     {
-        for ( uint k = 0; k < N1; k++ )
+        for ( int k = 0; k < N1; k++ )
         {
-            for ( uint i = 0; i < L1; i++ )
+            for ( int i = 0; i < L1; i++ )
             {
-                for ( uint j = 0; j < M1; j++ )
+                for ( int j = 0; j < M1; j++ )
                 {
                     {
                         qtemp[index] = F( chunkId, aligndir, i, j, k, 0 );
@@ -2437,12 +2437,12 @@ void Phdf5::getQ( ChunkedArray &F, const int chunkId, int *L, const int aligndir
     }
     else if ( aligndir == 2 )
     {
-        for ( uint i = 0; i < N1; i++ )
+        for ( int i = 0; i < N1; i++ )
 
         {
-            for ( uint j = 0; j < M1; j++ )
+            for ( int j = 0; j < M1; j++ )
             {
-                for ( uint k = 0; k < L1; k++ )
+                for ( int k = 0; k < L1; k++ )
                 {
                     qtemp[index] = F( chunkId, aligndir, i, j, k, 0 );
                     index++;

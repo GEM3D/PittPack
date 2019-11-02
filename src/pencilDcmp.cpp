@@ -4902,7 +4902,6 @@ const char *PittPackGetErrorEnum( PittPackResult error )
             return ( "\n   failed to in setting error handler for MPI \n " );
         case THOMAS_FAIL:
             return ( "\n   Thomas algorithm Failed \n " );
-
         case INPUT_ARGS:
             return ( "\n   number of input arguments are not correct \n " );
         case CUFFT_FAIL_X:
@@ -4927,8 +4926,6 @@ const char *PittPackGetErrorEnum( PittPackResult error )
             return ( "\n   MPI Ineighbor failure \n " );
         case CONNECTIVITY_CONSTRUCTION_FAIL:
             return ( "\n   Connectivity construction failure \n " );
-
-
     }
 
     return "<unknown>";

@@ -4913,12 +4913,21 @@ const char *PittPackGetErrorEnum( PittPackResult error )
             return ( "\n   CUFFT failed in inverse X-transform  \n " );
         case CUFFT_FAIL_INV_Y:
             return ( "\n   CUFFT failed in inverse Y-transform \n " );
+        case GRAPH_CREATE_FAIL:
+            return ( "\n   MPI failed to create graph  \n " );
         case MESH_DIVISIBLE:
             return ( "\n   Mesh is not divisible by Number of Chunks  \n " );
         case MPI_DIST_GTAPH_FAIL_X:
             return ( "\n   MPI distributed graph failure in X direction \n " );
         case MPI_DIST_GTAPH_FAIL_Y:
             return ( "\n   MPI distributed graph failure in Y direction \n " );
+        case MPI_INEIGHBOR_FAIL_ZX:
+            return ( "\n   MPI Ineighbor failure \n " );
+        case MPI_INEIGHBOR_FAIL_XY:
+            return ( "\n   MPI Ineighbor failure \n " );
+        case CONNECTIVITY_CONSTRUCTION_FAIL:
+            return ( "\n   Connectivity construction failure \n " );
+
 
     }
 

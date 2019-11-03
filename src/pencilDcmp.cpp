@@ -1866,7 +1866,6 @@ static double exactValue( double omega, double x, int tg )
     else if ( tg == -2 )
     {
          ans = ( cosine( omega*x ) );
-        //ans = ( sine( omega * x ) );
     }
 
     // cout<< "exact value "<<tg <<endl;

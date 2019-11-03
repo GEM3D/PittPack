@@ -231,6 +231,7 @@ void test_cases(int NXCHUNK,  int argcs, char *pArgs[] )
    std::cout<<err[9]<<std::endl;
    std::cout<<err[10]<<std::endl;
    std::cout<<err[11]<<std::endl;
+   delete[] err;
 //   std::cout<<test_case_DDDDDD(M)<<std::endl;
 
 }

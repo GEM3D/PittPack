@@ -15,6 +15,7 @@ using namespace std;
 typedef void ( *exitroutinetype )( char *err_msg );
 extern void acc_set_error_routine( exitroutinetype callback_routine );
 
+
 void handle_gpu_errors( char *err_msg )
 {
     printf( "GPU Error: %s", err_msg );
@@ -22,6 +23,7 @@ void handle_gpu_errors( char *err_msg )
     //  MPI_Abort(MPI_COMM_WORLD, 1);
     exit( -1 );
 }
+int PencilDcmp::obj_counter=0;
 
 PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
 {
@@ -29,6 +31,7 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
     ny = n1;
     nz = n2;
 
+    obj_counter++;
     p0 = px;
     p1 = py;
 
@@ -235,6 +238,9 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
     ny = n1;
     nz = n2;
 
+
+    obj_counter++;
+    cout<<" num objects "<<obj_counter<<endl;
     // set scale=1.0
     scale = 1.0;
     // this poisson solver will be used in a flow solver
@@ -528,7 +534,9 @@ void PencilDcmp::MPIStartUp()
 PencilDcmp::~PencilDcmp()
 {
     int initFlag;
-
+    
+    obj_counter--;
+     
     if ( Nbrs[0] != NULL )
     {
         delete[] Nbrs[0];
@@ -638,7 +646,7 @@ PencilDcmp::~PencilDcmp()
     }
 
     // cout<<" init flag "<<initFlag<<endl;
-    if ( initFlag == 0 )
+    if ( initFlag == 0 && obj_counter==0)
     {
         if ( MPI_Finalize() != MPI_SUCCESS )
         {
@@ -1857,8 +1865,8 @@ static double exactValue( double omega, double x, int tg )
     }
     else if ( tg == -2 )
     {
-        // ans = ( cosine( omega*x ) );
-        ans = ( sine( omega * x ) );
+         ans = ( cosine( omega*x ) );
+        //ans = ( sine( omega * x ) );
     }
 
     // cout<< "exact value "<<tg <<endl;
@@ -6450,6 +6458,8 @@ void PencilDcmp::pittPack() /*!<called on CPU runs on GPU */
 
 std::unique_ptr<PencilDcmp>make_Poisson(int argcs, char *pArgs[], int nx, int ny, int nz )
 {
+
+
 #if(PITTPACKACC)
         return std::unique_ptr<PencilDcmp>(new PoissonGPU(argcs,pArgs, nx,ny,nz ));
 #else

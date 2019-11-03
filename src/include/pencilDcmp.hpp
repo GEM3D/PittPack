@@ -29,6 +29,7 @@
 
 typedef unsigned int uint;
 
+
 typedef struct shuffle /*!< \brief Struct used to generate iax, iay, jax and jay arrays  */
 {
     sint         id;
@@ -38,6 +39,7 @@ typedef struct shuffle /*!< \brief Struct used to generate iax, iay, jax and jay
 class PencilDcmp
 {
     protected:
+    static int obj_counter;
     SignalProc Sig;
     TriDiag    T;
     MultiGrid  MG;                        /*!< Multigrid object to solve the real part of the transformation */

@@ -37,9 +37,11 @@ void test_cases(int NXCHUNK,  int argcs, char *pArgs[] )
    int ncases=20;
 
    double *err=new double[2*ncases];
+/*
    err[0]=test_case_NNNNDD(M);
    err[1]=test_case_DDDDDD(M);
    err[2]=test_case_NNNNNN(M);
+*/
    err[3]=test_case_PPPPPP(M);
 
     Nx = 2*Nx;
@@ -49,10 +51,11 @@ void test_cases(int NXCHUNK,  int argcs, char *pArgs[] )
     auto M0=make_Poisson( argcs, pArgs, Nx, Ny, Nz );
     M0->setBox( X );
     M0->setCoords( dir );
- 
+ /*
    err[4]=test_case_NNNNDD(M0);
    err[5]=test_case_DDDDDD(M0);
    err[6]=test_case_NNNNNN(M0);
+*/
    err[7]=test_case_PPPPPP(M0);
 
     Nx = 2*Nx;
@@ -62,10 +65,11 @@ void test_cases(int NXCHUNK,  int argcs, char *pArgs[] )
     auto M1=make_Poisson( argcs, pArgs, Nx, Ny, Nz );
     M1->setBox( X );
     M1->setCoords( dir );
- 
+ /*
    err[8]=test_case_NNNNDD(M1);
    err[9]=test_case_DDDDDD(M1);
    err[10]=test_case_NNNNNN(M1);
+*/
    err[11]=test_case_PPPPPP(M1);
 
 

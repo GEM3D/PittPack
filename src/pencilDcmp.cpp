@@ -1479,7 +1479,7 @@ void PencilDcmp::nbrAllToAllZXOverlap()
     // for All to allV
 
     double *ptr = NULL;
-    //int     end = P.chunkSize;
+    int     end = P.chunkSize;
     // int     ierr;
 
     //
@@ -1730,7 +1730,7 @@ void PencilDcmp::nbrAllToAllXYOverlap()
 #if ( 1 )
 
     double *ptr = NULL;
-    //int     end = P.chunkSize;
+    int     end = P.chunkSize;
     // int     ierr;
 
     // part A
@@ -5095,7 +5095,7 @@ int PencilDcmp::solveThmBatch( const int index )
 {
     double eig;
 
-        cout<< RED<<"solveThmBatch no full batch" <<RESET<<endl;
+      //  cout<< RED<<"solveThmBatch no full batch" <<RESET<<endl;
     for ( int j = 0; j < nxChunk; j++ )
     {
 /*
@@ -5123,8 +5123,8 @@ int PencilDcmp::solveThmBatch( const int index )
             }
             else
             {
-                 T.shermanMorrisonThomasV1( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
-               // T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
+                // T.shermanMorrisonThomasV1( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
+               T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
                 // cout<< RED<<"solveThmBatch 0 N" <<RESET<<endl;
             }
             fillInArrayBack( i, j, index, x1 + nz * i );
@@ -5150,7 +5150,7 @@ int PencilDcmp::solveThmBatch( const int index )
 
         //cout<< RED<<"solveThmBatch" <<RESET<<endl;
 
-        cout<< RED<<"solveThmBatch full batch" <<RESET<<endl;
+ //       cout<< RED<<"solveThmBatch full batch" <<RESET<<endl;
     //    clear(x2);
 
     int count = 0;

@@ -158,10 +158,14 @@ if [[ $cluster == "crc" ]]; then
     else
         export GPU1=1
         module load gcc/5.4.0
-        module load openmpi/2.0.2
-        module load pgi/18.10
-        export CC=/ihome/crc/install/pgi/18.10/linux86-64/18.10/mpi/openmpi-2.1.2/bin/mpicc
-        export CXX=/ihome/crc/install/pgi/18.10/linux86-64/18.10/mpi/openmpi-2.1.2/bin/mpiCC
+        ##module load openmpi/2.0.2
+        module load openmpi/3.1.1
+        ##module load pgi/18.10
+        module load pgi/19.4
+        ##export CC=/ihome/crc/install/pgi/18.10/linux86-64/18.10/mpi/openmpi-2.1.2/bin/mpicc
+        ##export CXX=/ihome/crc/install/pgi/18.10/linux86-64/18.10/mpi/openmpi-2.1.2/bin/mpiCC
+        export CC=/ihome/crc/install/pgi/19.4/linux86-64/2019/mpi/openmpi-3.1.3/bin/mpicc
+        export CXX=/ihome/crc/install/pgi/19.4/linux86-64/2019/mpi/openmpi-3.1.3/bin/mpiCC
 fi
 
 fi

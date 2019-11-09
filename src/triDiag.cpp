@@ -1962,22 +1962,22 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
 {
     int N = nChunk * nzChunk;
 
-    cout<<" diag "<<diag<<endl;
+  //  cout<<" diag "<<diag<<endl;
  
     for(int i=0;i<3;i++)
     {
 //     subDiag[i]=1.0;
 //     supDiag[i]=1.0;
-     cout<<subDiag[i]<<endl;
-     cout<<supDiag[i]<<endl;
+//     cout<<subDiag[i]<<endl;
+//     cout<<supDiag[i]<<endl;
     }
     // print the input
     //
     
-        cout<<" before solve "<<endl;
+   //     cout<<" before solve "<<endl;
         for ( int i = 0; i < N; i++ )
         {
-            cout<<rh[i]<<endl;
+     //       cout<<rh[i]<<endl;
         }
     
 
@@ -2100,15 +2100,15 @@ if(fabs(part2<1.e-6))
 
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<rh[0]<<" "<<rh[N-1]<<endl;
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<endl;
-    
+    /* 
             cout<<" final solve "<<endl;
 
             for ( int i = 0; i < N; i++ )
             {
                 cout<<rh[i]<<endl;
             }
-     
-#if ( 1 )
+     */
+#if ( 0 )
     if ( fabs( rh[0] - rh[N - 1] ) > 1.e-6 )
     {
         printf( " periodicity screwed up\n " );
@@ -2172,7 +2172,7 @@ void TriDiag::shermanMorrisonThomasV1( double *tmpMG, double *rh, double *rh1, d
         */
 
     // this will remove the singularity for the corner that we set the calue as zero
-#if ( 0 )
+#if  0 
 
     if ( fabs( diag + 2. ) < 1.e-10 )
     {
@@ -2247,19 +2247,21 @@ if(fabs(part2<1.e-6))
 
 #if ( 1 )
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<rh[0]<<" "<<rh[N-1]<<endl;
-    cout << " ends index " << index << " eig " << diag << " " << endl;
-    cout << " final solve " << endl;
+   // cout << " ends index " << index << " eig " << diag << " " << endl;
+/*  
+  cout << " final solve " << endl;
 
     for ( int i = 0; i < N; i++ )
     {
         cout << rh[i] << endl;
     }
-
+*/
+#if(DEBUG)
     if(fabs(rh[0]-rh[N-1])>1.e-6)
     {
      printf(" periodicity screwed up\n ");
      exit(0);
    }
-
+#endif
 #endif
 }

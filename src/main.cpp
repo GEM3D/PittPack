@@ -62,7 +62,7 @@ int main( int argcs, char *pArgs[] )
         exit( 1 );
     }
 
-#if 0
+#if 1
     int my_rank, com_size;
     MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
     MPI_Comm_size( MPI_COMM_WORLD, &com_size );
@@ -77,15 +77,15 @@ int main( int argcs, char *pArgs[] )
     int Nz = NZCHUNK * p0;
 
      auto M=make_Poisson( argcs, pArgs, Nx, Ny, Nz );
-     // char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
     // char mybc[6] = {'D', 'D', 'P', 'P', 'P', 'P'};
-    //  char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
+    // char mybc[6] = {'D', 'D', 'P', 'P', 'P', 'P'};
+      char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
     // char mybc[6] = {'P', 'P', 'P', 'P', 'P', 'P'};
     // it is illposed
     //  char mybc[6] = {'N', 'N', 'N', 'N', 'N', 'N'};
     // char mybc[6] = {'D', 'D', 'D', 'D', 'D', 'D'};
 
-     char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
+  //  char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
     // char mybc[6] = {'D', 'D', 'D', 'D', 'P', 'P'};
     //char mybc[6] = {'P', 'P', 'P', 'P', 'N', 'N'};
     //       char mybc[6] = {'D', 'D', 'D', 'D', 'P', 'P'};
@@ -152,7 +152,7 @@ int main( int argcs, char *pArgs[] )
     }
 #endif 
 
-    test_cases(NXCHUNK,  argcs, pArgs );
+ //   test_cases(NXCHUNK,  argcs, pArgs );
 
     return ( 0 );
 };

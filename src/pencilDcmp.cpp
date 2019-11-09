@@ -23,6 +23,8 @@ void handle_gpu_errors( char *err_msg )
     //  MPI_Abort(MPI_COMM_WORLD, 1);
     exit( -1 );
 }
+
+// initialize static variable 
 int PencilDcmp::obj_counter=0;
 
 PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
@@ -5093,6 +5095,7 @@ int PencilDcmp::solveThmBatch( const int index )
 {
     double eig;
 
+        cout<< RED<<"solveThmBatch no full batch" <<RESET<<endl;
     for ( int j = 0; j < nxChunk; j++ )
     {
 /*
@@ -5109,8 +5112,9 @@ int PencilDcmp::solveThmBatch( const int index )
         {
             eig = getEigenVal( i, j );
 
+           // cout<<" eigenval "<<eig<<endl;
             fillInArrayContig( i, j, index, x1 + i * nz );
-            //     cout<< RED<<"solve half Batch" <<RESET<<endl;
+                 cout<< RED<<"solve half Batch" <<RESET<<endl;
 
             if ( bc[4] != 'P' )
             {
@@ -5119,8 +5123,8 @@ int PencilDcmp::solveThmBatch( const int index )
             }
             else
             {
-                // T.shermanMorrisonThomasV1( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
-                T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
+                 T.shermanMorrisonThomasV1( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
+               // T.shermanMorrisonThomas( x2 + i * nz, x1 + nz * i, x3 + i * nz, eig, 1.0, 1.0, index );
                 // cout<< RED<<"solveThmBatch 0 N" <<RESET<<endl;
             }
             fillInArrayBack( i, j, index, x1 + nz * i );
@@ -5144,8 +5148,9 @@ int PencilDcmp::solveThmBatch( const int index )
         }
     */
 
-    //    cout<< RED<<"solveThmBatch" <<RESET<<endl;
+        //cout<< RED<<"solveThmBatch" <<RESET<<endl;
 
+        cout<< RED<<"solveThmBatch full batch" <<RESET<<endl;
     //    clear(x2);
 
     int count = 0;
@@ -5158,6 +5163,9 @@ int PencilDcmp::solveThmBatch( const int index )
         i = l % nyChunk;
         j = l / nyChunk;
         eig = getEigenVal( i, j );
+       
+        //cout<<" eig  "<<eig<<end;;        
+
         fillInArrayContig( i, j, index, x1 + l * nz );
         // T.thomasLowMem( x2 + l * nz, x1 + nz * l, eig, index );
 
@@ -5168,11 +5176,11 @@ int PencilDcmp::solveThmBatch( const int index )
         }
         else
         {
-            // cout<< RED<<"solve full batch N" <<RESET<<endl;
+             //cout<< RED<<"solve full batch N" <<RESET<<endl;
             //   this is too strong for enforcing boundries.
-            //    T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3+l*nz ,eig, 0.0 ,-eig, index );
-            T.shermanMorrisonThomasV1( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 0.0, 1.0, index );
-            // T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 1.0, 1.0, index );
+           //    T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3+l*nz ,eig, 0.0 ,-eig, index );
+           // T.shermanMorrisonThomasV1( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 0.0, 1.0, index );
+             T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 1.0, 1.0, index );
         }
 
         fillInArrayBack( i, j, index, x1 + nz * l );
@@ -5772,7 +5780,7 @@ void PencilDcmp::fillTrigonometric( double *rhs )
                 }
 
                 rhs[i + j * Nx + Nx * Ny * k]
-                = -4. * pi * pi * cos( 2. * pi * z ) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
+                = -4. * pi * pi * sin( 2. * pi * z ) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
                                * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )
                                + ( omega[1] * omega[1] ) * exactValue( omega[0] , x, tags[0] )
                                  * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )

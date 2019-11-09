@@ -47,7 +47,7 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     SOLUTIONMETHOD = 0,              /*!< (0) solves with Thomas (1) Uses PCR (2) CR-P (4) Multigrid and (5) cuSPARCE (CR and PCR )
                                           the last two are disabled disabled to avoid unnecesary memory usage,
                                            need to change the MULTIGRIDON to 1 to enable allocation for multigrid and cuSPARSE */
-    INITANALYTIC = 1, /*! This enables initializeTrigonometric function used for debugging and verification of oder of accuracy*/
+    INITANALYTIC = 0, /*! This enables initializeTrigonometric function used for debugging and verification of oder of accuracy*/
     PIVOT        = 1, /*!< This is only used for cuSPARSE, for diagonally dominant matrix pivoting is not required */
     INNERITER    = 10,
     OUTERITER    = 20,
@@ -56,8 +56,8 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     VECLENGTH     = 256, /*!< sets the number of gpu-threads */
     MAXLEVEL      = 20,
     COEFF0        = 1 , /*!< (COEFF0*pi) is the frequency of the exact solution in the x-direction  */
-    COEFF1        = 2, /*!< (COEFF0*pi) is the frequency of the exact solution in the y-direction  */
-    COEFF2        = 3, /*!< (COEFF0*pi) is the frequency of the exact solution in the z-direction  */
+    COEFF1        = 1, /*!< (COEFF0*pi) is the frequency of the exact solution in the y-direction  */
+    COEFF2        = 1, /*!< (COEFF0*pi) is the frequency of the exact solution in the z-direction  */
     AMPL0         = 0, /*!< amplitude of the wave in x direction*/
     AMPL1         = 0, /*!< amplitude of the wave in y direction*/
     AMPL2         = 0, /*!< amplitude of the wave in z direction*/
@@ -66,7 +66,7 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     PROFILE_COMM  = 0, /*!< Turn it on and it will report the amount of time spent for communication */
     NITER         = 10, /*!< Number of iteration for Poisson Solver*/
     RUNINFO       = 1 , /* set this to one to write the report for the run*/
-    ZERO_MEAN     = 1, /*!< To enforce the solution to have zero mean */ 
+    ZERO_MEAN     = 0, /*!< To enforce the solution to have zero mean */ 
 
 };
 
@@ -126,7 +126,7 @@ const double pi = 3.1415926535897932384;
 #define USE_SHARED 0 /*!< set to 0 will use global memory, set to 1 will use shared memory*/
 #define REVTRSP 1    /*!< 1) stands for simplest transform. 0) transposes using shared mem*/
 #define R_COPY 1
-#define THOM_FULL_BATCH 0 /*! full batch=1 refers to 2D batch of the system of tridiagonal solves, 0 implies x-dimenional batching only*/
+#define THOM_FULL_BATCH 1 /*! full batch=1 refers to 2D batch of the system of tridiagonal solves, 0 implies x-dimenional batching only*/
 #define JIC 0
 
 PittPackResult OPENACC_Init( int &my_rank, int &com_size );       /*!< Initializes the GPU's. equivalent to MPI_Init()  */

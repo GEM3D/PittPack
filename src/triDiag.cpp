@@ -1962,15 +1962,24 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
 {
     int N = nChunk * nzChunk;
 
+    cout<<" diag "<<diag<<endl;
+ 
+    for(int i=0;i<3;i++)
+    {
+//     subDiag[i]=1.0;
+//     supDiag[i]=1.0;
+     cout<<subDiag[i]<<endl;
+     cout<<supDiag[i]<<endl;
+    }
     // print the input
     //
-    /*
+    
         cout<<" before solve "<<endl;
         for ( int i = 0; i < N; i++ )
         {
             cout<<rh[i]<<endl;
         }
-    */
+    
 
     double b[3];
     double bb[3];
@@ -1991,6 +2000,7 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
 
     double fact, gamma;
     gamma = -b[0];
+// put for debug
 
     // this is for diagonal entry modification
     // only 3 elements are needed
@@ -2019,7 +2029,7 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
         //  {
         //          cout<<rh[i]<<endl;
         //  }
-        // cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
+         //cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
         // only when there is singularity remove it
         shermanMorrisonThomasV1( tmpMG, rh, rh1, diag, 1.0, 1.0, index );
 
@@ -2090,15 +2100,15 @@ if(fabs(part2<1.e-6))
 
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<rh[0]<<" "<<rh[N-1]<<endl;
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<endl;
-    /*
+    
             cout<<" final solve "<<endl;
 
             for ( int i = 0; i < N; i++ )
             {
                 cout<<rh[i]<<endl;
             }
-      */
-#if ( 0 )
+     
+#if ( 1 )
     if ( fabs( rh[0] - rh[N - 1] ) > 1.e-6 )
     {
         printf( " periodicity screwed up\n " );
@@ -2235,7 +2245,7 @@ if(fabs(part2<1.e-6))
 
 #endif
 
-#if ( 0 )
+#if ( 1 )
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<rh[0]<<" "<<rh[N-1]<<endl;
     cout << " ends index " << index << " eig " << diag << " " << endl;
     cout << " final solve " << endl;
@@ -2244,12 +2254,12 @@ if(fabs(part2<1.e-6))
     {
         cout << rh[i] << endl;
     }
-/*
+
     if(fabs(rh[0]-rh[N-1])>1.e-6)
     {
      printf(" periodicity screwed up\n ");
      exit(0);
    }
-*/
+
 #endif
 }

@@ -100,14 +100,16 @@ void ChunkedArray::moveDeviceToHost()
 #if ( PITTPACKACC )
 #pragma acc routine seq
 // index 0 retrieves real and indez zero retrieves
-inline double &ChunkedArray::operator()( int i, int j, int k, int index ) { return P[2 * ( i + nx * j + nx * ny * k ) + index]; }
+//inline double &ChunkedArray::operator()( int i, int j, int k, int index ) { return P[2 * ( i + nx * j + nx * ny * k ) + index]; }
+double &ChunkedArray::operator()( int i, int j, int k, int index ) { return P[2 * ( i + nx * j + nx * ny * k ) + index]; }
 #else
 double &ChunkedArray::operator()( int i, int j, int k, int index ) { return P[2 * ( i + nx * j + nx * ny * k ) + index]; }
 #endif
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
-inline double &ChunkedArray::operator()( int i, int j, int k )
+//inline double &ChunkedArray::operator()( int i, int j, int k )
+double &ChunkedArray::operator()( int i, int j, int k )
 // double &ChunkedArray::operator()( int i, int j, int k )
 {
     return P[2 * ( i + nx * j + nx * ny * k )];
@@ -120,7 +122,8 @@ double &ChunkedArray::operator()( int i, int j, int k ) { return P[2 * ( i + nx 
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
-inline  double &ChunkedArray::operator()( int i, int j, int k, int dir, int index )
+//inline  double &ChunkedArray::operator()( int i, int j, int k, int dir, int index )
+double &ChunkedArray::operator()( int i, int j, int k, int dir, int index )
 {
     if ( dir == 0 )
     {
@@ -159,7 +162,8 @@ double &ChunkedArray::operator()( int i, int j, int k, int dir, int index )
 
 #if ( PITTPACKACC )
 #pragma acc routine seq
-inline double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int k, int index )
+//inline double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int k, int index )
+double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int k, int index )
 {
     /*! brief: rearrangement is consistent with the planes where (1,0,0) (0,1,0) and (0,0,1) around which rotation occurs */
 
@@ -236,7 +240,8 @@ double &ChunkedArray::operator()( int chunkId, int dir, int i, int j, int k, int
 // intel's compiler complaining about inlining
 #if ( PITTPACKACC )
 #pragma acc routine seq
-inline double &ChunkedArray::operator()( int i )
+//inline double &ChunkedArray::operator()( int i )
+double &ChunkedArray::operator()( int i )
 {
     /*
        if(i>=arraySize)

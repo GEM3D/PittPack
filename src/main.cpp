@@ -64,7 +64,7 @@ int main( int argcs, char *pArgs[] )
         exit( 1 );
     }
 
-#if 0
+#if 1
     int my_rank, com_size;
     MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
     MPI_Comm_size( MPI_COMM_WORLD, &com_size );
@@ -99,8 +99,6 @@ int main( int argcs, char *pArgs[] )
 } 
    M->assignBoundary( mybc );
 
-    double a[3] = {0, 0, 0};
-//    cout << RED << " myRank " << my_rank << " a[3]= " << a[0] << " " << a[1] << RESET << endl;
 
     // double X[6] = {-1.0, 1.0, -1.0, 1.0, -1.0, 1.0};
     double X[6] = {0, 1.0, 0, 1.0, 0, 1.0};
@@ -122,6 +120,11 @@ int main( int argcs, char *pArgs[] )
 
         if ( INITANALYTIC == 0 )
         {
+            if(NITER>1) 
+            {
+            cout<<" set NITER=1 for this test case "<<endl;
+            exit(1);
+            }
             double *rhs = new double[Nx * Ny * Nz];
             M->fillTrigonometric( rhs );
                 M->assignRhs( rhs );

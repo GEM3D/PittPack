@@ -5755,7 +5755,6 @@ void PencilDcmp::fillTrigonometric( double *rhs )
         c3 = dxyz[2];
     }
 
-    double omega[3] = {COEFF0 * pi, COEFF1 * pi, COEFF2 * pi};
 
     for ( int k = 0; k < Nz; k++ )
     {
@@ -5918,10 +5917,13 @@ void PencilDcmp::pittPack() /*!<called on CPU runs on GPU */
             }
             if ( INITANALYTIC )
             {
+#if ( SOLVE != 0 )
 #if ( PITTPACKACC )
 #pragma acc parallel num_gangs( 1024 ) vector_length( VECLENGTH )
 #endif
+
                 initializeTrigonometric();
+#endif
             }
 
 #if ( POSS )

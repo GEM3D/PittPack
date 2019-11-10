@@ -79,7 +79,8 @@ int main( int argcs, char *pArgs[] )
     int Nz = NZCHUNK * p0;
 
      auto M=make_Poisson( argcs, pArgs, Nx, Ny, Nz );
-    // char mybc[6] = {'D', 'D', 'P', 'P', 'P', 'P'};
+     //char mybc[6] = {'P', 'P', 'D', 'D', 'P', 'P'};
+     char mybc[6] = {'P', 'P', 'D', 'D', 'P', 'P'};
     // char mybc[6] = {'D', 'D', 'P', 'P', 'P', 'P'};
     //  char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
     // char mybc[6] = {'P', 'P', 'P', 'P', 'P', 'P'};
@@ -87,7 +88,7 @@ int main( int argcs, char *pArgs[] )
     //  char mybc[6] = {'N', 'N', 'N', 'N', 'N', 'N'};
     // char mybc[6] = {'D', 'D', 'D', 'D', 'D', 'D'};
 
-    char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
+//    char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
     // char mybc[6] = {'D', 'D', 'D', 'D', 'P', 'P'};
     //char mybc[6] = {'P', 'P', 'P', 'P', 'N', 'N'};
     //       char mybc[6] = {'D', 'D', 'D', 'D', 'P', 'P'};

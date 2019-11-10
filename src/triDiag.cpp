@@ -1852,7 +1852,7 @@ void TriDiag::thomasLowMemNoBC( double *tmpMG, double *rh, double *diag, int ind
     int j    = 1;
     tmpMG[j] = supDiag[j - 1] / bet;
     // periodic only, supDiag[0]=0.0
-    // tmpMG[j] = 0.0;
+    ///tmpMG[j] = 0.0;
     bet   = b[1] - subDiag[1] * tmpMG[j];
     rh[1] = ( rh[1] - subDiag[1] * rh[j - 1] ) / bet;
 
@@ -1966,8 +1966,8 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
  
     for(int i=0;i<3;i++)
     {
-//     subDiag[i]=1.0;
-//     supDiag[i]=1.0;
+     //subDiag[i]=1.0;
+     //supDiag[i]=1.0;
 //     cout<<subDiag[i]<<endl;
 //     cout<<supDiag[i]<<endl;
     }
@@ -2029,7 +2029,7 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
         //  {
         //          cout<<rh[i]<<endl;
         //  }
-         //cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
+        //cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
         // only when there is singularity remove it
         shermanMorrisonThomasV1( tmpMG, rh, rh1, diag, 1.0, 1.0, index );
 
@@ -2108,7 +2108,7 @@ if(fabs(part2<1.e-6))
                 cout<<rh[i]<<endl;
             }
      */
-#if ( 0 )
+#if ( DEBUG )
     if ( fabs( rh[0] - rh[N - 1] ) > 1.e-6 )
     {
         printf( " periodicity screwed up\n " );

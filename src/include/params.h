@@ -47,7 +47,7 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     SOLUTIONMETHOD = 0,              /*!< (0) solves with Thomas (1) Uses PCR (2) CR-P (4) Multigrid and (5) cuSPARCE (CR and PCR )
                                           the last two are disabled disabled to avoid unnecesary memory usage,
                                            need to change the MULTIGRIDON to 1 to enable allocation for multigrid and cuSPARSE */
-    INITANALYTIC = 1, /*! This enables initializeTrigonometric function used for debugging and verification of oder of accuracy*/
+    INITANALYTIC = 0, /*! This enables initializeTrigonometric function used for debugging and verification of oder of accuracy*/
     PIVOT        = 1, /*!< This is only used for cuSPARSE, for diagonally dominant matrix pivoting is not required */
     INNERITER    = 10,
     OUTERITER    = 20,
@@ -55,16 +55,16 @@ enum PittPackParams /*!<Parameters to set before compiling  */
     = 10000, /*!< Overrides the default number of gpu blocks (gangs), setting this to a large value will replace this with nyChunk */
     VECLENGTH     = 256, /*!< sets the number of gpu-threads */
     MAXLEVEL      = 20,
-    COEFF0        = 1 , /*!< (COEFF0*pi) is the frequency of the exact solution in the x-direction  */
+    COEFF0        = 2 , /*!< (COEFF0*pi) is the frequency of the exact solution in the x-direction  */
     COEFF1        = 2, /*!< (COEFF0*pi) is the frequency of the exact solution in the y-direction  */
-    COEFF2        = 3, /*!< (COEFF0*pi) is the frequency of the exact solution in the z-direction  */
+    COEFF2        = 2, /*!< (COEFF0*pi) is the frequency of the exact solution in the z-direction  */
     AMPL0         = 0, /*!< amplitude of the wave in x direction*/
     AMPL1         = 0, /*!< amplitude of the wave in y direction*/
     AMPL2         = 0, /*!< amplitude of the wave in z direction*/
     CUFFT_STREAMS = 0, /*!< uses different stream for fft transform  */
     MONITOR_MEM   = 0, /*!< set this to 1 to monitor memory usage at each level of solution  */
     PROFILE_COMM  = 0, /*!< Turn it on and it will report the amount of time spent for communication */
-    NITER         = 10, /*!< Number of iteration for Poisson Solver*/
+    NITER         = 1, /*!< Number of iteration for Poisson Solver*/
     RUNINFO       = 1 , /* set this to one to write the report for the run*/
     ZERO_MEAN     = 0, /*!< To enforce the solution to have zero mean */ 
 

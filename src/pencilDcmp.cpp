@@ -2178,7 +2178,8 @@ if ( INITANALYTIC == 1 )
 else
 {
 
-                val  = P( i, j, k, 0 ) - ( cosine( 2. * pi * z ) );
+                //val  = P( i, j, k, 0 ) - ( cosine( 2. * pi * z ) );
+                val  = P( i, j, k, 0 ) - ( sine( 2. * pi * y ) );
                 val1 = 0.0;
 }
                 //                  cout<<"omega "<<omega[1]<<endl;
@@ -4724,7 +4725,8 @@ void PencilDcmp::modifyRhsDirichlet()
                 P( i, j, k )
                 = P( i, j, k )
                   - 2. * exactValue( omega[0], x, tags[0] ) * exactValue( omega[1], y, tags[1] ) * exactValue( omega[2], z, tags[2] );
-
+              //      -2*sin(2*pi*z);
+//                 cout<<" here \n"<<endl;
                 //                  cout<< 2. * exactValue( omega[0] , x, tags[0] ) * exactValue( omega[1] , y, tags[1] ) * exactValue(
                 //                  omega[2] , z, tags[2] )<<endl;
             }
@@ -4754,6 +4756,7 @@ void PencilDcmp::modifyRhsDirichlet()
                 P( i, j, k )
                 = P( i, j, k )
                   - 2 * exactValue( omega[0], x, tags[0] ) * exactValue( omega[1], y, tags[1] ) * exactValue( omega[2], z, tags[2] );
+                  //  -2*sin(2*pi*z);
             }
         }
     }
@@ -4829,8 +4832,8 @@ void PencilDcmp::modifyRhsDirichlet()
             {
                 x = Xa + i * c1 + shift * c1 * 0.5;
                 P( i, j, k )
-                = P( i, j, k )
-                  - 2. * exactValue( omega[0], x, tags[0] ) * exactValue( omega[1], y, tags[1] ) * exactValue( omega[2], z, tags[2] );
+                = P( i, j, k ) - 2. * exactValue( omega[0], x, tags[0] ) * exactValue( omega[1], y, tags[1] ) * exactValue( omega[2], z, tags[2] );
+                  //  -2*sin(2*pi*y);
             }
         }
     }
@@ -4853,8 +4856,8 @@ void PencilDcmp::modifyRhsDirichlet()
             {
                 x = Xa + i * c1 + shift * c1 * 0.5;
                 P( i, j, k )
-                = P( i, j, k )
-                  - 2. * exactValue( omega[0], x, tags[0] ) * exactValue( omega[1], y, tags[1] ) * exactValue( omega[2], z, tags[2] );
+                = P( i, j, k ) - 2. * exactValue( omega[0], x, tags[0] ) * exactValue( omega[1], y, tags[1] ) * exactValue( omega[2], z, tags[2] );
+                 //   -2*sin(2.*pi*y);
             }
         }
     }
@@ -5125,7 +5128,7 @@ int PencilDcmp::solveThmBatch( const int index )
 
            // cout<<" eigenval "<<eig<<endl;
             fillInArrayContig( i, j, index, x1 + i * nz );
-                 cout<< RED<<"solve half Batch" <<RESET<<endl;
+            //     cout<< RED<<"solve half Batch" <<RESET<<endl;
 
             if ( bc[4] != 'P' )
             {
@@ -5190,7 +5193,7 @@ int PencilDcmp::solveThmBatch( const int index )
              //cout<< RED<<"solve full batch N" <<RESET<<endl;
             //   this is too strong for enforcing boundries.
            //    T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3+l*nz ,eig, 0.0 ,-eig, index );
-           // T.shermanMorrisonThomasV1( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 0.0, 1.0, index );
+//           T.shermanMorrisonThomasV1( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 0.0, 1.0, index );
              T.shermanMorrisonThomas( x2 + l * nz, x1 + nz * l, x3 + l * nz, eig, 1.0, 1.0, index );
         }
 
@@ -5790,7 +5793,7 @@ void PencilDcmp::fillTrigonometric( double *rhs )
                 }
 
                 rhs[i + j * Nx + Nx * Ny * k]
-                = -4. * pi * pi * sin( 2. * pi * z ) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
+                = -4. * pi * pi * sin( 2. * pi * y ) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
                                * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )
                                + ( omega[1] * omega[1] ) * exactValue( omega[0] , x, tags[0] )
                                  * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )
@@ -6068,8 +6071,8 @@ void PencilDcmp::pittPack() /*!<called on CPU runs on GPU */
 #if ( PITTPACKACC )
 #pragma acc parallel num_gangs( trsps_gang1 ) vector_length( VECLENGTH )
 #endif
-            // changeLocationYOverlap();
-            changeLocationY();
+             changeLocationYOverlap();
+            //changeLocationY();
 #else
 #if ( PITTPACKACC )
 #pragma acc parallel num_gangs( trsps_gang1 ) vector_length( VECLENGTH )

@@ -27,7 +27,6 @@ if(my_rank==0) cout << " p0 " << p0 << " " << p1 << endl;
     int Nz = NZCHUNK * p0;
 
     auto M=make_Poisson( argcs, pArgs, Nx, Ny, Nz );
-    double a[3] = {0, 0, 0};
     double X[6] = {0, 1.0, 0, 1.0, 0, 1.0};
  
     M->setBox( X );
@@ -85,6 +84,14 @@ if(my_rank==0)
    std::cout<<err[10]<<std::endl;
    std::cout<<err[11]<<std::endl;
 }
+    std::cout<<"===============================================\n"<<std::endl;
+    std::cout<<"----------- order of accuracy  ----------------\n"<<std::endl;
+    std::cout<<"===============================================\n"<<std::endl;
+    std::cout<<" NNNNDD "<< " first refinement " <<err[0]/err[4]<<  " second refinement "  <<err[4]/err[8]<<std::endl;
+    std::cout<<" DDDDDD "<< " first refinement " <<err[1]/err[5]<<  " second refinement " <<err[5]/err[9]<<std::endl;
+    std::cout<<" NNNNNN "<< " first refinement "<<err[2]/err[6]<<  " second refinement "  <<err[6]/err[10]<<std::endl;
+    std::cout<<" PPPPPP "<< " first refinement "<<err[3]/err[7]<<  " second refinement " <<err[7]/err[11]<<std::endl;
+
    delete[] err;
 //   std::cout<<test_case_DDDDDD(M)<<std::endl;
 

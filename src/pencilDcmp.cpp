@@ -224,7 +224,7 @@ PencilDcmp::PencilDcmp( int n0, int n1, int n2, int px, int py )
     recv_request =new MPI_Request[p0];
     recv_status  =new MPI_Status[p0];
 
-#if ( DEBUG )
+#if DEBUG 
     cout << "iaxsize " << iaxSize << endl;
     cout << "iaysize " << iaySize << endl;
 #endif
@@ -242,7 +242,7 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
 
 
     obj_counter++;
-    cout<<" num objects "<<obj_counter<<endl;
+
     // set scale=1.0
     scale = 1.0;
     // this poisson solver will be used in a flow solver
@@ -270,6 +270,11 @@ PencilDcmp::PencilDcmp( int argcs, char *pArgs[], int n0, int n1, int n2 )
     }
 
     MPIStartUp();
+
+ if(myRank==0)
+{
+    cout<<" num objects "<<obj_counter<<endl;
+}
 
 #if(PITTPACKACC)
     PittPackResult result;
@@ -701,7 +706,7 @@ void PencilDcmp::allocateChunks()
             exit( 1 );
         }
 
-#if ( 1 )
+#if ( DEBUG )
         cout << "regular neighborhood AlltoAll full recv nameAppendixfer is used" << endl;
         cout << " chunkSize" << P.getChunkSize() << endl;
 #endif
@@ -2764,7 +2769,9 @@ void PencilDcmp::constructShuffleVectorX()
         */
     }
 
+#if DEBUG
     cout << "totalSize= " << totalSize << endl;
+#endif
 
     setUpShuffleArraysX( a );
 
@@ -2783,7 +2790,7 @@ void PencilDcmp::setUpShuffleArraysX( vector<shuffle0> &a )
     }
 
     sint finalsize = count + a.size();
-#if ( 1 )
+#if DEBUG
     cout << "FinalSize= " << finalsize << endl;
 #endif
     jax = new sint[finalsize];
@@ -2833,7 +2840,9 @@ void PencilDcmp::setUpShuffleArraysX( vector<shuffle0> &a )
 #if ( USE_SHARED != 1 )
     tmpX = new double[xSize];
 #endif
+#if DEBUG
     cout << " xSize  " << xSize << " iaxSize  " << endl;
+#endif
 
 #if ( PITTPACKACC )
 #pragma acc update device( iaxSize )
@@ -3628,7 +3637,7 @@ void PencilDcmp::assignBoundary( char *boundary )
 
     T.assignBC( bc );
 
-    for ( int i = 0; i < 6 && myRank == 0; i++ )
+    for ( int i = 0; (i < 6) && (myRank == 0); i++ )
     {
         cout << " myRank " << myRank << " Dirichlet tags " << faceTag[i] << endl;
     }
@@ -3678,8 +3687,9 @@ void PencilDcmp::extractTag()
     {
         tags[2] = -2;
     }
-
+#if DEBUG
     std::cout << "tags " << tags[0] << " " << tags[1] << " " << tags[2] << std::endl;
+#endif
 }
 
 void PencilDcmp::setScale()
@@ -3691,7 +3701,7 @@ void PencilDcmp::setScale()
     sc[1] = nyChunk * nChunk;
     scale = sc[0] * sc[1];
 
-    std::cout << "scale " << scale << std::endl;
+  //  std::cout << "scale " << scale << std::endl;
 #if ( PITTPACKACC )
 #pragma acc update device( scale )
 #endif
@@ -3738,7 +3748,8 @@ void PencilDcmp::detectTransforms()
         transform[2] = 'U';
     }
 
-    for ( int i = 0; i < 3; i++ )
+
+    for ( int i = 0; i < 3 && myRank==0; i++  )
     {
         std::cout << " transform[ " << i << " ]= " << transform[i] << std::endl;
     }
@@ -6443,8 +6454,8 @@ void PencilDcmp::pittPack() /*!<called on CPU runs on GPU */
 #if ( DEBUG2 )
     printX( myfile );
     myfile.close();
-#endif
     cout << " *********************************" << endl;
+#endif
 #if ( DEBUG2 )
     //#if (1 )
     for ( int k = 0; k < 1; k++ )

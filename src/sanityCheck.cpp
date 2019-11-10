@@ -20,7 +20,7 @@ void test_cases(int NXCHUNK,  int argcs, char *pArgs[] )
     int p0 = sqrt( com_size );
     int p1 = p0;
 
-    cout << " p0 " << p0 << " " << p1 << endl;
+if(my_rank==0) cout << " p0 " << p0 << " " << p1 << endl;
 
     int Nx = NXCHUNK * p0;
     int Ny = NYCHUNK * p0;
@@ -41,7 +41,6 @@ void test_cases(int NXCHUNK,  int argcs, char *pArgs[] )
    err[0]=test_case_NNNNDD(M);
    err[1]=test_case_DDDDDD(M);
    err[2]=test_case_NNNNNN(M);
-
    err[3]=test_case_PPPPPP(M);
 
     Nx = 2*Nx;
@@ -71,6 +70,8 @@ void test_cases(int NXCHUNK,  int argcs, char *pArgs[] )
    err[11]=test_case_PPPPPP(M1);
 
 
+if(my_rank==0)
+{
    std::cout<<err[0]<<std::endl;
    std::cout<<err[1]<<std::endl;
    std::cout<<err[2]<<std::endl;
@@ -83,6 +84,7 @@ void test_cases(int NXCHUNK,  int argcs, char *pArgs[] )
    std::cout<<err[9]<<std::endl;
    std::cout<<err[10]<<std::endl;
    std::cout<<err[11]<<std::endl;
+}
    delete[] err;
 //   std::cout<<test_case_DDDDDD(M)<<std::endl;
 
@@ -90,9 +92,11 @@ void test_cases(int NXCHUNK,  int argcs, char *pArgs[] )
 
 double test_case_NNNNDD(std::unique_ptr<PencilDcmp> &M )
 {   
+#if DEBUG
     std::cout<<"============================="<<std::endl;
     std::cout<<"           NNNNDD            "<<std::endl;
     std::cout<<"============================="<<std::endl;
+#endif
     char mybc[6] = {'N', 'N', 'N', 'N', 'D', 'D'};
     M->assignBoundary( mybc );
     M->pittPack();
@@ -101,9 +105,11 @@ double test_case_NNNNDD(std::unique_ptr<PencilDcmp> &M )
 
 double test_case_DDDDDD(std::unique_ptr<PencilDcmp> &M )
 {
+#if DEBUG
     std::cout<<"============================="<<std::endl;
     std::cout<<"           DDDDDD            "<<std::endl;
     std::cout<<"============================="<<std::endl;
+#endif
     char mybc[6] = {'D', 'D', 'D', 'D', 'D', 'D'};
     M->assignBoundary( mybc );
     M->pittPack();
@@ -112,9 +118,11 @@ double test_case_DDDDDD(std::unique_ptr<PencilDcmp> &M )
 
 double test_case_NNNNNN(std::unique_ptr<PencilDcmp> &M )
 {
+#if DEBUG
     std::cout<<"============================="<<std::endl;
     std::cout<<"           NNNNNN            "<<std::endl;
     std::cout<<"============================="<<std::endl;
+#endif
     char mybc[6] = {'N', 'N', 'N', 'N', 'N', 'N'};
     M->assignBoundary( mybc );
     M->pittPack();
@@ -123,9 +131,11 @@ double test_case_NNNNNN(std::unique_ptr<PencilDcmp> &M )
 
 double test_case_PPPPPP(std::unique_ptr<PencilDcmp> &M )
 {
+#if DEBUG
     std::cout<<"============================="<<std::endl;
     std::cout<<"           PPPPP            "<<std::endl;
     std::cout<<"============================="<<std::endl;
+#endif
     char mybc[6] = {'P', 'P', 'P', 'P', 'P', 'P'};
     M->assignBoundary( mybc );
     M->pittPack();

@@ -46,11 +46,13 @@ int main( int argcs, char *pArgs[] )
         exit( 0 );
     }
 
+#if DEBUG
     for ( int i = 0; i < argcs; i++ )
     {
         cout << pArgs[i] << "\t";
     }
     cout << endl;
+#endif
 
     int NXCHUNK = atoi( pArgs[1] );
     int NYCHUNK = atoi( pArgs[2] );
@@ -70,7 +72,7 @@ int main( int argcs, char *pArgs[] )
     int p0 = sqrt( com_size );
     int p1 = p0;
 
-    cout << " p0 " << p0 << " " << p1 << endl;
+ if(my_rank==0)  cout << " p0 " << p0 << " " << p1 << endl;
 
     int Nx = NXCHUNK * p0;
     int Ny = NYCHUNK * p0;
@@ -91,8 +93,11 @@ int main( int argcs, char *pArgs[] )
     //       char mybc[6] = {'D', 'D', 'D', 'D', 'P', 'P'};
     //        char mybc[6] = {'D', 'D', 'D', 'D', 'N', 'N'};
     // char mybc[6] = {'N', 'N', 'N', 'N', 'N', 'N'};
+ if(my_rank==0)
+{
     std::cout << mybc[0] << " " << mybc[1] << " " << mybc[2] << " " << mybc[3] << " " << mybc[4] << " " << mybc[5] << std::endl;
-    M->assignBoundary( mybc );
+} 
+   M->assignBoundary( mybc );
 
     double a[3] = {0, 0, 0};
 //    cout << RED << " myRank " << my_rank << " a[3]= " << a[0] << " " << a[1] << RESET << endl;
@@ -104,7 +109,7 @@ int main( int argcs, char *pArgs[] )
 
    int dir = 2;
 
-    cout << "xxxxxxxxxxxxx set coords xxxxxxxxxxxxxxxxxxxxx" << endl;
+   // cout << "xxxxxxxxxxxxx set coords xxxxxxxxxxxxxxxxxxxxx" << endl;
     M->setCoords( dir );
 
    // step 1) pencils with n(0,0,1) is converted to pencil with n(1,0,0)
@@ -128,14 +133,14 @@ int main( int argcs, char *pArgs[] )
 // if you dont call poisson, if you do set it equal to dir=0
 
 #if ( 1 )
-    cout << " for writing out" << endl;
+  //  cout << " for writing out" << endl;
     M->setCoords( dir );
     if ( I_O == 1 )
     {
         M->IO( 1, dir, 0 );
     }
 
-   if ( INCLUDE_ERROE_CAL_IN_TIMING == 0 )
+   if ( INCLUDE_ERROE_CAL_IN_TIMING == 0 && my_rank==0 )
     {
         cout << RED << " err = " << M->getError() << RESET << endl;
     }

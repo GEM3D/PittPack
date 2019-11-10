@@ -28,7 +28,9 @@ MultiGrid::MultiGrid( int n, double Delx, char *sm, int iter1, int iter2, int it
     getRequiredSize();
 
     setSmoother( sm );
+#if DEBUG
     printf( "max=%d size=%d smoother=%d N=%d\n", maxLevel, arraySize, selectSmoother, N );
+#endif
     // allocate
     // allocate on the device
 
@@ -79,7 +81,9 @@ void MultiGrid::construct( int n, int iter1, int iter2, int iter3, double *sub, 
     getRequiredSize();
 
     setSmoother( sm );
+#if DEBUG
     printf( "max=%d size=%d smoother=%d N=%d\n", maxLevel, arraySize, selectSmoother, N );
+#endif
     // allocate
     // allocate on the device
 
@@ -248,7 +252,9 @@ void MultiGrid::fillIndices()
     {
         indices[i] = getIndex( i );
         // prin
+        #if DEBUG
         printf( "index[%d] = %d \n", i, indices[i] );
+       #endif
     }
     //#pragma acc update device( indices [0:maxLevel] )
 }
@@ -267,7 +273,9 @@ void MultiGrid::setSmoother( char *sm )
         selectSmoother = 1;
     }
 
+        #if DEBUG
     printf( "smoother set as %s %d\n", sm, selectSmoother );
+        #endif
 }
 
 void MultiGrid::initialize( double *uIn )
@@ -315,7 +323,11 @@ void MultiGrid::getRequiredSize()
         size += ( ( 1 << ( i + 1 ) ) + 1 );
     }
     arraySize = size;
+
+        #if DEBUG
     printf( "maxlevel =%d the required size %d  \n ", maxLevel, size );
+   
+        #endif 
 }
 #else
 
@@ -328,7 +340,9 @@ void MultiGrid::getRequiredSize()
         size += ( ( 1 << (i + 1) ) - 1 );
     }
     arraySize = size;
+        #if DEBUG
     printf( "maxlevel =%d the required size %d  \n ", maxLevel, size );
+#endif
 }
 
 #endif
@@ -1811,12 +1825,12 @@ void MultiGrid::suggestSize( int a )
             count++;
         }
     }
-
+#if DEBUG
     cout << RED << " Suggestion " << a << " is divisible by: " << endl;
     for ( int i = 0; i < count; i++ )
     {
         cout << GREEN << q[i] << RESET << endl;
     }
-
+#endif
     delete[] q;
 }

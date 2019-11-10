@@ -166,7 +166,7 @@ void CommPoint2Point<Type>::recv()
 template <class Type>
 void CommPoint2Point<Type>::send()
 {
-    cout << "this tag " << Msg.tag << endl;
+   // cout << "this tag " << Msg.tag << endl;
     MPI_Send( Msg.buf, Msg.count, ConvertType( getAbstractionDataType<Type>() ), Msg.reciever, Msg.tag, Com.mpiCom );
 }
 static MPI_Datatype ConvertType( Abstraction::DataType type )

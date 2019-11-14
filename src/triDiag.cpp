@@ -1962,22 +1962,30 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
 {
     int N = nChunk * nzChunk;
 
-  //  cout<<" diag "<<diag<<endl;
- 
+    cout<<" diag "<<diag<<endl;
+#if 0 
     for(int i=0;i<3;i++)
     {
      //subDiag[i]=1.0;
      //supDiag[i]=1.0;
-//     cout<<subDiag[i]<<endl;
-//     cout<<supDiag[i]<<endl;
+     cout<<supDiag[i]<<endl;
     }
+ for(int i=0;i<3;i++)
+    {
+     //subDiag[i]=1.0;
+     //supDiag[i]=1.0;
+     cout<<subDiag[i]<<endl;
+    }
+#endif
+
+   // exit(0);
     // print the input
     //
     
    //     cout<<" before solve "<<endl;
         for ( int i = 0; i < N; i++ )
         {
-     //       cout<<rh[i]<<endl;
+            cout<<rh[i]<<endl;
         }
     
 
@@ -2029,7 +2037,7 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
         //  {
         //          cout<<rh[i]<<endl;
         //  }
-        //cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
+        cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
         // only when there is singularity remove it
         shermanMorrisonThomasV1( tmpMG, rh, rh1, diag, 1.0, 1.0, index );
 
@@ -2100,14 +2108,14 @@ if(fabs(part2<1.e-6))
 
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<rh[0]<<" "<<rh[N-1]<<endl;
     //    cout<<" ends index "<<index<<" eig "<<diag<<" "<<endl;
-    /* 
+     
             cout<<" final solve "<<endl;
 
             for ( int i = 0; i < N; i++ )
             {
                 cout<<rh[i]<<endl;
             }
-     */
+     
 #if ( DEBUG )
     if ( fabs( rh[0] - rh[N - 1] ) > 1.e-6 )
     {

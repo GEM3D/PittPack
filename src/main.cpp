@@ -80,7 +80,7 @@ int main( int argcs, char *pArgs[] )
 
      auto M=make_Poisson( argcs, pArgs, Nx, Ny, Nz );
      //char mybc[6] = {'P', 'P', 'D', 'D', 'P', 'P'};
-     char mybc[6] = {'P', 'P', 'D', 'D', 'P', 'P'};
+     char mybc[6] = {'N','N', 'P', 'P', 'P', 'P'};
     // char mybc[6] = {'D', 'D', 'P', 'P', 'P', 'P'};
     //  char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
     // char mybc[6] = {'P', 'P', 'P', 'P', 'P', 'P'};
@@ -128,7 +128,7 @@ int main( int argcs, char *pArgs[] )
             }
             double *rhs = new double[Nx * Ny * Nz];
             M->fillTrigonometric( rhs );
-                M->assignRhs( rhs );
+            M->assignRhs( rhs );
         }
         M->pittPack();
 
@@ -144,13 +144,13 @@ int main( int argcs, char *pArgs[] )
         M->IO( 1, dir, 0 );
     }
 
-   if ( INCLUDE_ERROE_CAL_IN_TIMING == 0 && my_rank==0 )
+   if( INCLUDE_ERROE_CAL_IN_TIMING == 0 && my_rank==0 )
     {
         cout << RED << " err = " << M->getError() << RESET << endl;
     }
 #endif
 
-    #endif
+#endif
     if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
     {
         cout << RED << "Warning : output file show the error not the solution  " << RESET << endl;

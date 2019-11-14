@@ -8,7 +8,7 @@
 #define DEBUG1 0 /*!<mainly turn off IO for debugging */
 #define DEBUG0 0 /*!<mainly turn off IO for debugging  for solverCPU */
 #define DEBUG 0  /*!<mainly turn off IO for debugging  for solverCPU */
-#define COMM_PATTERN  2 /*!< two type of comm_patterns are available, (0) Pairwise exchange (1) Neighorhood collective, don not try comm_pattern with CPU    \
+#define COMM_PATTERN  0 /*!< two type of comm_patterns are available, (0) Pairwise exchange (1) Neighorhood collective, don not try comm_pattern with CPU    \
          yet */
 #define SHORT_                                                                                                                             \
     0 /*!< controls the type for \f$iax, iay, jax, jay\f$ arrays, setting to 1 selects \f$short int\f$  where settingt it to zero will set \
@@ -118,7 +118,7 @@ const double pi = 3.1415926535897932384;
 // These are for debugging and turning on and off several stages of the Poisson solve
 
 #define POSS 1
-#define SOLVE 1 
+#define SOLVE 1
 #define IFFTX 1
 #define IFFTY 1 
 #define FFTX 1

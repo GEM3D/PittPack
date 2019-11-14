@@ -2178,9 +2178,10 @@ if ( INITANALYTIC == 1 )
 else
 {
 
-                //val  = P( i, j, k, 0 ) - ( cosine( 2. * pi * z ) );
-                val  = P( i, j, k, 0 ) - ( sine( 2. * pi * y ) );
+                val  = P( i, j, k, 0 ) - ( cosine( 2. * pi * x ) );
+//                val  = P( i, j, k, 0 ) - ( sine( 2. * pi * x ) );
                 val1 = 0.0;
+                 cout<<"val  "<< P(i,k,k,0) <<"  "<<cos(2*pi*x)<<endl;
 }
                 //                  cout<<"omega "<<omega[1]<<endl;
 
@@ -3640,7 +3641,7 @@ void PencilDcmp::assignBoundary( char *boundary )
 
     for ( int i = 0; (i < 6) && (myRank == 0); i++ )
     {
-        cout << " myRank " << myRank << " Dirichlet tags " << faceTag[i] << endl;
+        cout << " myRank " << myRank << " Dirichlet tags (1 means true) " << faceTag[i] << endl;
     }
 
 //#pragma acc enter data create( bc[0 : 6] )
@@ -3702,7 +3703,7 @@ void PencilDcmp::setScale()
     sc[1] = nyChunk * nChunk;
     scale = sc[0] * sc[1];
 
-  //  std::cout << "scale " << scale << std::endl;
+    std::cout << "scale " << scale << std::endl;
 #if ( PITTPACKACC )
 #pragma acc update device( scale )
 #endif
@@ -4857,7 +4858,8 @@ void PencilDcmp::modifyRhsDirichlet()
                 x = Xa + i * c1 + shift * c1 * 0.5;
                 P( i, j, k )
                 = P( i, j, k ) - 2. * exactValue( omega[0], x, tags[0] ) * exactValue( omega[1], y, tags[1] ) * exactValue( omega[2], z, tags[2] );
-                 //   -2*sin(2.*pi*y);
+                //    -2*sin(2.*pi*y);
+                //cout<<y<<endl;
             }
         }
     }
@@ -5645,7 +5647,7 @@ void PencilDcmp::assignRhs( double *rhs )
     int Ny = nyChunk;
     int Nz = nz;
 
-    if ( shift )
+    if ( !shift )
     {
         c1 = ( coords[1] - coords[0] ) / ( Nx + 1. );
         c2 = ( coords[3] - coords[2] ) / ( Ny + 1. );
@@ -5682,8 +5684,8 @@ void PencilDcmp::assignRhs( double *rhs )
 #endif
                 for ( int i = 0; i < Nx; i++ )
                 {
-                    P( i, j, k, 0 ) = rhs[i + Nx * j + Nx * Ny * k] * c3 * c3;
-                    //                   P( i, j, k, 0 ) = rhs[i + Nx * j + Nx * Ny * k];
+                   P( i, j, k, 0 ) = rhs[i + Nx * j + Nx * Ny * k] * c3 * c3;
+                     //                  P( i, j, k, 0 ) = rhs[i + Nx * j + Nx * Ny * k];
                     //                   sum=sum+rhs[i + Nx * j + Nx * Ny * k];
                     P( i, j, k, 1 ) = 0.0;
                     //                   cout<<P(i,j,k)<<endl;;
@@ -5793,7 +5795,8 @@ void PencilDcmp::fillTrigonometric( double *rhs )
                 }
 
                 rhs[i + j * Nx + Nx * Ny * k]
-                = -4. * pi * pi * sin( 2. * pi * y ) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
+                //= -4. * pi * pi * sin( 2. * pi * x ) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
+                = -4*pi*pi*cosine( 2. * pi * x ) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
                                * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )
                                + ( omega[1] * omega[1] ) * exactValue( omega[0] , x, tags[0] )
                                  * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )
@@ -5920,13 +5923,11 @@ void PencilDcmp::pittPack() /*!<called on CPU runs on GPU */
             }
             if ( INITANALYTIC )
             {
-#if ( SOLVE != 0 )
 #if ( PITTPACKACC )
 #pragma acc parallel num_gangs( 1024 ) vector_length( VECLENGTH )
 #endif
 
                 initializeTrigonometric();
-#endif
             }
 
 #if ( POSS )
@@ -5936,10 +5937,12 @@ void PencilDcmp::pittPack() /*!<called on CPU runs on GPU */
             }
             //   if ( bc[0] != 'P' && bc[2] != 'P' )
             {
+#if(SOLVE!=0)
 #if ( PITTPACKACC )
 #pragma acc parallel num_gangs( 1024 ) vector_length( VECLENGTH )
 #endif
                 modifyRhsDirichlet();
+#endif
             }
 
             if ( MONITOR_MEM )

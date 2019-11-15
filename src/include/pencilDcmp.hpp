@@ -454,6 +454,8 @@ private:
     void readIn();
     void pittPack(); /*!<  method to call FFT and Thomas for solve  */
 
+     double getErrorCos(int dir);
+     double getErrorSin(int dir);
  
 #if ( PITTPACKACC )
 #pragma acc routine gang

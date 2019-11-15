@@ -1156,14 +1156,18 @@ void PencilDcmp::changeOwnershipPairwiseExchangeXY()
 #else
         ptr = &R( 0 );
         end = R.chunkSize;
+#if ( PITTPACKACC )
 #pragma acc update device( R.P [0:end] ) async( 5 )
+#endif
 
 #if ( PITTPACKACC )
 #pragma acc wait( 4, 5 )
 #endif
 
 //#pragma acc data present(P.P,R.P)
+#if ( PITTPACKACC )
 #pragma acc parallel loop
+#endif
         for ( int k = 0; k < P.chunkSize; k++ )
         {
             P( k + P.chunkSize * getPeriodicIndexStride( -j ) ) = R( k );
@@ -2181,7 +2185,7 @@ else
                 val  = P( i, j, k, 0 ) - ( cosine( 2. * pi * x ) );
 //                val  = P( i, j, k, 0 ) - ( sine( 2. * pi * x ) );
                 val1 = 0.0;
-                 cout<<"val  "<< P(i,k,k,0) <<"  "<<cos(2*pi*x)<<endl;
+                // cout<<"val  "<< P(i,k,k,0) <<"  "<<cos(2*pi*x)<<endl;
 }
                 //                  cout<<"omega "<<omega[1]<<endl;
 
@@ -2222,6 +2226,228 @@ else
     return ( err );
 #endif
 }
+
+
+#if ( PITTPACKACC )
+#pragma acc routine gang
+#endif
+double PencilDcmp::getErrorCos(int dir)
+{
+    double x, y, z;
+    double Xa = coords[0];
+    double Ya = coords[2];
+    double Za = coords[4];
+    double c1, c2, c3;
+    double shift = SHIFT;
+
+    int Nx = nx / p0;
+    int Ny = ny / p0;
+    int Nz = nz;
+
+    int unitSize = nxChunk * nyChunk * nzChunk * nChunk;
+    if ( !SHIFT )
+    {
+        c1 = ( coords[1] - coords[0] ) / ( Nx + 1. );
+        c2 = ( coords[3] - coords[2] ) / ( Ny + 1. );
+        c3 = ( coords[5] - coords[4] ) / ( Nz + 1. );
+#if ( DEBUG )
+        cout << " c1  " << c1 << " " << c2 << " " << c3 << endl;
+#endif
+    }
+    else
+    {
+        c1 = dxyz[0];
+        c2 = dxyz[1];
+        c3 = dxyz[2];
+    }
+
+    double val  = 0.0;
+    double val1 = 0.0;
+#if ( 1 )
+#if ( PITTPACKACC )
+#pragma acc loop gang private( x, y, z, val, val1 )
+#endif
+    for ( int k = 0; k < Nz; k++ )
+    {
+        if ( !SHIFT )
+        {
+            z = Za + ( k + 1 ) * c3;
+        }
+        else
+        {
+            z = Za + k * c3 + shift * c3 * 0.5;
+        }
+
+#if ( PITTPACKACC )
+#pragma acc loop worker
+#endif
+        for ( int j = 0; j < Ny; j++ )
+        {
+            if ( !SHIFT )
+            {
+                y = Ya + ( j + 1 ) * c2;
+            }
+            else
+            {
+                y = Ya + j * c2 + shift * c2 * 0.5;
+            }
+
+#if ( PITTPACKACC )
+#pragma acc loop vector private( val, val1 )
+#endif
+            for ( int i = 0; i < Nx; i++ )
+            {
+                if ( !SHIFT )
+                {
+                    x = Xa + ( i + 1 ) * c1;
+                }
+                else
+                {
+                    x = Xa + i * c1 + shift * c1 * .5;
+                }
+                if(dir==0)
+                {
+                val  = P( i, j, k, 0 ) - ( cosine( 2. * pi * x ) );
+                }
+                else if(dir==1)
+                {
+                val  = P( i, j, k, 0 ) - ( cosine( 2. * pi * y ) );
+                }
+                val1 = 0.0;
+                P( i, j, k ) = ( val * val + val1 * val1 );
+
+            }
+        }
+    }
+
+    double err = 0.0;
+
+#if ( PITTPACKACC )
+#pragma acc loop vector firstprivate( err ) reduction( + : err )
+#endif
+    for ( int i = 0; i < unitSize; i++ )
+    {
+        err = err + P( 2 * i );
+    }
+    err = err / ( unitSize );
+    err = squareRoot( err );
+
+    return ( err );
+#endif
+}
+
+
+#if ( PITTPACKACC )
+#pragma acc routine gang
+#endif
+double PencilDcmp::getErrorSin(int dir)
+{
+    double x, y, z;
+    double Xa = coords[0];
+    double Ya = coords[2];
+    double Za = coords[4];
+    double c1, c2, c3;
+    double shift = SHIFT;
+
+    int Nx = nx / p0;
+    int Ny = ny / p0;
+    int Nz = nz;
+
+    int unitSize = nxChunk * nyChunk * nzChunk * nChunk;
+    if ( !SHIFT )
+    {
+        c1 = ( coords[1] - coords[0] ) / ( Nx + 1. );
+        c2 = ( coords[3] - coords[2] ) / ( Ny + 1. );
+        c3 = ( coords[5] - coords[4] ) / ( Nz + 1. );
+#if ( DEBUG )
+        cout << " c1  " << c1 << " " << c2 << " " << c3 << endl;
+#endif
+    }
+    else
+    {
+        c1 = dxyz[0];
+        c2 = dxyz[1];
+        c3 = dxyz[2];
+    }
+
+    double val  = 0.0;
+    double val1 = 0.0;
+#if ( 1 )
+#if ( PITTPACKACC )
+#pragma acc loop gang private( x, y, z, val, val1 )
+#endif
+    for ( int k = 0; k < Nz; k++ )
+    {
+        if ( !SHIFT )
+        {
+            z = Za + ( k + 1 ) * c3;
+        }
+        else
+        {
+            z = Za + k * c3 + shift * c3 * 0.5;
+        }
+
+#if ( PITTPACKACC )
+#pragma acc loop worker
+#endif
+        for ( int j = 0; j < Ny; j++ )
+        {
+            if ( !SHIFT )
+            {
+                y = Ya + ( j + 1 ) * c2;
+            }
+            else
+            {
+                y = Ya + j * c2 + shift * c2 * 0.5;
+            }
+
+#if ( PITTPACKACC )
+#pragma acc loop vector private( val, val1 )
+#endif
+            for ( int i = 0; i < Nx; i++ )
+            {
+                if ( !SHIFT )
+                {
+                    x = Xa + ( i + 1 ) * c1;
+                }
+                else
+                {
+                    x = Xa + i * c1 + shift * c1 * .5;
+                }
+                if(dir==0)
+                {
+                val  = P( i, j, k, 0 ) - ( sine( 2. * pi * x ) );
+                }
+                else if(dir==1)
+                {
+                val  = P( i, j, k, 0 ) - ( sine( 2. * pi * y ) );
+                }
+                val1 = 0.0;
+                P( i, j, k ) = ( val * val + val1 * val1 );
+
+            }
+        }
+    }
+
+    double err = 0.0;
+
+#if ( PITTPACKACC )
+#pragma acc loop vector firstprivate( err ) reduction( + : err )
+#endif
+    for ( int i = 0; i < unitSize; i++ )
+    {
+        err = err + P( 2 * i );
+    }
+    err = err / ( unitSize );
+    err = squareRoot( err );
+
+    return ( err );
+#endif
+}
+
+
+
+
 
 #if ( PITTPACKACC )
 #pragma acc routine gang

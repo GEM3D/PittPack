@@ -9,10 +9,10 @@ double test_case_NNPPPP( std::unique_ptr<PencilDcmp> &M,double *rhs );
 double test_case_PPNNPP( std::unique_ptr<PencilDcmp> &M,double *rhs );
 double test_case_DDPPPP( std::unique_ptr<PencilDcmp> &M,double *rhs );
 double test_case_PPDDPP( std::unique_ptr<PencilDcmp> &M,double *rhs );
-void   fillTrigonometricCosX( double *X, int nxChunk, int nyChunk, int nz, double *rhs );
-void   fillTrigonometricCosY( double *X, int nxChunk, int nyChunk, int nz, double *rhs );
-void   fillTrigonometricSinX( double *X, int nxChunk, int nyChunk, int nz, double *rhs );
-void   fillTrigonometricSinY( double *X, int nxChunk, int nyChunk, int nz, double *rhs );
+void   fillTrigonometricCosX(int myRank, int p0, double *X, int nxChunk, int nyChunk, int nz, double *rhs );
+void   fillTrigonometricCosY(int myRank, int p0, double *X, int nxChunk, int nyChunk, int nz, double *rhs );
+void   fillTrigonometricSinX(int myRank, int p0, double *X, int nxChunk, int nyChunk, int nz, double *rhs );
+void   fillTrigonometricSinY(int myRank, int p0, double *X, int nxChunk, int nyChunk, int nz, double *rhs );
 
 void test_cases( int NXCHUNK, int argcs, char *pArgs[] )
 {
@@ -114,22 +114,23 @@ void test_cases( int NXCHUNK, int argcs, char *pArgs[] )
     M2->setBox( X );
     M2->setCoords( dir );
     double *rhs=new double[Nx*Ny*Nz];
-    fillTrigonometricCosX(X,NXCHUNK,NYCHUNK, Nz, rhs );
+    
+    fillTrigonometricCosX(my_rank, p0,X,NXCHUNK,NYCHUNK, Nz, rhs );
     err[0]= test_case_NNPPPP(M2,rhs);
-    cout<<" err = "<<err[0]<<endl;
+    cout<< RED <<"err = "<<err[0]<<RESET<<endl;
 
-    fillTrigonometricCosY(X,NXCHUNK,NYCHUNK, Nz, rhs );
+#if 1
+    fillTrigonometricCosY(my_rank, p0,X,NXCHUNK,NYCHUNK, Nz, rhs );
     err[1]= test_case_PPNNPP(M2,rhs);
-    cout<<" err = "<<err[1]<<endl;
-
-    fillTrigonometricSinX(X,NXCHUNK,NYCHUNK, Nz, rhs );
+    cout<<RED<<" err = "<<err[1]<<RESET<<endl;
+    fillTrigonometricSinX(my_rank,p0,X,NXCHUNK,NYCHUNK, Nz, rhs );
     err[2]= test_case_DDPPPP(M2,rhs);
-    cout<<" err = "<<err[2]<<endl;
+    cout<<RED<<" err = "<<err[2]<<RESET<<endl;
 
-    fillTrigonometricSinY(X,NXCHUNK,NYCHUNK, Nz, rhs );
+    fillTrigonometricSinY(my_rank,p0,X,NXCHUNK,NYCHUNK, Nz, rhs );
     err[3]= test_case_PPDDPP(M2,rhs);
-    cout<<" err = "<<err[3]<<endl;
-
+    cout<<RESET<<" err = "<<err[3]<<RESET<<endl;
+#endif
 
 
 
@@ -253,7 +254,7 @@ double test_case_PPPPPP( std::unique_ptr<PencilDcmp> &M )
     return ( M->getError() );
 }
 
-void fillTrigonometricCosX( double *X, int nxChunk, int nyChunk, int nz, double *rhs )
+void fillTrigonometricCosX(int myRank, int p0, double *X, int nxChunk, int nyChunk, int nz, double *rhs )
 {
     double pi = 4. * arctan( 1.0 );
     double x, y, z;
@@ -264,17 +265,21 @@ void fillTrigonometricCosX( double *X, int nxChunk, int nyChunk, int nz, double 
     int Nz = nz;
 
     double dxyz[3];
-    dxyz[0] = -( X[0] - X[1] ) / ( Nx );
-    dxyz[1] = -( X[2] - X[3] ) / ( Ny );
+    dxyz[0] = -( X[0] - X[1] ) / ( Nx*p0 );
+    dxyz[1] = -( X[2] - X[3] ) / ( Ny*p0 );
     dxyz[2] = -( X[4] - X[5] ) / ( Nz );
+
+    double dx = ( X[1] - X[0] ) / double( p0 );
+    double dy = ( X[3] - X[2] ) / double( p0 );
+
+    double Xa = X[0] + ( myRank % p0 ) * dx;
+    double Ya = X[2] + ( myRank / p0 ) * dy;
+    double Za = X[4];
+
 
     c1 = dxyz[0];
     c2 = dxyz[1];
     c3 = dxyz[2];
-
-    double Xa = X[0];
-    double Ya = X[2];
-    double Za = X[4];
 
     double shift = 1;
 
@@ -296,7 +301,7 @@ void fillTrigonometricCosX( double *X, int nxChunk, int nyChunk, int nz, double 
     }
 }
 
-void fillTrigonometricCosY( double *X, int nxChunk, int nyChunk, int nz, double *rhs )
+void fillTrigonometricCosY( int myRank, int p0, double *X, int nxChunk, int nyChunk, int nz, double *rhs )
 {
     double pi = 4. * arctan( 1.0 );
     double x, y, z;
@@ -307,15 +312,18 @@ void fillTrigonometricCosY( double *X, int nxChunk, int nyChunk, int nz, double 
     int Nz = nz;
 
     double dxyz[3];
-    dxyz[0] = -( X[0] - X[1] ) / ( Nx );
-    dxyz[1] = -( X[2] - X[3] ) / ( Ny );
+    dxyz[0] = -( X[0] - X[1] ) / ( Nx*p0 );
+    dxyz[1] = -( X[2] - X[3] ) / ( Ny*p0 );
     dxyz[2] = -( X[4] - X[5] ) / ( Nz );
     c1      = dxyz[0];
     c2      = dxyz[1];
     c3      = dxyz[2];
 
-    double Xa = X[0];
-    double Ya = X[2];
+    double dx = ( X[1] - X[0] ) / double( p0 );
+    double dy = ( X[3] - X[2] ) / double( p0 );
+
+    double Xa = X[0] + ( myRank % p0 ) * dx;
+    double Ya = X[2] + ( myRank / p0 ) * dy;
     double Za = X[4];
 
     double shift = 1;
@@ -338,7 +346,7 @@ void fillTrigonometricCosY( double *X, int nxChunk, int nyChunk, int nz, double 
     }
 }
 
-void fillTrigonometricSinX( double *X, int nxChunk, int nyChunk, int nz, double *rhs )
+void fillTrigonometricSinX( int myRank, int p0, double *X, int nxChunk, int nyChunk, int nz, double *rhs )
 {
     double pi = 4. * arctan( 1.0 );
     double x, y, z;
@@ -349,17 +357,21 @@ void fillTrigonometricSinX( double *X, int nxChunk, int nyChunk, int nz, double 
     int Nz = nz;
 
     double dxyz[3];
-    dxyz[0] = -( X[0] - X[1] ) / ( Nx );
-    dxyz[1] = -( X[2] - X[3] ) / ( Ny );
+    dxyz[0] = -( X[0] - X[1] ) / ( Nx*p0 );
+    dxyz[1] = -( X[2] - X[3] ) / ( Ny*p0 );
     dxyz[2] = -( X[4] - X[5] ) / ( Nz );
+
+    double dx = ( X[1] - X[0] ) / double( p0 );
+    double dy = ( X[3] - X[2] ) / double( p0 );
+
+    double Xa = X[0] + ( myRank % p0 ) * dx;
+    double Ya = X[2] + ( myRank / p0 ) * dy;
+    double Za = X[4];
 
     c1 = dxyz[0];
     c2 = dxyz[1];
     c3 = dxyz[2];
 
-    double Xa = X[0];
-    double Ya = X[2];
-    double Za = X[4];
 
     double shift = 1;
 
@@ -381,7 +393,7 @@ void fillTrigonometricSinX( double *X, int nxChunk, int nyChunk, int nz, double 
     }
 }
 
-void fillTrigonometricSinY( double *X, int nxChunk, int nyChunk, int nz, double *rhs )
+void fillTrigonometricSinY( int myRank, int p0, double *X, int nxChunk, int nyChunk, int nz, double *rhs )
 {
     double pi = 4. * arctan( 1.0 );
     double x, y, z;
@@ -392,16 +404,21 @@ void fillTrigonometricSinY( double *X, int nxChunk, int nyChunk, int nz, double 
     int Nz = nz;
 
     double dxyz[3];
-    dxyz[0] = -( X[0] - X[1] ) / ( Nx );
-    dxyz[1] = -( X[2] - X[3] ) / ( Ny );
+    dxyz[0] = -( X[0] - X[1] ) / ( Nx*p0 );
+    dxyz[1] = -( X[2] - X[3] ) / ( Ny*p0 );
     dxyz[2] = -( X[4] - X[5] ) / ( Nz );
     c1      = dxyz[0];
     c2      = dxyz[1];
     c3      = dxyz[2];
 
-    double Xa = X[0];
-    double Ya = X[2];
+    double dx = ( X[1] - X[0] ) / double( p0 );
+    double dy = ( X[3] - X[2] ) / double( p0 );
+
+    double Xa = X[0] + ( myRank % p0 ) * dx;
+    double Ya = X[2] + ( myRank / p0 ) * dy;
     double Za = X[4];
+
+ 
 
     double shift = 1;
 

@@ -2182,8 +2182,8 @@ if ( INITANALYTIC == 1 )
 else
 {
 
-                val  = P( i, j, k, 0 ) - ( cosine( 2. * pi * x ) );
-//                val  = P( i, j, k, 0 ) - ( sine( 2. * pi * x ) );
+//                val  = P( i, j, k, 0 ) - ( cosine( 2. * pi * x ) );
+                val  = P( i, j, k, 0 ) - ( sine( 2. * pi * x ) );
                 val1 = 0.0;
                 // cout<<"val  "<< P(i,k,k,0) <<"  "<<cos(2*pi*x)<<endl;
 }
@@ -2424,7 +2424,6 @@ double PencilDcmp::getErrorSin(int dir)
                 }
                 val1 = 0.0;
                 P( i, j, k ) = ( val * val + val1 * val1 );
-
             }
         }
     }
@@ -6022,7 +6021,7 @@ void PencilDcmp::fillTrigonometric( double *rhs )
 
                 rhs[i + j * Nx + Nx * Ny * k]
                 //= -4. * pi * pi * sin( 2. * pi * x ) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
-                = -4*pi*pi*cosine( 2. * pi * x ) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
+                = -4*pi*pi*sine( 2. * pi * x ) /* ( ( omega[0] * omega[0] ) * exactValue( omega[0] , x, tags[0] )
                                * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )
                                + ( omega[1] * omega[1] ) * exactValue( omega[0] , x, tags[0] )
                                  * exactValue( omega[1] , y, tags[1] ) * exactValue( omega[2] , z, tags[2] )

@@ -80,7 +80,7 @@ int main( int argcs, char *pArgs[] )
 
      auto M=make_Poisson( argcs, pArgs, Nx, Ny, Nz );
      //char mybc[6] = {'P', 'P', 'D', 'D', 'P', 'P'};
-     char mybc[6] = {'N','N', 'P', 'P', 'P', 'P'};
+     char mybc[6] = {'D','D', 'P', 'P', 'P', 'P'};
     // char mybc[6] = {'D', 'D', 'P', 'P', 'P', 'P'};
     //  char mybc[6] = {'P', 'P', 'P', 'P', 'D', 'D'};
     // char mybc[6] = {'P', 'P', 'P', 'P', 'P', 'P'};

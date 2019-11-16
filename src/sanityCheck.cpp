@@ -44,7 +44,8 @@ void test_cases( int NXCHUNK, int argcs, char *pArgs[] )
 
     double *err = new double[2 * ncases];
 
-#if 0
+if(INITANALYTIC)
+{
     err[0] = test_case_NNNNDD( M );
     err[1] = test_case_DDDDDD( M );
     err[2] = test_case_NNNNNN( M );
@@ -103,7 +104,9 @@ void test_cases( int NXCHUNK, int argcs, char *pArgs[] )
               << " first refinement " << err[3] / err[7] << " second refinement " << err[7] / err[11] << std::endl;
 
 //==================================================================================
-#endif
+}
+else
+{
     cout<<" =============================== "<<endl;
     cout<<" ----------- 1D cases ---------- "<<endl;
     cout<<" =============================== "<<endl;
@@ -166,10 +169,10 @@ if(my_rank==0)
     std::cout << " DDPPPP "  << " first refinement " << err[2] / err[6] <<  std::endl;
     std::cout << " PPDDPP "  << " first refinement " << err[3] / err[7] <<  std::endl;
 }
-
-    delete[] err;
     delete[] rhs;
     delete[] rhs0;
+}
+    delete[] err;
 }
 
 double test_case_NNPPPP( std::unique_ptr<PencilDcmp> &M, double *rhs )

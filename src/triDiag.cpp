@@ -2037,7 +2037,7 @@ void TriDiag::shermanMorrisonThomas( double *tmpMG, double *rh, double *rh1, dou
         //  {
         //          cout<<rh[i]<<endl;
         //  }
-        cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
+        //cout<<RED<<" singlularity  "<<counter<<RESET<<endl;
         // only when there is singularity remove it
         shermanMorrisonThomasV1( tmpMG, rh, rh1, diag, 1.0, 1.0, index );
 

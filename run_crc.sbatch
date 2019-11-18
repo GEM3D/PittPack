@@ -35,7 +35,7 @@
 
 #########################################
 
-#SBATCH --job-name=jimbam
+#SBATCH --job-name=pittpack
 #SBATCH --output=Max.out
 #SBATCH --mail-user=jaber@pitt.edu
 #SBATCH --mail-type=END,FAIL 
@@ -71,7 +71,7 @@
 
 
 
-mpirun -np $SLURM_NTASKS ./bin/PittPack 100 100 100 
+mpirun -np $SLURM_NTASKS ./bin/PittPack 400 400 100 
 
 ##mpirun -np $SLURM_NTASKS  ./bin/amrGem input/nasaplane.stl 6 6
 

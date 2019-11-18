@@ -6071,10 +6071,15 @@ void PencilDcmp::readIn()
 }
 
 
-
-
 void PencilDcmp::pittPack() /*!<called on CPU runs on GPU */
 {
+
+    if(p0==1)
+    {
+      pittPackSingleGPU();
+    return;
+    }
+
     double t1 = 0.0;
     double t2 = 0.0;
 
@@ -6706,6 +6711,335 @@ void PencilDcmp::pittPack() /*!<called on CPU runs on GPU */
 
 //#endif
 }
+
+void PencilDcmp::pittPackSingleGPU() /*!<called on CPU runs on GPU */
+{
+    double t1 = 0.0;
+    double t2 = 0.0;
+
+//cout<<" single GPU is solving  "<<endl;
+    //   initializeAndBind();
+  long int initMem=0.0; 
+#if ( PITTPACKACC )
+     initMem = acc_get_memory() / 1e9;
+#endif
+
+    if ( MONITOR_MEM )
+    {
+#if ( PITTPACKACC )
+        cout << "amount of available memory " << initMem << endl;
+#endif
+    }
+    double err = 0.0;
+    finalErr   = 0.0;
+
+    // double eig;
+
+    double t1_com = 0.0;
+    double t2_com = 0.0;
+    double deT    = 0.0;
+
+#if ( 1 )
+
+#if ( PITTPACKACC )
+    int trsps_gang0 = MIN( 1024, iaxSize );
+    int trsps_gang1 = MIN( 1024, iaySize );
+
+    int nSig0 = nxChunk;
+    int nSig1 = nyChunk;
+    initMem   = acc_get_free_memory() / 1e9;
+#endif
+
+   int result = SUCCESS;
+
+    for ( int num = 0; num < NITER; num++ )
+    {
+#if ( PITTPACKACC )
+#pragma acc data present( P.P [0:2 * nxChunk * nyChunk * nzChunk * nChunk], this ) copy( result, err )
+#endif
+        {
+            if ( INITANALYTIC )
+            {
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( 1024 ) vector_length( VECLENGTH )
+#endif
+                initializeTrigonometric();
+            }
+
+#if ( POSS )
+           //   if ( bc[0] != 'P' && bc[2] != 'P' )
+            {
+
+#if(SOLVE!=0)
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( 1024 ) vector_length( VECLENGTH )
+#endif
+                modifyRhsDirichlet();
+#endif
+            }
+
+            t1 = MPI_Wtime();
+#if ( PITTPACKACC )
+            if ( GPUAW == 0 )
+            {
+                P.moveHostToDevice();
+            }
+#endif
+            // perform FFT in x direction
+
+// step 3) perform  FFT
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( nSig0 ) vector_length( VECLENGTH )
+#endif
+            preprocessSignalAccordingly( 0, 0 );
+
+            performTransformXdir();
+
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( nSig0 ) vector_length( VECLENGTH )
+#endif
+            postprocessSignalAccordingly( 0, 0 );
+
+#if ( FFTY )
+            // step 5) pencils with n(1,0,0) is converted to pencil with n(0,1,0)
+#if ( PITTPACKACC )
+            if ( GPUAW2 == 0 )
+            {
+                P.moveDeviceToHost();
+            }
+#endif
+          
+#if ( PITTPACKACC )
+            if ( GPUAW2 == 0 )
+            {
+                P.moveHostToDevice();
+            }
+#endif
+            // step 6) swaps X and Y coordinates, now X is Y and nx is ny
+
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( trsps_gang0 ) vector_length( VECLENGTH )
+#endif
+            rearrangeX2Y();
+            // step 7) change location of the array such that FFT can be performed on a contegeous array in the transverse direction
+
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( nSig1 ) vector_length( VECLENGTH )
+#endif
+            preprocessSignalAccordingly( 1, 1 );
+
+            // step 8) perform  FFT transform can be performed
+            performTransformYdir();
+
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( nSig1 ) vector_length( VECLENGTH )
+#endif
+            postprocessSignalAccordingly( 1, 1 );
+
+// step 9) restore the array to original status before FFT
+
+#endif
+
+#if ( SOLVE )
+
+#if ( PITTPACKACC )
+            if ( GPUAW == 0 )
+            {
+                P.moveDeviceToHost();
+            }
+#endif
+
+#if ( PITTPACKACC )
+            if ( GPUAW == 0 )
+            {
+                P.moveHostToDevice();
+            }
+#endif
+
+// generating two streams to handle the task parallel section of the code
+
+            if ( SOLUTIONMETHOD == 0 )
+            {
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( gangTri ) vector_length( 1 )
+#endif
+                solveThmBatch( 0 );
+
+                if ( bc[0] == 'P' || bc[2] == 'P' )
+                {
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( gangTri ) vector_length( 1 )
+#endif
+                    solveThmBatch( 1 );
+                }
+            }
+
+            else if ( SOLUTIONMETHOD == 1 )
+            {
+
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( gangTri ) vector_length( VECLENGTH )
+#endif
+                solvePCR( 0 );
+
+                if ( bc[0] == 'P' || bc[2] == 'P' )
+                {
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( gangTri ) vector_length( VECLENGTH )
+#endif
+                    solvePCR( 1 );
+                }
+            }
+            else if ( SOLUTIONMETHOD == 2 )
+            {
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( gangTri ) vector_length( VECLENGTH )
+#endif
+                solveCRP( 0 );
+
+                if ( bc[0] == 'P' || bc[2] == 'P' )
+                {
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( gangTri ) vector_length( VECLENGTH )
+#endif
+                    solveCRP( 1 );
+                }
+            }
+
+           if ( result != SUCCESS )
+            {
+                cout << "Exit Code: " << THOMAS_FAIL << endl;
+                cout << BLUE << PittPackGetErrorEnum( THOMAS_FAIL ) << RESET << endl;
+                exit( 1 );
+            }
+
+ // step 12) pencils with n(0,0,1) is converted to pencil with n(0,1,0)
+#if ( PITTPACKACC )
+            if ( GPUAW == 0 )
+            {
+                P.moveDeviceToHost();
+            }
+#endif
+
+#if ( PITTPACKACC )
+
+            if ( GPUAW == 0 )
+            {
+                P.moveHostToDevice();
+            }
+#endif
+#endif
+
+// step 14) perform IFFT
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( nSig1 ) vector_length( VECLENGTH )
+#endif
+            preprocessSignalAccordinglyReverse( 1, 1 );
+
+            performInverseTransformYdir();
+
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( nSig1 ) vector_length( VECLENGTH )
+#endif
+            postprocessSignalAccordinglyReverse( 1, 1 );
+            // step 15) restore the array to original status before IFFT
+
+// step 16) swaps X and Y coordinates, now X is Y and nx is ny
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( trsps_gang0 ) vector_length( VECLENGTH )
+#endif
+            rearrangeX2YInverse();
+
+            // step 17) pencils with n(0,1,0) is converted to pencil with n(1,0,0)
+
+#if ( PITTPACKACC )
+            if ( GPUAW2 == 0 )
+            {
+                P.moveDeviceToHost();
+            }
+#endif
+
+#if ( PITTPACKACC )
+            if ( GPUAW2 == 0 )
+            {
+                P.moveHostToDevice();
+            }
+#endif
+#endif
+
+#if ( IFFTX )
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( nSig0 ) vector_length( VECLENGTH )
+#endif
+            preprocessSignalAccordinglyReverse( 0, 0 );
+
+            performInverseTransformXdir();
+
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( nSig0 ) vector_length( VECLENGTH )
+#endif
+            postprocessSignalAccordinglyReverse( 0, 0 );
+
+#if ( PITTPACKACC )
+#pragma acc parallel num_gangs( nSig0 ) vector_length( VECLENGTH )
+#endif
+            rescale();
+#endif
+
+            t2 = MPI_Wtime();
+            deT += ( t2 - t1 );
+#endif
+
+            if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
+            {
+#if ( PITTPACKACC )
+#pragma acc parallel vector_length( 32 ) reduction( max : err )
+#endif
+                err = getError();
+            }
+
+        }
+    }
+
+    if ( INCLUDE_ERROE_CAL_IN_TIMING == 1 )
+    {
+        MPI_Allreduce( &err, &finalErr, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+        finalErr = finalErr / p0 / p0;
+
+        if ( myRank == 0 )
+        {
+            // cout << YELLOW << "Error  (" << myRank << ") =" << err << " " << finalErr << RESET << endl;
+            cout << YELLOW << "Error Per processor"
+                 << " " << finalErr << RESET << endl;
+        }
+    }
+
+    MPI_Reduce( &deT, &runTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+
+    if ( myRank == 0 )
+    {
+        runTime = runTime / (double)NITER;
+        if(RUNINFO)
+        {
+        runInfo();
+        }
+        if ( PROFILE_COMM )
+        {
+            printf( "change ownership time =%lf percent of solution and take %lf seconds \n", t2_com / deT * 100., t2_com );
+        }
+    }
+
+#if ( PITTPACKACC )
+    P.moveDeviceToHost();
+#endif
+
+    if ( ZERO_MEAN )
+    {
+        subtractMeanValue();
+    }
+
+}
+
 
 std::unique_ptr<PencilDcmp>make_Poisson(int argcs, char *pArgs[], int nx, int ny, int nz )
 {

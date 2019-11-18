@@ -453,7 +453,7 @@ private:
     void fillTrigonometric( double *rhs );
     void readIn();
     void pittPack(); /*!<  method to call FFT and Thomas for solve  */
-
+    void pittPackSingleGPU() ;
      double getErrorCos(int dir);
      double getErrorSin(int dir);
  

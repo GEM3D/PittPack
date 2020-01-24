@@ -143,27 +143,32 @@ fi
 
 if [[ $cluster == "crc" ]]; then
      module purge
-     module load intel/2018.2.199
-     module load intel-mpi/2018.2.199
-     module load gcc/6.3.0
-     module load hdf5/1.10.0
-     module load fftw/3.3.8
-     module load  cmake/3.7.1
+##     module load intel/2018.2.199
+##     module load intel-mpi/2018.2.199
+##     module load gcc/6.3.0
+##     module load openmpi/2.0.2
+##     module load hdf5/1.10.0
+##     module load fftw/3.3.8
+##     module load  cmake/3.7.1
+     module load gcc/8.2.0 
+     module load openmpi/3.1.1 
      module load googletest/1.8.1
+     module load fftw/3.3.8-double
+     module load hdf5/1.10.2
 
     if [ $GPU -lt 1 ]; then
-        export CC=$I_MPI_ROOT/intel64/bin/mpicc
-        export CXX=$I_MPI_ROOT/intel64/bin/mpiicpc
+        export CC=$MPI_ROOT/bin/mpicc
+        export CXX=$MPI_ROOT/bin/mpiCC
         export GPU1=0;
     else
         export GPU1=1
-        module load gcc/5.4.0
-        ##module load openmpi/2.0.2
-        module load openmpi/3.1.3
-        ##module load pgi/18.10
+     #   module load gcc/5.4.0
+     #   module load openmpi/2.0.2
+        #module load openmpi/3.1.3
+     #   module load pgi/18.10
         module load pgi/19.4
-        ##export CC=/ihome/crc/install/pgi/18.10/linux86-64/18.10/mpi/openmpi-2.1.2/bin/mpicc
-        ##export CXX=/ihome/crc/install/pgi/18.10/linux86-64/18.10/mpi/openmpi-2.1.2/bin/mpiCC
+     #   export CC=/ihome/crc/install/pgi/18.10/linux86-64/18.10/mpi/openmpi-2.1.2/bin/mpicc
+     #   export CXX=/ihome/crc/install/pgi/18.10/linux86-64/18.10/mpi/openmpi-2.1.2/bin/mpiCC
         export CC=/ihome/crc/install/pgi/19.4/linux86-64/2019/mpi/openmpi-3.1.3/bin/mpicc
         export CXX=/ihome/crc/install/pgi/19.4/linux86-64/2019/mpi/openmpi-3.1.3/bin/mpiCC
 fi

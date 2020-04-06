@@ -124,7 +124,7 @@ For complete documentation visit www.pittpack.com
 
 ## Notes 
 We welcome any feedbacks by the users and developers <br/>
-Please read the LICENSE file for how to use this software
+Please read the LICENSE file for how to use this software <br/>
 Please refer to the article listed in the publications section.
 
 ## Acknowledgements

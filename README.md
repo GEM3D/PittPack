@@ -125,11 +125,15 @@ For complete documentation visit www.pittpack.com
 ## Notes 
 We welcome any feedbacks by the users and developers <br/>
 Please read the LICENSE file for how to use this software
+Please refer to the article listed in the publications section.
 
 ## Acknowledgements
 **PittPack** is developed as part of the NSF-GEM3D Award No. 1440638. <br/>
 It is developed at the Department of Mechanical Engineering at University Pittsburgh, PA, USA. 
 
+## Publications
+[1] Hasbestan, J. J., Xiao, C. N., & Senocak, I. (2020). PittPack: An open-source Poisson’s equation solver for extreme-scale computing with accelerators. 
+Computer Physics Communications, p.107272 DOI: https://doi.org/10.1016/j.cpc.2020.107272.
 
 ## Contributors
   * Jaber J. Hasbestan (jaber@pitt.edu)

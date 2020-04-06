@@ -125,7 +125,7 @@ For complete documentation visit www.pittpack.com
 ## Notes 
 We welcome any feedbacks by the users and developers <br/>
 Please read the LICENSE file for how to use this software <br/>
-Please refer to the article listed in the publications section.
+Please refer to the article listed in the publications section if your project uses PittPack.
 
 ## Acknowledgements
 **PittPack** is developed as part of the NSF-GEM3D Award No. 1440638. <br/>

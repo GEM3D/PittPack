@@ -2205,7 +2205,7 @@ else
     double err = 0.0;
 
 #if ( PITTPACKACC )
-#pragma acc loop vector firstprivate( err ) reduction( + : err )
+#pragma acc loop vector  reduction( + : err )
 #endif
     for ( int i = 0; i < unitSize; i++ )
     {
@@ -2323,7 +2323,7 @@ double PencilDcmp::getErrorCos(int dir)
     double err = 0.0;
 
 #if ( PITTPACKACC )
-#pragma acc loop vector firstprivate( err ) reduction( + : err )
+#pragma acc loop vector  reduction( + : err )
 #endif
     for ( int i = 0; i < unitSize; i++ )
     {
@@ -2431,7 +2431,7 @@ double PencilDcmp::getErrorSin(int dir)
     double err = 0.0;
 
 #if ( PITTPACKACC )
-#pragma acc loop vector firstprivate( err ) reduction( + : err )
+#pragma acc loop vector reduction( + : err )
 #endif
     for ( int i = 0; i < unitSize; i++ )
     {
